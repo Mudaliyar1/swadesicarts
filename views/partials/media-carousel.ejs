@@ -24,7 +24,7 @@
     <% if (allMedia.length > 0) { %>
         <div style="position: relative; width: 100%;" id="carouselMainContainer">
             <% if (allMedia[0].type === 'video') { %>
-                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" autoplay playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
                 <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                     <i class="bi bi-volume-up-fill"></i>
                 </button>
@@ -115,11 +115,19 @@
             
             if (!mainContainer) return;
 
+            // Clean up previous video before changing media
+            const previousVideo = mainContainer.querySelector('video');
+            if (previousVideo) {
+                previousVideo.pause();
+                previousVideo.currentTime = 0;
+                previousVideo.src = '';
+            }
+
             // Build new main media HTML
             let newHTML = '';
             if (media.type === 'video') {
                 newHTML = `
-                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" autoplay playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
                     <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                         <i class="bi bi-volume-up-fill"></i>
                     </button>
@@ -161,22 +169,32 @@
                 // Stop any running autoplay when video starts
                 stopAutoPlay();
                 
-                // For mobile, try to autoplay with sound using play API
-                setTimeout(() => {
-                    if (videoEl) {
+                // Auto-play the video (muted initially for mobile compatibility)
+                const playVideo = () => {
+                    const playPromise = videoEl.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            // Successfully started playing, now try to unmute
+                            videoEl.muted = false;
+                        }).catch(error => {
+                            // Play failed, keep muted
+                            console.log('Video autoplay blocked:', error);
+                            videoEl.muted = true;
+                            // Try again with muted
+                            videoEl.play().catch(err => console.log('Muted play failed:', err));
+                        });
+                    } else {
+                        // Promise not supported, video should play
                         videoEl.muted = false;
-                        const playPromise = videoEl.play();
-                        if (playPromise !== undefined) {
-                            playPromise.catch(error => {
-                                // If autoplay with sound fails on mobile, keep muted
-                                console.log('Autoplay failed, keeping muted:', error);
-                                if (videoEl) {
-                                    videoEl.muted = true;
-                                }
-                            });
-                        }
                     }
-                }, 100);
+                };
+
+                // Wait for metadata to load before playing
+                if (videoEl.readyState >= 1) {
+                    playVideo();
+                } else {
+                    videoEl.addEventListener('loadedmetadata', playVideo, { once: true });
+                }
                 
                 // When video ends, advance to next slide
                 videoEl.addEventListener('ended', function() {
@@ -455,6 +473,33 @@
             const initialMuteBtn = document.getElementById('muteBtn');
             
             if (initialVideo && initialVideo.tagName === 'VIDEO') {
+                // Auto-play the initial video (muted initially for mobile compatibility)
+                const playInitialVideo = () => {
+                    const playPromise = initialVideo.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            // Successfully started playing, now try to unmute
+                            initialVideo.muted = false;
+                        }).catch(error => {
+                            // Play failed, keep muted
+                            console.log('Video autoplay blocked:', error);
+                            initialVideo.muted = true;
+                            // Try again with muted
+                            initialVideo.play().catch(err => console.log('Muted play failed:', err));
+                        });
+                    } else {
+                        // Promise not supported, video should play
+                        initialVideo.muted = false;
+                    }
+                };
+
+                // Wait for metadata to load before playing
+                if (initialVideo.readyState >= 1) {
+                    playInitialVideo();
+                } else {
+                    initialVideo.addEventListener('loadedmetadata', playInitialVideo, { once: true });
+                }
+
                 // Add ended event listener for initial video
                 initialVideo.addEventListener('ended', function() {
                     if (!isUserInteracting && allMediaItems.length > 1) {
