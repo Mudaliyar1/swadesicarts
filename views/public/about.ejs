@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    
+    <section class="page-header py-5 bg-light">
+        <div class="container">
+            <h1 class="fw-bold text-center">About Swadesi Carts</h1>
+            <p class="text-center text-muted">Your trusted partner for authentic products and services</p>
+        </div>
+    </section>
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4 mb-lg-0">
+                    <h2 class="fw-bold mb-3">Our Story</h2>
+                    <p class="text-muted">Swadesi Carts was founded with a vision to provide authentic, high-quality products and services to our customers. We believe in the power of traditional wisdom combined with modern technology.</p>
+                    <p class="text-muted">Our commitment to quality and customer satisfaction has made us a trusted name in seasonal products, tech services, and organic products.</p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://via.placeholder.com/600x400?text=Our+Story" class="img-fluid rounded shadow" alt="About Us">
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-4">
+                        <div class="icon-circle-lg mb-3 mx-auto">
+                            <i class="bi bi-award text-swadesi"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Quality Assured</h4>
+                        <p class="text-muted mb-0">All our products go through strict quality checks</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-4">
+                        <div class="icon-circle-lg mb-3 mx-auto">
+                            <i class="bi bi-people text-swadesi"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Customer First</h4>
+                        <p class="text-muted mb-0">Your satisfaction is our top priority</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm text-center p-4">
+                        <div class="icon-circle-lg mb-3 mx-auto">
+                            <i class="bi bi-shield-check text-swadesi"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2">Trusted Service</h4>
+                        <p class="text-muted mb-0">Years of experience and thousands of happy customers</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center py-5 bg-light rounded">
+                <h3 class="fw-bold mb-3">Ready to Get Started?</h3>
+                <p class="text-muted mb-4">Contact us today to learn more about our products and services</p>
+                <a href="/contact" class="btn btn-swadesi btn-lg">
+                    <i class="bi bi-envelope"></i> Contact Us
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../partials/footer') %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">Add Product</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/seasonal-products" class="active" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0">Add Seasonal Product</h2>
+                <a href="/admin/seasonal-products" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form action="/admin/seasonal-products/create" method="POST" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Title *</label>
+                                <input type="text" class="form-control" name="title" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category *</label>
+                                <input type="text" class="form-control" name="category" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Short Description *</label>
+                                <textarea class="form-control" name="shortDescription" rows="2" maxlength="200" required></textarea>
+                                <small class="text-muted">Maximum 200 characters</small>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Full Description *</label>
+                                <textarea class="form-control" name="fullDescription" rows="6" required></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Featured Image *</label>
+                                <input type="file" class="form-control" id="featuredImage" name="featuredImage" accept="image/*" required onchange="previewFeaturedImage(event)">
+                                <div id="featuredPreview"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Gallery Images/Videos (Optional)</label>
+                                <input type="file" class="form-control" id="gallery" name="gallery" accept="image/*,video/*" multiple onchange="previewGalleryFiles(event)">
+                                <small class="text-muted d-block mt-2">You can upload multiple images and videos. They will all be visible on the product detail page.</small>
+                            </div>
+                            
+                            <!-- Gallery Carousel Preview -->
+                            <div class="col-12 mb-3" id="galleryCarouselContainer" style="display: none;">
+                                <label class="form-label">Gallery Preview (Carousel)</label>
+                                <div style="border: 2px solid #dee2e6; border-radius: 8px; padding: 1rem; background-color: #f8f9fa;">
+                                    <!-- Main Display -->
+                                    <div style="position: relative; width: 100%; margin-bottom: 1rem;">
+                                        <div id="carouselMainDisplay" style="display: flex; align-items: center; justify-content: center; background-color: white; border-radius: 6px; overflow: hidden; aspect-ratio: 1; position: relative;">
+                                            <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Thumbnails -->
+                                    <div id="galleryCarouselThumbnails" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 0.5rem; margin-bottom: 1rem;"></div>
+                                    
+                                    <!-- Controls -->
+                                    <div style="display: flex; justify-content: center; gap: 1rem; align-items: center;">
+                                        <button type="button" class="btn btn-sm btn-swadesi" id="prevBtn" onclick="prevCarouselItem()" disabled>
+                                            <i class="bi bi-chevron-left"></i> Previous
+                                        </button>
+                                        <span id="carouselCounter" style="font-weight: bold; color: var(--swadesi-green); min-width: 60px; text-align: center;">-</span>
+                                        <button type="button" class="btn btn-sm btn-swadesi" id="nextBtn" onclick="nextCarouselItem()" disabled>
+                                            Next <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Order</label>
+                                <input type="number" class="form-control" name="order" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Visibility</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="isVisible" checked>
+                                    <label class="form-check-label">Visible on website</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-swadesi"><i class="bi bi-check-circle"></i> Create Product</button>
+                                <a href="/admin/seasonal-products" class="btn btn-outline-secondary">Cancel</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        let galleryCarouselItems = [];
+        let currentCarouselIndex = 0;
+
+        function previewFeaturedImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('featuredPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    preview.innerHTML = `
+                        <div class="mt-2">
+                            <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 200px;">
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function previewGalleryFiles(event) {
+            const input = event.target;
+            galleryCarouselItems = [];
+            currentCarouselIndex = 0;
+            
+            if (input.files && input.files.length > 0) {
+                const container = document.getElementById('galleryCarouselContainer');
+                container.style.display = 'block';
+                
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const isVideo = file.type.startsWith('video/');
+                        galleryCarouselItems.push({
+                            src: e.target.result,
+                            type: isVideo ? 'video' : 'image',
+                            name: file.name
+                        });
+                        
+                        if (galleryCarouselItems.length === input.files.length) {
+                            renderGalleryCarousel();
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                document.getElementById('galleryCarouselContainer').style.display = 'none';
+                galleryCarouselItems = [];
+            }
+        }
+
+        function renderGalleryCarousel() {
+            if (galleryCarouselItems.length === 0) return;
+            
+            const thumbContainer = document.getElementById('galleryCarouselThumbnails');
+            thumbContainer.innerHTML = '';
+            
+            galleryCarouselItems.forEach((item, index) => {
+                const thumb = document.createElement('div');
+                thumb.style.cssText = 'cursor: pointer; border-radius: 6px; overflow: hidden; aspect-ratio: 1; border: 3px solid transparent; transition: all 0.3s ease; background-color: white;';
+                thumb.className = index === 0 ? 'gallery-thumb-active' : 'gallery-thumb';
+                
+                if (item.type === 'video') {
+                    thumb.innerHTML = `
+                        <div style="position: relative; width: 100%; height: 100%;">
+                            <video src="${item.src}" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                            <span style="position: absolute; bottom: 2px; right: 2px; background-color: rgba(0, 123, 255, 0.9); color: white; padding: 0.2rem 0.4rem; border-radius: 3px; font-size: 0.65rem;">
+                                <i class="bi bi-play-circle-fill"></i>
+                            </span>
+                        </div>
+                    `;
+                } else {
+                    thumb.innerHTML = `<img src="${item.src}" style="width: 100%; height: 100%; object-fit: cover;" alt="Thumb">`;
+                }
+                
+                thumb.onclick = () => showCarouselItem(index);
+                thumbContainer.appendChild(thumb);
+            });
+            
+            showCarouselItem(0);
+        }
+
+        function showCarouselItem(index) {
+            if (index < 0 || index >= galleryCarouselItems.length) return;
+            
+            currentCarouselIndex = index;
+            const item = galleryCarouselItems[index];
+            const mainDisplay = document.getElementById('carouselMainDisplay');
+            
+            if (item.type === 'video') {
+                mainDisplay.innerHTML = `
+                    <video src="${item.src}" style="width: 100%; height: 100%; object-fit: cover;" controls></video>
+                    <span class="carousel-video-badge" style="position: absolute; top: 10px; left: 10px; background-color: rgba(0, 0, 0, 0.7); color: white; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">
+                        <i class="bi bi-play-circle"></i> VIDEO
+                    </span>
+                `;
+            } else {
+                mainDisplay.innerHTML = `<img src="${item.src}" style="width: 100%; height: 100%; object-fit: cover;" alt="Gallery">`;
+            }
+            
+            document.querySelectorAll('#galleryCarouselThumbnails > div').forEach((thumb, i) => {
+                if (i === index) {
+                    thumb.classList.add('gallery-thumb-active');
+                    thumb.classList.remove('gallery-thumb');
+                    thumb.style.borderColor = 'var(--swadesi-green)';
+                    thumb.style.transform = 'scale(1.05)';
+                } else {
+                    thumb.classList.remove('gallery-thumb-active');
+                    thumb.classList.add('gallery-thumb');
+                    thumb.style.borderColor = 'transparent';
+                    thumb.style.transform = 'scale(1)';
+                }
+            });
+            
+            const counter = document.getElementById('carouselCounter');
+            counter.textContent = `${index + 1} / ${galleryCarouselItems.length}`;
+            
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === galleryCarouselItems.length - 1;
+        }
+
+        function prevCarouselItem() {
+            if (currentCarouselIndex > 0) {
+                showCarouselItem(currentCarouselIndex - 1);
+            }
+        }
+
+        function nextCarouselItem() {
+            if (currentCarouselIndex < galleryCarouselItems.length - 1) {
+                showCarouselItem(currentCarouselIndex + 1);
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (galleryCarouselItems.length === 0) return;
+            if (event.key === 'ArrowLeft') {
+                prevCarouselItem();
+            } else if (event.key === 'ArrowRight') {
+                nextCarouselItem();
+            }
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .gallery-thumb-active {
+                border-color: var(--swadesi-green) !important;
+                transform: scale(1.05) !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

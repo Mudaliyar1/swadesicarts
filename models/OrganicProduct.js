@@ -1,0 +1,76 @@
+const mongoose = require('mongoose');
+
+const organicProductSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
+  },
+  category: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  shortDescription: {
+    type: String,
+    required: true,
+    maxlength: 200
+  },
+  fullDescription: {
+    type: String,
+    required: true
+  },
+  benefits: [{
+    type: String
+  }],
+  certifications: [{
+    name: String,
+    icon: String
+  }],
+  featuredImage: {
+    url: String,
+    publicId: String
+  },
+  gallery: [{
+    url: String,
+    publicId: String,
+    type: {
+      type: String,
+      enum: ['image', 'video'],
+      default: 'image'
+    }
+  }],
+  isVisible: {
+    type: Boolean,
+    default: true
+  },
+  inStock: {
+    type: Boolean,
+    default: true
+  },
+  order: {
+    type: Number,
+    default: 0
+  }
+}, {
+  timestamps: true
+});
+
+// Generate slug before validation
+organicProductSchema.pre('validate', function(next) {
+  if (this.isModified('title') && !this.slug) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+  next();
+});
+
+module.exports = mongoose.model('OrganicProduct', organicProductSchema);

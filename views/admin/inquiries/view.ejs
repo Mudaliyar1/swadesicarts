@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">Inquiry Details</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/inquiries" class="active" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0">Inquiry Details</h2>
+                <div>
+                    <a href="/admin/inquiries/<%= inquiry._id %>/pdf" class="btn btn-info me-2">
+                        <i class="bi bi-file-pdf"></i> Download PDF
+                    </a>
+                    <a href="/admin/inquiries" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Inquiry Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Date Received</label>
+                                    <p class="fw-bold"><%= new Date(inquiry.createdAt).toLocaleString() %></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="text-muted small">Product Type</label>
+                                    <p><span class="badge bg-secondary"><%= inquiry.productType %></span></p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="text-muted small">Related Product/Package</label>
+                                <p class="fw-bold">
+                                    <% if (inquiry.productType === 'general') { %>
+                                        General Inquiry
+                                    <% } else if (inquiry.productTitle) { %>
+                                        <%= inquiry.productTitle %>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
+                                </p>
+                            </div>
+
+                            <hr>
+
+                            <h6 class="fw-bold mb-3">Customer Details</h6>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="text-muted small">Name</label>
+                                    <p class="fw-bold"><%= inquiry.name %></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="text-muted small">Mobile</label>
+                                    <p class="fw-bold"><%= inquiry.mobile %></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="text-muted small">Email</label>
+                                    <p class="fw-bold"><%= inquiry.email %></p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="text-muted small">Requirement</label>
+                                <p style="white-space: pre-wrap;"><%= inquiry.requirement %></p>
+                            </div>
+
+                            <% if (inquiry.adminNotes) { %>
+                            <div class="alert alert-info">
+                                <strong>Admin Notes:</strong><br>
+                                <%= inquiry.adminNotes %>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">Update Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Current Status</label>
+                                <% if (inquiry.status === 'new') { %>
+                                    <p><span class="badge bg-danger fs-6">New</span></p>
+                                <% } else if (inquiry.status === 'contacted') { %>
+                                    <p><span class="badge bg-warning fs-6">Contacted</span></p>
+                                <% } else { %>
+                                    <p><span class="badge bg-success fs-6">Closed</span></p>
+                                <% } %>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Change Status To</label>
+                                <select class="form-select" id="statusSelect">
+                                    <option value="new" <%= inquiry.status === 'new' ? 'selected' : '' %>>New</option>
+                                    <option value="contacted" <%= inquiry.status === 'contacted' ? 'selected' : '' %>>Contacted</option>
+                                    <option value="closed" <%= inquiry.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Admin Notes</label>
+                                <textarea class="form-control" id="adminNotes" rows="4"><%= inquiry.adminNotes || '' %></textarea>
+                            </div>
+
+                            <button onclick="updateInquiryStatus('<%= inquiry._id %>', document.getElementById('statusSelect').value)" class="btn btn-swadesi w-100">
+                                <i class="bi bi-check-circle"></i> Update Status
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

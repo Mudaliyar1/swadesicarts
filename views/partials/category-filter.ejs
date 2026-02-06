@@ -1,0 +1,25 @@
+<% if (categories && categories.length > 0) { %>
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <label class="mb-0 fw-bold">Filter by Category:</label>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="<%= currentPage === 'organic' ? '/organic-products' : currentPage === 'seasonal' ? '/seasonal-products' : '/tech-packages' %>" 
+                           class="btn <%= selectedCategory === '' ? 'btn-swadesi' : 'btn-outline-secondary' %>">
+                            All
+                        </a>
+                        <% categories.forEach(category => { %>
+                        <a href="<%= currentPage === 'organic' ? '/organic-products' : currentPage === 'seasonal' ? '/seasonal-products' : '/tech-packages' %>?category=<%= encodeURIComponent(category) %>" 
+                           class="btn <%= selectedCategory === category ? 'btn-swadesi' : 'btn-outline-secondary' %>">
+                            <%= category %>
+                        </a>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>

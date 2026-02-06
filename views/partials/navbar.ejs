@@ -1,0 +1,39 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-swadesi sticky-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="bi bi-cart3"></i> Swadesi Carts
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'home' ? 'active' : '' %>" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'seasonal' ? 'active' : '' %>" href="/seasonal-products">Seasonal Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'tech' ? 'active' : '' %>" href="/tech-packages">Tech Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'organic' ? 'active' : '' %>" href="/organic-products">Organic Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'about' ? 'active' : '' %>" href="/about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'contact' ? 'active' : '' %>" href="/contact">Contact</a>
+                </li>
+                <% if (isAdminLoggedIn) { %>
+                <li class="nav-item ms-2">
+                    <a class="nav-link btn btn-outline-light" href="/admin/dashboard" title="Admin Dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>

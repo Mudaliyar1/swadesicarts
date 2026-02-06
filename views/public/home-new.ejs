@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style-new.css">
+</head>
+<body>
+    <%- include('../partials/navbar-new') %>
+    
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content fade-in-up">
+                    <h1>Your Trusted Partner for Everything Organic & Tech</h1>
+                    <p class="hero-subtitle">Premium seasonal products, professional tech solutions, and 100% certified organic items all in one place.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/seasonal-products" class="btn btn-primary-hero">Shop Seasonal</a>
+                        <a href="/tech-packages" class="btn btn-light">Tech Solutions</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center fade-in-down">
+                    <div style="font-size: 200px; opacity: 0.1;">🌿</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="bg-light-custom">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why Choose Swadesi Carts?</h2>
+                <p>Excellence in every category</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h5>Authentic & Certified</h5>
+                        <p class="text-muted-custom">100% authentic products with proper certifications and guarantees</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-lightning-charge"></i>
+                        </div>
+                        <h5>Expert Services</h5>
+                        <p class="text-muted-custom">Professional tech solutions from experienced developers</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="feature-icon">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <h5>Fast Delivery</h5>
+                        <p class="text-muted-custom">Quick and reliable shipping to your doorstep</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SEASONAL PRODUCTS -->
+    <section>
+        <div class="container">
+            <div class="section-header">
+                <h2>Seasonal Products</h2>
+                <p>Fresh and authentic seasonal items</p>
+            </div>
+            <% if (featuredSeasonal.length > 0) { %>
+                <div class="row g-4">
+                    <% featuredSeasonal.forEach(product => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card product-card">
+                            <div class="product-image-wrapper">
+                                <% if (product.featuredImage && product.featuredImage.url) { %>
+                                    <img src="<%= product.featuredImage.url %>" alt="<%= product.title %>">
+                                <% } else { %>
+                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                        🛍️
+                                    </div>
+                                <% } %>
+                                <span class="product-badge">New</span>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-category"><%= product.category %></span>
+                                <h5 class="product-card-title"><%= product.title %></h5>
+                                <p class="product-card-description"><%= product.shortDescription %></p>
+                                <div class="product-card-footer">
+                                    <a href="/seasonal-products/<%= product.slug %>" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/seasonal-products" class="btn btn-accent btn-lg">View All Seasonal Products</a>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- TECH PACKAGES -->
+    <section class="bg-light-custom">
+        <div class="container">
+            <div class="section-header">
+                <h2>Tech Services & Packages</h2>
+                <p>Professional development solutions</p>
+            </div>
+            <% if (featuredTech.length > 0) { %>
+                <div class="row g-4">
+                    <% featuredTech.forEach(package => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card product-card">
+                            <div class="product-image-wrapper">
+                                <% if (package.featuredImage && package.featuredImage.url) { %>
+                                    <img src="<%= package.featuredImage.url %>" alt="<%= package.title %>">
+                                <% } else { %>
+                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                        💻
+                                    </div>
+                                <% } %>
+                                <span class="product-badge">Featured</span>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-category"><%= package.category %></span>
+                                <h5 class="product-card-title"><%= package.title %></h5>
+                                <p class="product-card-description"><%= package.shortDescription %></p>
+                                <div class="product-price"><%= package.price.displayText || package.price %></div>
+                                <div class="product-card-footer">
+                                    <a href="/tech-packages/<%= package.slug %>" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/tech-packages" class="btn btn-accent btn-lg">View All Tech Packages</a>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- ORGANIC PRODUCTS -->
+    <section>
+        <div class="container">
+            <div class="section-header">
+                <h2>Organic Products</h2>
+                <p>100% certified organic products for healthy living</p>
+            </div>
+            <% if (featuredOrganic.length > 0) { %>
+                <div class="row g-4">
+                    <% featuredOrganic.forEach(product => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card product-card">
+                            <div class="product-image-wrapper">
+                                <% if (product.featuredImage && product.featuredImage.url) { %>
+                                    <img src="<%= product.featuredImage.url %>" alt="<%= product.title %>">
+                                <% } else { %>
+                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                        🌱
+                                    </div>
+                                <% } %>
+                                <span class="product-badge">Organic</span>
+                            </div>
+                            <div class="product-card-body">
+                                <span class="product-category"><%= product.category %></span>
+                                <h5 class="product-card-title"><%= product.title %></h5>
+                                <p class="product-card-description"><%= product.shortDescription %></p>
+                                <div class="product-card-footer">
+                                    <a href="/organic-products/<%= product.slug %>" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/organic-products" class="btn btn-accent btn-lg">View All Organic Products</a>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
+            <% } %>
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="bg-primary" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;">
+        <div class="container">
+            <div class="text-center text-white">
+                <h2 class="mb-3">Ready to Get Started?</h2>
+                <p class="fs-5 mb-4">Join thousands of satisfied customers. Explore our wide range of products and services today.</p>
+                <a href="/contact" class="btn btn-light btn-lg">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../partials/footer-new') %>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

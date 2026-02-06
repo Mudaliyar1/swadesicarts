@@ -1,0 +1,38 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-swadesi">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            Swadesi <span>Carts</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'home' ? 'active' : '' %>" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'about' ? 'active' : '' %>" href="/about">About</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle <%= ['seasonal', 'tech', 'organic'].includes(currentPage) ? 'active' : '' %>" href="#" role="button" data-bs-toggle="dropdown">
+                        Products
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/seasonal-products">Seasonal Products</a></li>
+                        <li><a class="dropdown-item" href="/tech-packages">Tech Services</a></li>
+                        <li><a class="dropdown-item" href="/organic-products">Organic Products</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= currentPage === 'contact' ? 'active' : '' %>" href="/contact">Contact</a>
+                </li>
+            </ul>
+            <% if (isAdminLoggedIn) { %>
+                <a href="/admin/dashboard" class="btn btn-outline-light ms-3">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            <% } %>
+        </div>
+    </div>
+</nav>
