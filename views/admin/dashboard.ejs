@@ -31,6 +31,7 @@
             <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
             <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
             <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
             <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
             <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
         </ul>
@@ -56,6 +57,7 @@
                 <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
                 <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
                 <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
                 <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
                 <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
@@ -135,6 +137,24 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="/admin/stories" style="text-decoration: none;">
+                        <div class="card border-0 shadow-sm stat-card" style="height: 100%; cursor: pointer; transition: all 0.3s ease;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="text-muted mb-1 small">Stories</p>
+                                        <h3 class="fw-bold mb-0"><%= stats.stories || 0 %></h3>
+                                    </div>
+                                    <div class="stat-icon bg-danger">
+                                        <i class="bi bi-images"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
             </div>
 

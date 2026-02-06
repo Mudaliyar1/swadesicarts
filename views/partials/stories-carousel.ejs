@@ -344,10 +344,27 @@
             updateProgressBars();
 
             if (media.type === 'video') {
-                storyContent.innerHTML = `<video id="storyVideo" src="${media.url}" style="width: 100%; height: 100%; max-height: 65vh; object-fit: contain;" autoplay></video>`;
+                storyContent.innerHTML = `<video id="storyVideo" src="${media.url}" style="width: 100%; height: 100%; max-height: 65vh; object-fit: contain;" autoplay playsinline muted></video>`;
                 currentVideo = document.getElementById('storyVideo');
                 muteBtn.style.display = 'block';
                 updateMuteButton();
+                
+                // For mobile, try to autoplay with sound using play API
+                setTimeout(() => {
+                    if (currentVideo) {
+                        currentVideo.muted = false;
+                        const playPromise = currentVideo.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                // If autoplay with sound fails on mobile, keep muted
+                                console.log('Autoplay failed, keeping muted:', error);
+                                if (currentVideo) {
+                                    currentVideo.muted = true;
+                                }
+                            });
+                        }
+                    }
+                }, 100);
                 
                 // Start video progress tracking
                 startVideoProgress(currentVideo);

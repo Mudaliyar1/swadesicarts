@@ -67,6 +67,7 @@ exports.showDashboard = async (req, res) => {
     const TechPackage = require('../models/TechPackage');
     const OrganicProduct = require('../models/OrganicProduct');
     const Inquiry = require('../models/Inquiry');
+    const Story = require('../models/Story');
 
     const stats = {
       seasonalProducts: await SeasonalProduct.countDocuments(),
@@ -75,7 +76,8 @@ exports.showDashboard = async (req, res) => {
       totalInquiries: await Inquiry.countDocuments(),
       newInquiries: await Inquiry.countDocuments({ status: 'new' }),
       contactedInquiries: await Inquiry.countDocuments({ status: 'contacted' }),
-      closedInquiries: await Inquiry.countDocuments({ status: 'closed' })
+      closedInquiries: await Inquiry.countDocuments({ status: 'closed' }),
+      stories: await Story.countDocuments()
     };
 
     const recentInquiries = await Inquiry.find()

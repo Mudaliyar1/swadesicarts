@@ -24,7 +24,7 @@
     <% if (allMedia.length > 0) { %>
         <div style="position: relative; width: 100%;" id="carouselMainContainer">
             <% if (allMedia[0].type === 'video') { %>
-                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" autoplay playsinline style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" autoplay playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
                 <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                     <i class="bi bi-volume-up-fill"></i>
                 </button>
@@ -119,7 +119,7 @@
             let newHTML = '';
             if (media.type === 'video') {
                 newHTML = `
-                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" autoplay playsinline style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" autoplay playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
                     <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                         <i class="bi bi-volume-up-fill"></i>
                     </button>
@@ -161,7 +161,22 @@
                 // Stop any running autoplay when video starts
                 stopAutoPlay();
                 
-                videoEl.play().catch(err => console.log('Video autoplay prevented:', err));
+                // For mobile, try to autoplay with sound using play API
+                setTimeout(() => {
+                    if (videoEl) {
+                        videoEl.muted = false;
+                        const playPromise = videoEl.play();
+                        if (playPromise !== undefined) {
+                            playPromise.catch(error => {
+                                // If autoplay with sound fails on mobile, keep muted
+                                console.log('Autoplay failed, keeping muted:', error);
+                                if (videoEl) {
+                                    videoEl.muted = true;
+                                }
+                            });
+                        }
+                    }
+                }, 100);
                 
                 // When video ends, advance to next slide
                 videoEl.addEventListener('ended', function() {
