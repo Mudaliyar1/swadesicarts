@@ -61,11 +61,23 @@
     <% } %>
 </div>
 
+<script type="application/json" id="mediaCarouselData">
+<%- JSON.stringify(allMedia) %>
+</script>
+
 <script>
     // Carousel initialization
     (function() {
         let currentMediaIndex = 0;
-        const allMediaItems = <%- JSON.stringify(allMedia) %>;
+        let allMediaItems = [];
+        const dataEl = document.getElementById('mediaCarouselData');
+        if (dataEl && dataEl.textContent) {
+            try {
+                allMediaItems = JSON.parse(dataEl.textContent);
+            } catch (error) {
+                allMediaItems = [];
+            }
+        }
 
         window.carouselChangeMedia = function(index) {
             if (index < 0 || index >= allMediaItems.length) return;
