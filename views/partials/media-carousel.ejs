@@ -24,10 +24,34 @@
     <% if (allMedia.length > 0) { %>
         <div style="position: relative; width: 100%;" id="carouselMainContainer">
             <% if (allMedia[0].type === 'video') { %>
-                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" controls style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
-                <span class="carousel-video-badge"><i class="bi bi-play-circle"></i> VIDEO</span>
+                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" autoplay playsinline style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
+                    <i class="bi bi-volume-up-fill"></i>
+                </button>
+                <!-- Custom Video Controls -->
+                <div class="video-controls-bar">
+                    <div class="video-progress-container">
+                        <div class="video-progress-bar" id="videoProgress">
+                            <div class="video-progress-fill"></div>
+                            <div class="video-progress-handle"></div>
+                        </div>
+                    </div>
+                    <div class="video-time-display">
+                        <span id="videoCurrentTime">0:00</span> / <span id="videoDuration">0:00</span>
+                    </div>
+                </div>
             <% } else { %>
                 <img id="mainMedia" src="<%= allMedia[0].url %>" alt="Product" class="carousel-main-media" style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block; border-radius: 8px;">
+            <% } %>
+            
+            <!-- Navigation Arrows -->
+            <% if (allMedia.length > 1) { %>
+                <button class="carousel-nav-btn carousel-nav-prev" id="carouselPrevBtn" aria-label="Previous">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="carousel-nav-btn carousel-nav-next" id="carouselNextBtn" aria-label="Next">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
             <% } %>
         </div>
 
@@ -66,10 +90,13 @@
 </script>
 
 <script>
-    // Carousel initialization
+    // Carousel initialization with auto-play
     (function() {
         let currentMediaIndex = 0;
         let allMediaItems = [];
+        let autoPlayInterval = null;
+        let isUserInteracting = false;
+        
         const dataEl = document.getElementById('mediaCarouselData');
         if (dataEl && dataEl.textContent) {
             try {
@@ -92,14 +119,104 @@
             let newHTML = '';
             if (media.type === 'video') {
                 newHTML = `
-                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" controls style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
-                    <span class="carousel-video-badge"><i class="bi bi-play-circle"></i> VIDEO</span>
+                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" autoplay playsinline style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                    <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
+                        <i class="bi bi-volume-up-fill"></i>
+                    </button>
+                    <div class="video-controls-bar">
+                        <div class="video-progress-container">
+                            <div class="video-progress-bar" id="videoProgress">
+                                <div class="video-progress-fill"></div>
+                                <div class="video-progress-handle"></div>
+                            </div>
+                        </div>
+                        <div class="video-time-display">
+                            <span id="videoCurrentTime">0:00</span> / <span id="videoDuration">0:00</span>
+                        </div>
+                    </div>
                 `;
             } else {
                 newHTML = `<img id="mainMedia" src="${media.url}" alt="Product" class="carousel-main-media" style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block; border-radius: 8px;">`;
             }
             
+            // Add navigation buttons if multiple items
+            if (allMediaItems.length > 1) {
+                newHTML += `
+                    <button class="carousel-nav-btn carousel-nav-prev" id="carouselPrevBtn" aria-label="Previous">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button class="carousel-nav-btn carousel-nav-next" id="carouselNextBtn" aria-label="Next">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                `;
+            }
+            
             mainContainer.innerHTML = newHTML;
+
+            // Handle video autoplay and mute button
+            const videoEl = document.getElementById('mainMedia');
+            const muteBtn = document.getElementById('muteBtn');
+            
+            if (videoEl && videoEl.tagName === 'VIDEO') {
+                // Stop any running autoplay when video starts
+                stopAutoPlay();
+                
+                videoEl.play().catch(err => console.log('Video autoplay prevented:', err));
+                
+                // When video ends, advance to next slide
+                videoEl.addEventListener('ended', function() {
+                    if (!isUserInteracting && allMediaItems.length > 1) {
+                        let nextIndex = currentMediaIndex + 1;
+                        if (nextIndex >= allMediaItems.length) nextIndex = 0;
+                        window.carouselChangeMedia(nextIndex);
+                    }
+                });
+                
+                if (muteBtn) {
+                    muteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        videoEl.muted = !videoEl.muted;
+                        muteBtn.innerHTML = videoEl.muted ? 
+                            '<i class="bi bi-volume-mute-fill"></i>' : 
+                            '<i class="bi bi-volume-up-fill"></i>';
+                        muteBtn.setAttribute('aria-label', videoEl.muted ? 'Unmute' : 'Mute');
+                    });
+                }
+                
+                // Setup custom progress bar
+                setupVideoProgress(videoEl);
+            }
+
+            // Start autoplay if current item is not a video
+            if (media.type !== 'video') {
+                startAutoPlay();
+            }
+
+            // Re-attach event listeners to new buttons
+            const prevBtn = document.getElementById('carouselPrevBtn');
+            const nextBtn = document.getElementById('carouselNextBtn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    pauseAutoPlay();
+                    let prevIndex = currentMediaIndex - 1;
+                    if (prevIndex < 0) prevIndex = allMediaItems.length - 1;
+                    window.carouselChangeMedia(prevIndex);
+                    setTimeout(resumeAutoPlay, 5000);
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    pauseAutoPlay();
+                    let nextIndex = currentMediaIndex + 1;
+                    if (nextIndex >= allMediaItems.length) nextIndex = 0;
+                    window.carouselChangeMedia(nextIndex);
+                    setTimeout(resumeAutoPlay, 5000);
+                });
+            }
 
             // Update thumbnail active state
             document.querySelectorAll('.carousel-thumbnail-item').forEach((thumb, i) => {
@@ -111,35 +228,281 @@
             if (counter) counter.textContent = index + 1;
         };
 
+        // Auto-play function
+        function startAutoPlay() {
+            if (allMediaItems.length <= 1) return; // Don't auto-play if only one item
+            
+            stopAutoPlay(); // Clear any existing interval
+            
+            // Check if current media is a video
+            const currentMedia = allMediaItems[currentMediaIndex];
+            if (currentMedia && currentMedia.type === 'video') {
+                // Don't use interval for video, let video control advancement
+                return;
+            }
+            
+            autoPlayInterval = setInterval(function() {
+                if (!isUserInteracting) {
+                    let nextIndex = currentMediaIndex + 1;
+                    if (nextIndex >= allMediaItems.length) {
+                        nextIndex = 0; // Loop back to start
+                    }
+                    window.carouselChangeMedia(nextIndex);
+                }
+            }, 3000); // 3 seconds for images
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+        }
+
+        // Setup custom video progress bar
+        function setupVideoProgress(videoEl) {
+            const progressBar = document.getElementById('videoProgress');
+            const progressFill = progressBar ? progressBar.querySelector('.video-progress-fill') : null;
+            const currentTimeEl = document.getElementById('videoCurrentTime');
+            const durationEl = document.getElementById('videoDuration');
+            
+            if (!progressBar) return;
+
+            // Format time helper
+            function formatTime(seconds) {
+                if (isNaN(seconds)) return '0:00';
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // Update progress display
+            function updateProgress() {
+                if (videoEl.duration) {
+                    const percent = (videoEl.currentTime / videoEl.duration) * 100;
+                    if (progressFill) {
+                        progressFill.style.width = percent + '%';
+                    }
+                    if (currentTimeEl) {
+                        currentTimeEl.textContent = formatTime(videoEl.currentTime);
+                    }
+                }
+            }
+
+            // Update duration
+            videoEl.addEventListener('loadedmetadata', function() {
+                if (durationEl) {
+                    durationEl.textContent = formatTime(videoEl.duration);
+                }
+            });
+
+            // Update progress as video plays
+            videoEl.addEventListener('timeupdate', updateProgress);
+
+            // Handle progress bar seeking
+            progressBar.addEventListener('click', function(e) {
+                const rect = progressBar.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                videoEl.currentTime = percent * videoEl.duration;
+                updateProgress();
+            });
+
+            // Handle progress bar drag with mouse
+            let isDragging = false;
+            const progressHandle = progressBar.querySelector('.video-progress-handle');
+            
+            if (progressHandle) {
+                progressHandle.addEventListener('mousedown', () => {
+                    isDragging = true;
+                });
+                
+                // Touch support
+                progressHandle.addEventListener('touchstart', () => {
+                    isDragging = true;
+                });
+            }
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+            
+            document.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging && videoEl.duration) {
+                    const rect = progressBar.getBoundingClientRect();
+                    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                    videoEl.currentTime = percent * videoEl.duration;
+                    updateProgress();
+                }
+            });
+
+            // Touch move support
+            document.addEventListener('touchmove', function(e) {
+                if (isDragging && videoEl.duration && e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = progressBar.getBoundingClientRect();
+                    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
+                    videoEl.currentTime = percent * videoEl.duration;
+                    updateProgress();
+                }
+            }, { passive: false });
+
+            // Mute video when tab is not visible
+            let wasUserMuted = videoEl.muted;
+            let isMutedByHidden = false;
+
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    // Tab is hidden - mute the video
+                    wasUserMuted = videoEl.muted;
+                    videoEl.muted = true;
+                    isMutedByHidden = true;
+                } else {
+                    // Tab is visible again - restore previous mute state
+                    if (isMutedByHidden) {
+                        videoEl.muted = wasUserMuted;
+                        isMutedByHidden = false;
+                        
+                        // Update mute button UI
+                        const muteBtn = document.getElementById('muteBtn');
+                        if (muteBtn) {
+                            muteBtn.innerHTML = videoEl.muted ? 
+                                '<i class="bi bi-volume-mute-fill"></i>' : 
+                                '<i class="bi bi-volume-up-fill"></i>';
+                            muteBtn.setAttribute('aria-label', videoEl.muted ? 'Unmute' : 'Mute');
+                        }
+                    }
+                }
+            });
+        }
+
+        function pauseAutoPlay() {
+            isUserInteracting = true;
+        }
+
+        function resumeAutoPlay() {
+            isUserInteracting = false;
+        }
+
         // Add click handlers to thumbnails
         document.addEventListener('DOMContentLoaded', function() {
+            const carouselContainer = document.querySelector('.media-carousel-container');
+            
             document.querySelectorAll('.carousel-thumbnail-item').forEach((item) => {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
+                    pauseAutoPlay();
                     const index = parseInt(this.getAttribute('data-index'));
                     window.carouselChangeMedia(index);
+                    
+                    // Resume auto-play after 5 seconds of no interaction
+                    setTimeout(resumeAutoPlay, 5000);
                 });
             });
+
+            // Navigation button handlers
+            const prevBtn = document.getElementById('carouselPrevBtn');
+            const nextBtn = document.getElementById('carouselNextBtn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    pauseAutoPlay();
+                    let prevIndex = currentMediaIndex - 1;
+                    if (prevIndex < 0) prevIndex = allMediaItems.length - 1;
+                    window.carouselChangeMedia(prevIndex);
+                    setTimeout(resumeAutoPlay, 5000);
+                });
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    pauseAutoPlay();
+                    let nextIndex = currentMediaIndex + 1;
+                    if (nextIndex >= allMediaItems.length) nextIndex = 0;
+                    window.carouselChangeMedia(nextIndex);
+                    setTimeout(resumeAutoPlay, 5000);
+                });
+            }
+
+            // Pause on hover, resume on mouse leave
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', pauseAutoPlay);
+                carouselContainer.addEventListener('mouseleave', resumeAutoPlay);
+            }
+
+            // Handle video mute button on initial load
+            const initialVideo = document.getElementById('mainMedia');
+            const initialMuteBtn = document.getElementById('muteBtn');
+            
+            if (initialVideo && initialVideo.tagName === 'VIDEO') {
+                // Add ended event listener for initial video
+                initialVideo.addEventListener('ended', function() {
+                    if (!isUserInteracting && allMediaItems.length > 1) {
+                        let nextIndex = currentMediaIndex + 1;
+                        if (nextIndex >= allMediaItems.length) nextIndex = 0;
+                        window.carouselChangeMedia(nextIndex);
+                    }
+                });
+                
+                if (initialMuteBtn) {
+                    initialMuteBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        initialVideo.muted = !initialVideo.muted;
+                        initialMuteBtn.innerHTML = initialVideo.muted ? 
+                            '<i class="bi bi-volume-mute-fill"></i>' : 
+                            '<i class="bi bi-volume-up-fill"></i>';
+                        initialMuteBtn.setAttribute('aria-label', initialVideo.muted ? 'Unmute' : 'Mute');
+                    });
+                }
+                
+                // Setup progress bar for initial video
+                setupVideoProgress(initialVideo);
+            } else {
+                // Start auto-play only if initial media is not a video
+                startAutoPlay();
+            }
         });
 
         // Also bind immediately in case DOM is already loaded
         document.querySelectorAll('.carousel-thumbnail-item').forEach((item) => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
+                pauseAutoPlay();
                 const index = parseInt(this.getAttribute('data-index'));
                 window.carouselChangeMedia(index);
+                
+                // Resume auto-play after 5 seconds of no interaction
+                setTimeout(resumeAutoPlay, 5000);
             });
         });
+
+        // Start auto-play if DOM is already loaded
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(startAutoPlay, 100);
+        }
 
         // Keyboard navigation
         document.addEventListener('keydown', function(event) {
             const mainMedia = document.getElementById('mainMedia');
             if (!mainMedia) return;
             
-            if (event.key === 'ArrowLeft' && currentMediaIndex > 0) {
-                window.carouselChangeMedia(currentMediaIndex - 1);
-            } else if (event.key === 'ArrowRight' && currentMediaIndex < allMediaItems.length - 1) {
-                window.carouselChangeMedia(currentMediaIndex + 1);
+            if (event.key === 'ArrowLeft') {
+                pauseAutoPlay();
+                let prevIndex = currentMediaIndex - 1;
+                if (prevIndex < 0) prevIndex = allMediaItems.length - 1;
+                window.carouselChangeMedia(prevIndex);
+                setTimeout(resumeAutoPlay, 5000);
+            } else if (event.key === 'ArrowRight') {
+                pauseAutoPlay();
+                let nextIndex = currentMediaIndex + 1;
+                if (nextIndex >= allMediaItems.length) nextIndex = 0;
+                window.carouselChangeMedia(nextIndex);
+                setTimeout(resumeAutoPlay, 5000);
             }
         });
     })();

@@ -6,6 +6,7 @@ const techPackageController = require('../controllers/admin/techPackageControlle
 const organicProductController = require('../controllers/admin/organicProductController');
 const inquiryController = require('../controllers/admin/inquiryController');
 const adminController = require('../controllers/admin/adminController');
+const storyController = require('../controllers/admin/storyController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
 
@@ -76,5 +77,18 @@ router.post('/admins/create', isAuthenticated, adminController.create);
 router.get('/admins/edit/:id', isAuthenticated, adminController.showEdit);
 router.post('/admins/edit/:id', isAuthenticated, adminController.update);
 router.delete('/admins/delete/:id', isAuthenticated, adminController.delete);
+
+// Stories routes
+router.get('/stories', isAuthenticated, storyController.list);
+router.get('/stories/create', isAuthenticated, storyController.showCreate);
+router.post('/stories/create', isAuthenticated, upload.fields([
+  { name: 'media', maxCount: 10 }
+]), storyController.create);
+router.get('/stories/edit/:id', isAuthenticated, storyController.showEdit);
+router.post('/stories/edit/:id', isAuthenticated, upload.fields([
+  { name: 'media', maxCount: 10 }
+]), storyController.update);
+router.delete('/stories/delete/:id', isAuthenticated, storyController.delete);
+router.post('/stories/:id/toggle', isAuthenticated, storyController.toggleActive);
 
 module.exports = router;

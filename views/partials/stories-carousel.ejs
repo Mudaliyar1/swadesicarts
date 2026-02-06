@@ -1,0 +1,599 @@
+<!-- Stories Section -->
+<% if (stories && stories.length > 0) { %>
+    <section class="stories-section py-5" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2>Latest Stories <i class="bi bi-book-half"></i></h2>
+                <p class="text-muted">Check out our latest updates and products</p>
+            </div>
+
+            <div class="stories-carousel" style="overflow-x: auto; padding: 10px 0;">
+                <div style="display: flex; gap: 25px; padding-bottom: 10px; justify-content: center; flex-wrap: wrap;">
+                    <% stories.forEach((story, index) => { %>
+                        <div class="story-card" style="flex: 0 0 110px; cursor: pointer; text-align: center;" data-story-index="<%= index %>">
+                            <div class="story-ring" style="padding: 3px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border-radius: 50%; display: inline-block; position: relative;">
+                                <div class="story-thumbnail-wrapper" style="position: relative; border-radius: 50%; overflow: hidden; background: #f0f0f0; width: 110px; height: 110px; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.3s ease;">
+                                    <% if (story.media && story.media.length > 0) { %>
+                                        <% if (story.media[0].type === 'video') { %>
+                                            <video src="<%= story.media[0].url %>" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                                            <span class="badge bg-primary position-absolute top-50 start-50 translate-middle" style="font-size: 1.5rem; opacity: 0.9;">
+                                                <i class="bi bi-play-circle-fill"></i>
+                                            </span>
+                                        <% } else { %>
+                                            <img src="<%= story.media[0].url %>" alt="<%= story.title %>" style="width: 100%; height: 100%; object-fit: cover;">
+                                        <% } %>
+                                    <% } %>
+                                </div>
+                                <% if (story.media && story.media.length > 1) { %>
+                                    <span class="badge bg-dark position-absolute" style="bottom: 0; right: 0; font-size: 0.7rem; z-index: 1;">+<%= story.media.length - 1 %></span>
+                                <% } %>
+                            </div>
+                            <div style="margin-top: 8px;">
+                                <small class="text-dark" style="font-weight: 500; font-size: 0.85rem; display: block; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= story.title %></small>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="text-center" style="margin-top: 10px; color: #999;">
+                <small><i class="bi bi-hand-index"></i> Tap a story to view</small>
+            </div>
+        </div>
+    </section>
+
+    <!-- Story Modal -->
+    <div class="modal fade" id="storyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="background: #1a1a1a; border-radius: 16px; overflow: hidden;">
+                <!-- Modal Header with Title and Progress Bars -->
+                <div class="modal-header border-0" style="padding: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); display: flex; flex-direction: column;">
+                    <!-- Progress Bars at Top -->
+                    <div id="progressBarsContainer" style="width: 100%; display: flex; gap: 4px; height: 3px; padding: 10px 15px 5px 15px;">
+                        <!-- Progress bars will be inserted here -->
+                    </div>
+                    
+                    <!-- Title Section -->
+                    <div style="padding: 15px 25px 20px 25px; display: flex; align-items: center; width: 100%;">
+                        <div style="flex: 1;">
+                            <h5 class="text-white mb-1" id="storyTitle"></h5>
+                            <small class="text-white-50" id="storyCounter"></small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                </div>
+
+                <!-- Modal Body with Story Content -->
+                <div class="modal-body p-0 position-relative" style="min-height: 400px; max-height: 70vh;">
+
+                    <!-- Story Content -->
+                    <div id="storyContent" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; background: #000;">
+                        <!-- Story content will be inserted here -->
+                    </div>
+
+                    <!-- Mute/Unmute Button (only for videos) -->
+                    <button type="button" class="btn btn-light rounded-circle position-absolute" id="muteBtn" style="top: 50px; right: 15px; z-index: 1060; width: 45px; height: 45px; display: none; opacity: 0.9;">
+                        <i class="bi bi-volume-up-fill" id="muteIcon"></i>
+                    </button>
+
+                    <!-- Media Navigation Arrows (for multiple media in one story) -->
+                    <button type="button" class="btn btn-light rounded-circle position-absolute" id="prevMediaBtn" style="left: 15px; top: 50%; transform: translateY(-50%); z-index: 1050; width: 40px; height: 40px; display: none; opacity: 0.8;">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <button type="button" class="btn btn-light rounded-circle position-absolute" id="nextMediaBtn" style="right: 15px; top: 50%; transform: translateY(-50%); z-index: 1050; width: 40px; height: 40px; display: none; opacity: 0.8;">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+
+                    <!-- Description Overlay -->
+                    <div id="storyDescription" class="position-absolute" style="bottom: 15px; left: 15px; right: 15px; background: rgba(0,0,0,0.8); color: white; padding: 12px 16px; border-radius: 10px; backdrop-filter: blur(10px); display: none; z-index: 1050;">
+                        <p class="mb-0 small" id="storyDescriptionText"></p>
+                    </div>
+                </div>
+
+                <!-- Modal Footer with Story Navigation -->
+                <div class="modal-footer border-0 justify-content-between" style="padding: 15px 25px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);">
+                    <button type="button" class="btn btn-outline-light btn-sm" id="prevStoryBtn" style="display: none;">
+                        <i class="bi bi-arrow-left"></i> Previous Story
+                    </button>
+                    <div></div>
+                    <button type="button" class="btn btn-outline-light btn-sm" id="nextStoryBtn" style="display: none;">
+                        Next Story <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const storiesJson = `<%- JSON.stringify(stories) %>`;
+        const stories = JSON.parse(storiesJson);
+        let currentStoryIndex = 0;
+        let currentMediaIndex = 0;
+        let currentVideo = null;
+        let progressInterval = null;
+        let progressAnimationFrame = null;
+
+        // Close story modal when user switches tab
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                const storyModal = bootstrap.Modal.getInstance(document.getElementById('storyModal'));
+                if (storyModal) {
+                    storyModal.hide();
+                }
+            }
+        });
+
+        // Add click event listeners to story cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const storyCards = document.querySelectorAll('.story-card');
+            storyCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const index = card.getAttribute('data-story-index');
+                    if (index !== null) {
+                        openStoryModal(parseInt(index));
+                    }
+                });
+            });
+        });
+
+        function openStoryModal(index) {
+            currentStoryIndex = index;
+            currentMediaIndex = 0;
+            showStory(index);
+            new bootstrap.Modal(document.getElementById('storyModal')).show();
+        }
+
+        function showStory(index) {
+            if (index < 0 || index >= stories.length) return;
+
+            const story = stories[index];
+            currentStoryIndex = index;
+            currentMediaIndex = 0; // Reset to first media when changing stories
+            
+            document.getElementById('storyTitle').textContent = story.title;
+            document.getElementById('storyCounter').textContent = `${index + 1} / ${stories.length}`;
+
+            // Show description if exists
+            const storyDescription = document.getElementById('storyDescription');
+            const storyDescriptionText = document.getElementById('storyDescriptionText');
+            if (story.description) {
+                storyDescriptionText.textContent = story.description;
+                storyDescription.style.display = 'block';
+            } else {
+                storyDescription.style.display = 'none';
+            }
+
+            // Update story navigation buttons
+            document.getElementById('prevStoryBtn').style.display = index > 0 ? 'flex' : 'none';
+            document.getElementById('nextStoryBtn').style.display = index < stories.length - 1 ? 'flex' : 'none';
+
+            // Show media navigation if multiple media
+            const prevMediaBtn = document.getElementById('prevMediaBtn');
+            const nextMediaBtn = document.getElementById('nextMediaBtn');
+            if (story.media && story.media.length > 1) {
+                prevMediaBtn.style.display = 'flex';
+                nextMediaBtn.style.display = 'flex';
+            } else {
+                prevMediaBtn.style.display = 'none';
+                nextMediaBtn.style.display = 'none';
+            }
+
+            // Render progress bars
+            renderProgressBars(story.media.length);
+            
+            showMedia(currentMediaIndex);
+        }
+
+        function renderProgressBars(count) {
+            const container = document.getElementById('progressBarsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < count; i++) {
+                const barWrapper = document.createElement('div');
+                barWrapper.style.cssText = 'flex: 1; height: 3px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden; cursor: pointer;';
+                barWrapper.onclick = () => showMedia(i);
+                
+                const barFill = document.createElement('div');
+                barFill.id = `progressBar${i}`;
+                barFill.style.cssText = 'width: 0%; height: 100%; background: linear-gradient(to right, #FF9933, #FFFFFF, #138808); transition: width 0.1s linear;';
+                
+                barWrapper.appendChild(barFill);
+                container.appendChild(barWrapper);
+            }
+        }
+
+        function updateProgressBars() {
+            const story = stories[currentStoryIndex];
+            if (!story || !story.media) return;
+            
+            // Set all previous bars to 100% (fully white/completed)
+            for (let i = 0; i < currentMediaIndex; i++) {
+                const bar = document.getElementById(`progressBar${i}`);
+                if (bar) {
+                    bar.style.transition = 'none';
+                    bar.style.width = '100%';
+                }
+            }
+            
+            // Set current bar to 0% (will be animated by startProgress)
+            const currentBar = document.getElementById(`progressBar${currentMediaIndex}`);
+            if (currentBar) {
+                currentBar.style.transition = 'none';
+                currentBar.style.width = '0%';
+            }
+            
+            // Set future bars to 0%
+            for (let i = currentMediaIndex + 1; i < story.media.length; i++) {
+                const bar = document.getElementById(`progressBar${i}`);
+                if (bar) {
+                    bar.style.transition = 'none';
+                    bar.style.width = '0%';
+                }
+            }
+        }
+
+        function startProgress(duration) {
+            stopProgress();
+            
+            const bar = document.getElementById(`progressBar${currentMediaIndex}`);
+            if (!bar) return;
+            
+            bar.style.width = '0%';
+            bar.style.transition = 'none';
+            
+            setTimeout(() => {
+                bar.style.transition = `width ${duration}ms linear`;
+                bar.style.width = '100%';
+            }, 50);
+            
+            progressInterval = setTimeout(() => {
+                advanceToNextMedia();
+            }, duration);
+        }
+
+        function startVideoProgress(video) {
+            stopProgress();
+            
+            const bar = document.getElementById(`progressBar${currentMediaIndex}`);
+            if (!bar) return;
+            
+            bar.style.width = '0%';
+            bar.style.transition = 'none';
+            
+            function updateVideoProgress() {
+                if (!video || video.ended) return;
+                
+                if (video.duration && !isNaN(video.duration) && video.duration > 0) {
+                    const progress = (video.currentTime / video.duration) * 100;
+                    bar.style.width = progress + '%';
+                }
+                
+                progressAnimationFrame = requestAnimationFrame(updateVideoProgress);
+            }
+            
+            video.addEventListener('loadedmetadata', () => {
+                bar.style.width = '0%';
+                updateVideoProgress();
+            });
+            
+            video.addEventListener('play', () => {
+                updateVideoProgress();
+            });
+            
+            video.addEventListener('ended', () => {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    advanceToNextMedia();
+                }, 100);
+            });
+            
+            // Start updating if video is already ready
+            if (video.readyState >= 1 && video.duration) {
+                updateVideoProgress();
+            }
+        }
+
+        function stopProgress() {
+            if (progressInterval) {
+                clearTimeout(progressInterval);
+                progressInterval = null;
+            }
+            if (progressAnimationFrame) {
+                cancelAnimationFrame(progressAnimationFrame);
+                progressAnimationFrame = null;
+            }
+        }
+
+        function advanceToNextMedia() {
+            const story = stories[currentStoryIndex];
+            if (!story || !story.media) return;
+            
+            if (currentMediaIndex < story.media.length - 1) {
+                showMedia(currentMediaIndex + 1);
+            } else if (currentStoryIndex < stories.length - 1) {
+                // Move to next story
+                currentStoryIndex++;
+                showStory(currentStoryIndex);
+            } else {
+                // All stories finished, close modal
+                stopProgress();
+                const storyModal = bootstrap.Modal.getInstance(document.getElementById('storyModal'));
+                if (storyModal) {
+                    storyModal.hide();
+                }
+            }
+        }
+
+        function showMedia(mediaIndex) {
+            const story = stories[currentStoryIndex];
+            if (!story || !story.media || mediaIndex < 0 || mediaIndex >= story.media.length) return;
+
+            stopProgress();
+            currentMediaIndex = mediaIndex;
+            const media = story.media[mediaIndex];
+            const storyContent = document.getElementById('storyContent');
+            const muteBtn = document.getElementById('muteBtn');
+
+            // Clear previous content
+            if (currentVideo) {
+                currentVideo.pause();
+                currentVideo = null;
+            }
+
+            updateProgressBars();
+
+            if (media.type === 'video') {
+                storyContent.innerHTML = `<video id="storyVideo" src="${media.url}" style="width: 100%; height: 100%; max-height: 65vh; object-fit: contain;" autoplay></video>`;
+                currentVideo = document.getElementById('storyVideo');
+                muteBtn.style.display = 'block';
+                updateMuteButton();
+                
+                // Start video progress tracking
+                startVideoProgress(currentVideo);
+            } else {
+                storyContent.innerHTML = `<img src="${media.url}" alt="${story.title}" style="width: 100%; height: 100%; max-height: 65vh; object-fit: contain;">`;
+                muteBtn.style.display = 'none';
+                
+                // Start 5-second timer for images
+                startProgress(5000);
+            }
+
+            // Update media navigation visibility
+            if (story.media.length > 1) {
+                document.getElementById('prevMediaBtn').style.display = mediaIndex > 0 ? 'flex' : 'none';
+                document.getElementById('nextMediaBtn').style.display = mediaIndex < story.media.length - 1 ? 'flex' : 'none';
+            }
+        }
+
+        function updateMuteButton() {
+            if (currentVideo) {
+                const muteIcon = document.getElementById('muteIcon');
+                if (currentVideo.muted) {
+                    muteIcon.className = 'bi bi-volume-mute-fill';
+                } else {
+                    muteIcon.className = 'bi bi-volume-up-fill';
+                }
+            }
+        }
+
+        // Media navigation
+        document.getElementById('prevMediaBtn').addEventListener('click', function() {
+            if (currentMediaIndex > 0) {
+                showMedia(currentMediaIndex - 1);
+            }
+        });
+
+        document.getElementById('nextMediaBtn').addEventListener('click', function() {
+            const story = stories[currentStoryIndex];
+            if (story && currentMediaIndex < story.media.length - 1) {
+                showMedia(currentMediaIndex + 1);
+            }
+        });
+
+        // Mute/Unmute toggle
+        document.getElementById('muteBtn').addEventListener('click', function() {
+            if (currentVideo) {
+                currentVideo.muted = !currentVideo.muted;
+                updateMuteButton();
+            }
+        });
+
+        // Story navigation
+        document.getElementById('prevStoryBtn').addEventListener('click', function() {
+            if (currentStoryIndex > 0) {
+                currentStoryIndex--;
+                showStory(currentStoryIndex);
+            } else {
+                // No previous stories, close modal
+                const storyModal = bootstrap.Modal.getInstance(document.getElementById('storyModal'));
+                if (storyModal) {
+                    storyModal.hide();
+                }
+            }
+        });
+
+        document.getElementById('nextStoryBtn').addEventListener('click', function() {
+            if (currentStoryIndex < stories.length - 1) {
+                currentStoryIndex++;
+                showStory(currentStoryIndex);
+            } else {
+                // No more stories, close modal
+                const storyModal = bootstrap.Modal.getInstance(document.getElementById('storyModal'));
+                if (storyModal) {
+                    storyModal.hide();
+                }
+            }
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const modal = document.getElementById('storyModal');
+            if (modal.classList.contains('show')) {
+                const story = stories[currentStoryIndex];
+                
+                // Left arrow - previous media or previous story
+                if (e.key === 'ArrowLeft') {
+                    if (currentMediaIndex > 0) {
+                        showMedia(currentMediaIndex - 1);
+                    } else if (currentStoryIndex > 0) {
+                        currentStoryIndex--;
+                        showStory(currentStoryIndex);
+                    }
+                }
+                
+                // Right arrow - next media or next story
+                if (e.key === 'ArrowRight') {
+                    if (story && currentMediaIndex < story.media.length - 1) {
+                        showMedia(currentMediaIndex + 1);
+                    } else if (currentStoryIndex < stories.length - 1) {
+                        currentStoryIndex++;
+                        showStory(currentStoryIndex);
+                    }
+                }
+                
+                // M key - toggle mute
+                if (e.key === 'm' || e.key === 'M') {
+                    document.getElementById('muteBtn').click();
+                }
+            }
+        });
+
+        // Clean up video when modal closes
+        document.getElementById('storyModal').addEventListener('hidden.bs.modal', function() {
+            stopProgress();
+            if (currentVideo) {
+                currentVideo.pause();
+                currentVideo = null;
+            }
+        });
+    </script>
+
+    <style>
+        .story-card .story-ring:hover {
+            transform: scale(1.05);
+        }
+
+        .story-card .story-thumbnail-wrapper:hover {
+            transform: scale(1.05);
+        }
+
+        .stories-carousel {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+
+        .stories-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .stories-carousel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .stories-carousel::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .stories-carousel::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        #prevStoryBtn, #nextStoryBtn {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #prevMediaBtn:hover, #nextMediaBtn:hover {
+            opacity: 1 !important;
+            transform: scale(1.1) translateY(-50%);
+        }
+
+        #muteBtn:hover {
+            opacity: 1 !important;
+            transform: scale(1.1);
+        }
+
+        #prevMediaBtn, #nextMediaBtn {
+            transition: all 0.3s ease;
+        }
+
+        #muteBtn {
+            transition: all 0.3s ease;
+        }
+
+        #progressBarsContainer {
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .story-card {
+                flex: 0 0 90px !important;
+            }
+
+            .story-ring {
+                padding: 2px !important;
+            }
+
+            .story-thumbnail-wrapper {
+                width: 90px !important;
+                height: 90px !important;
+                border: 2px solid white !important;
+            }
+
+            .story-card small {
+                font-size: 0.75rem !important;
+                max-width: 90px !important;
+            }
+
+            .modal-lg {
+                max-width: 95% !important;
+            }
+
+            .modal-body {
+                max-height: 60vh !important;
+            }
+
+            #storyDescription {
+                left: 10px !important;
+                right: 10px !important;
+                bottom: 10px !important;
+                padding: 8px 12px !important;
+                font-size: 0.85rem;
+            }
+
+            #muteBtn {
+                width: 35px !important;
+                height: 35px !important;
+                top: 45px !important;
+                right: 10px !important;
+            }
+
+            #prevMediaBtn, #nextMediaBtn {
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            #prevMediaBtn {
+                left: 10px !important;
+            }
+
+            #nextMediaBtn {
+                right: 10px !important;
+            }
+
+            #progressBarsContainer {
+                top: 8px !important;
+                left: 10px !important;
+                right: 10px !important;
+            }
+
+            #storyContent img, #storyContent video {
+                max-height: 55vh !important;
+            }
+        }
+    </style>
+<% } %>

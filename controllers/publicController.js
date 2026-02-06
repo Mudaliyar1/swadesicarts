@@ -1,6 +1,17 @@
 const SeasonalProduct = require('../models/SeasonalProduct');
 const TechPackage = require('../models/TechPackage');
 const OrganicProduct = require('../models/OrganicProduct');
+const Story = require('../models/Story');
+
+// Helper function to get active stories
+async function getActiveStories() {
+  try {
+    return await Story.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 });
+  } catch (error) {
+    console.error('Error fetching stories:', error);
+    return [];
+  }
+}
 
 // Home page
 exports.getHome = async (req, res) => {
@@ -20,11 +31,14 @@ exports.getHome = async (req, res) => {
       .sort({ order: 1 })
       .limit(3);
 
+    const stories = await getActiveStories();
+
     res.render('public/home-new', {
       title: 'Swadesi Carts - Home',
       featuredSeasonal,
       featuredTech,
       featuredOrganic,
+      stories,
       currentPage: 'home'
     });
   } catch (error) {
@@ -34,21 +48,35 @@ exports.getHome = async (req, res) => {
 };
 
 // About page
-exports.getAbout = (req, res) => {
-  res.render('public/about-new', {
-    title: 'About Us - Swadesi Carts',
-    currentPage: 'about'
-  });
+exports.getAbout = async (req, res) => {
+  try {
+    const stories = await getActiveStories();
+    res.render('public/about-new', {
+      title: 'About Us - Swadesi Carts',
+      stories,
+      currentPage: 'about'
+    });
+  } catch (error) {
+    console.error('About page error:', error);
+    res.status(500).send('Server Error');
+  }
 };
 
 // Contact page
-exports.getContact = (req, res) => {
-  res.render('public/contact-new', {
-    title: 'Contact Us - Swadesi Carts',
-    currentPage: 'contact',
-    success: req.flash('success'),
-    error: req.flash('error')
-  });
+exports.getContact = async (req, res) => {
+  try {
+    const stories = await getActiveStories();
+    res.render('public/contact-new', {
+      title: 'Contact Us - Swadesi Carts',
+      stories,
+      currentPage: 'contact',
+      success: req.flash('success'),
+      error: req.flash('error')
+    });
+  } catch (error) {
+    console.error('Contact page error:', error);
+    res.status(500).send('Server Error');
+  }
 };
 
 // Handle contact form

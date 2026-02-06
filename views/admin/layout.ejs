@@ -54,6 +54,12 @@
                 </a>
             </li>
             <li>
+                <a href="/admin/stories" class="<%= typeof currentPage !== 'undefined' && currentPage === 'stories' ? 'active' : '' %>" title="Stories">
+                    <i class="bi bi-images"></i>
+                    <span class="sidebar-text">Stories</span>
+                </a>
+            </li>
+            <li>
                 <a href="/admin/inquiries" class="<%= typeof currentPage !== 'undefined' && currentPage === 'inquiries' ? 'active' : '' %>" title="Inquiries">
                     <i class="bi bi-chat-dots"></i>
                     <span class="sidebar-text">Inquiries</span>
@@ -89,6 +95,7 @@
                 <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
                 <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
                 <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
                 <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
                 <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>

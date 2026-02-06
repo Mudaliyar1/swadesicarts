@@ -1,5 +1,16 @@
 const SeasonalProduct = require('../models/SeasonalProduct');
 const Inquiry = require('../models/Inquiry');
+const Story = require('../models/Story');
+
+// Helper function to get active stories
+async function getActiveStories() {
+  try {
+    return await Story.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 });
+  } catch (error) {
+    console.error('Error fetching stories:', error);
+    return [];
+  }
+}
 
 // Get all seasonal products
 exports.getAllProducts = async (req, res) => {
@@ -18,11 +29,14 @@ exports.getAllProducts = async (req, res) => {
     const products = await SeasonalProduct.find(query)
       .sort({ order: 1, createdAt: -1 });
 
+    const stories = await getActiveStories();
+
     res.render('public/seasonal-products-new', {
       title: 'Seasonal Products - Swadesi Carts',
       products,
       categories: categories.sort(),
       selectedCategory,
+      stories,
       currentPage: 'seasonal'
     });
   } catch (error) {
@@ -48,10 +62,13 @@ exports.getProductDetail = async (req, res) => {
       });
     }
 
+    const stories = await getActiveStories();
+
     res.render('public/product-detail-template', {
       title: `${product.title} - Swadesi Carts`,
       product,
       type: 'seasonal',
+      stories,
       currentPage: 'seasonal',
       success: req.flash('success'),
       error: req.flash('error')

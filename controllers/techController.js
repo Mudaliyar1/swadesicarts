@@ -1,5 +1,16 @@
 const TechPackage = require('../models/TechPackage');
 const Inquiry = require('../models/Inquiry');
+const Story = require('../models/Story');
+
+// Helper function to get active stories
+async function getActiveStories() {
+  try {
+    return await Story.find({ isActive: true }).sort({ displayOrder: 1, createdAt: -1 });
+  } catch (error) {
+    console.error('Error fetching stories:', error);
+    return [];
+  }
+}
 
 // Get all tech packages
 exports.getAllPackages = async (req, res) => {
@@ -18,11 +29,14 @@ exports.getAllPackages = async (req, res) => {
     const packages = await TechPackage.find(query)
       .sort({ order: 1, createdAt: -1 });
 
+    const stories = await getActiveStories();
+
     res.render('public/tech-packages-new', {
       title: 'Tech Services & Packages - Swadesi Carts',
       packages,
       categories: categories.sort(),
       selectedCategory,
+      stories,
       currentPage: 'tech'
     });
   } catch (error) {
@@ -47,10 +61,13 @@ exports.getPackageDetail = async (req, res) => {
       });
     }
 
+    const stories = await getActiveStories();
+
     res.render('public/product-detail-template', {
       title: `${package.title} - Swadesi Carts`,
       product: package,
       type: 'tech',
+      stories,
       currentPage: 'tech',
       success: req.flash('success'),
       error: req.flash('error')
