@@ -10,24 +10,190 @@
     <link rel="stylesheet" href="/css/style-new.css">
 </head>
 <body>
-    <%- include('../partials/navbar-new') %>
-    
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 hero-content fade-in-up">
-                    <h1>Your Trusted Partner for Everything Organic & Tech</h1>
-                    <p class="hero-subtitle">Premium seasonal products, professional tech solutions, and 100% certified organic items all in one place.</p>
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="/seasonal-products" class="btn btn-primary-hero">Shop Seasonal</a>
-                        <a href="/tech-packages" class="btn btn-light">Tech Solutions</a>
-                    </div>
+    <!-- LOADING ANIMATION -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-content">
+            <!-- Animated Background -->
+            <div class="loader-bg"></div>
+            
+            <!-- Bouncing Icons Container -->
+            <div class="icons-container">
+                <div class="bouncing-icon" data-icon="0">
+                    <span class="emoji">💻</span>
+                    <p class="category-name">Technology</p>
                 </div>
-                <div class="col-lg-6 text-center fade-in-down">
-                    <div style="font-size: 200px; opacity: 0.1;">🌿</div>
+                <div class="bouncing-icon" data-icon="1">
+                    <span class="emoji">🥬</span>
+                    <p class="category-name">Organic</p>
+                </div>
+                <div class="bouncing-icon" data-icon="2">
+                    <span class="emoji">🌸</span>
+                    <p class="category-name">Seasonal</p>
                 </div>
             </div>
+            
+            <!-- Progress Indicator -->
+            <div class="loader-progress">
+                <div class="progress-bar"></div>
+            </div>
+            
+            <!-- Brand Text -->
+            <h1 class="loader-title">Swadesi Carts</h1>
+            <p class="loader-subtitle">Nature's Finest Collection</p>
+        </div>
+    </div>
+
+    <%- include('../partials/navbar-new') %>
+    
+    <!-- HERO CAROUSEL SECTION -->
+    <section class="hero-carousel-section">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
+            <!-- Carousel Indicators -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="4"></button>
+            </div>
+
+            <!-- Carousel Slides -->
+            <div class="carousel-inner">
+                <!-- Slide 1: Organic Products -->
+                <div class="carousel-item active">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        position: relative; overflow: hidden;">
+                        <div class="hero-pattern"></div>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col-lg-6">
+                                    <div class="hero-content-carousel">
+                                        <span class="hero-tag-modern">🌿 ORGANIC VIBES</span>
+                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Nature's Best,<br>Your Wellness First 💚</h1>
+                                        <p class="hero-subtitle mb-4">100% certified organic from farm to your doorstep. No cap, just pure vibes! 🌱✨</p>
+                                        <a href="/organic-products" class="btn btn-genz btn-lg px-5">Shop Organic <i class="bi bi-arrow-right ms-2"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 text-center">
+                                    <div class="hero-image-wrapper floating">
+                                        <div class="hero-emoji">🌿</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Tech Solutions -->
+                <div class="carousel-item">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+                        position: relative; overflow: hidden;">
+                        <div class="hero-pattern"></div>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col-lg-6">
+                                    <div class="hero-content-carousel">
+                                        <span class="hero-tag-modern">💻 TECH THAT SLAPS</span>
+                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Code. Create.<br>Conquer. 🚀</h1>
+                                        <p class="hero-subtitle mb-4">Next-level dev solutions that hit different. Built by devs who get it. Period. 💯</p>
+                                        <a href="/tech-packages" class="btn btn-genz btn-lg px-5">Let's Build <i class="bi bi-lightning-charge-fill ms-2"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 text-center">
+                                    <div class="hero-image-wrapper floating">
+                                        <div class="hero-emoji">💻</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Seasonal Products -->
+                <div class="carousel-item">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                        position: relative; overflow: hidden;">
+                        <div class="hero-pattern"></div>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col-lg-6">
+                                    <div class="hero-content-carousel">
+                                        <span class="hero-tag-modern">🔥 TRENDING NOW</span>
+                                        <h1 class="display-3 fw-bold mb-4 glitch-text">This Season's<br>Main Character 🌟</h1>
+                                        <p class="hero-subtitle mb-4">Limited drops that everyone's talking about. Get yours before they're gone! No FOMO. 🎯</p>
+                                        <a href="/seasonal-products" class="btn btn-genz btn-lg px-5">Shop Drops <i class="bi bi-fire ms-2"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 text-center">
+                                    <div class="hero-image-wrapper floating">
+                                        <div class="hero-emoji">✨</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Quality Assurance -->
+                <div class="carousel-item">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                        position: relative; overflow: hidden;">
+                        <div class="hero-pattern"></div>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col-lg-6">
+                                    <div class="hero-content-carousel">
+                                        <span class="hero-tag-modern">✓ 100% LEGIT</span>
+                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Real Talk,<br>Real Quality 💎</h1>
+                                        <p class="hero-subtitle mb-4">Certified, verified, and straight fire. We only do authentic—no sketchy vibes here! 🎯</p>
+                                        <a href="/about" class="btn btn-genz btn-lg px-5">Our Story <i class="bi bi-star-fill ms-2"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 text-center">
+                                    <div class="hero-image-wrapper floating">
+                                        <div class="hero-emoji">💎</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Customer First -->
+                <div class="carousel-item">
+                    <div class="hero-slide" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                        position: relative; overflow: hidden;">
+                        <div class="hero-pattern"></div>
+                        <div class="container h-100">
+                            <div class="row align-items-center h-100">
+                                <div class="col-lg-6">
+                                    <div class="hero-content-carousel">
+                                        <span class="hero-tag-modern">⚡ FAST AF</span>
+                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Order Today,<br>Flex Tomorrow 📦</h1>
+                                        <p class="hero-subtitle mb-4">Lightning-fast shipping + secure packaging. Your order lands on your doorstep like *that*. 🏃‍♂️💨</p>
+                                        <a href="/contact" class="btn btn-genz btn-lg px-5">Hit Us Up <i class="bi bi-chat-dots-fill ms-2"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6 text-center">
+                                    <div class="hero-image-wrapper floating">
+                                        <div class="hero-emoji">⚡</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
         </div>
     </section>
 
@@ -215,5 +381,29 @@
     <%- include('../partials/footer-new') %>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Page Loader Animation
+        (function() {
+            const pageLoader = document.getElementById('pageLoader');
+            
+            // Check if already shown this session
+            const hasSeenLoader = sessionStorage.getItem('loaderShown');
+            
+            if (hasSeenLoader) {
+                // Hide immediately if already seen
+                pageLoader.style.display = 'none';
+            } else {
+                // Hide loader after 2.5 seconds
+                setTimeout(function() {
+                    pageLoader.classList.add('fade-out');
+                    setTimeout(function() {
+                        pageLoader.style.display = 'none';
+                        sessionStorage.setItem('loaderShown', 'true');
+                    }, 600);
+                }, 2500);
+            }
+        })();
+    </script>
 </body>
 </html>
