@@ -16,7 +16,7 @@
     <section class="page-header">
         <div class="container">
             <h1>Contact Us</h1>
-            <p>We'd love to hear from you. Get in touch with us today!</p>
+            <p><%= siteSettings && siteSettings.contact ? siteSettings.contact.heading : "We'd love to hear from you. Get in touch with us today!" %></p>
         </div>
     </section>
 
@@ -39,7 +39,7 @@
             <div class="row g-5">
                 <!-- CONTACT INFO -->
                 <div class="col-lg-4">
-                    <h2 class="mb-4">Get In Touch</h2>
+                    <h2 class="mb-4"><%= siteSettings && siteSettings.contact ? siteSettings.contact.subheading : 'Get In Touch' %></h2>
                     
                     <div class="mb-4">
                         <div class="d-flex align-items-start gap-3 mb-4">
@@ -48,7 +48,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Location</h5>
-                                <p class="text-muted-custom mb-0">India</p>
+                                <p class="text-muted-custom mb-0"><%= siteSettings && siteSettings.contact ? siteSettings.contact.location : 'India' %></p>
                             </div>
                         </div>
 
@@ -58,7 +58,9 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Email</h5>
-                                <a href="mailto:info@swadesicarts.com" class="text-accent text-decoration-none">info@swadesicarts.com</a>
+                                <a href="mailto:<%= siteSettings && siteSettings.contact ? siteSettings.contact.email : 'info@swadesicarts.com' %>" class="text-accent text-decoration-none">
+                                    <%= siteSettings && siteSettings.contact ? siteSettings.contact.email : 'info@swadesicarts.com' %>
+                                </a>
                             </div>
                         </div>
 
@@ -68,7 +70,9 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Phone</h5>
-                                <a href="tel:+91-000-0000000" class="text-accent text-decoration-none">+91-000-0000000</a>
+                                <a href="tel:<%= siteSettings && siteSettings.contact ? siteSettings.contact.phone : '+91-000-0000000' %>" class="text-accent text-decoration-none">
+                                    <%= siteSettings && siteSettings.contact ? siteSettings.contact.phone : '+91-000-0000000' %>
+                                </a>
                             </div>
                         </div>
 
@@ -78,28 +82,46 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Business Hours</h5>
-                                <p class="text-muted-custom mb-0">Monday - Saturday<br>9:00 AM - 6:00 PM IST</p>
+                                <p class="text-muted-custom mb-0">
+                                    <%= siteSettings && siteSettings.contact ? siteSettings.contact.businessHours.days : 'Monday - Saturday' %><br>
+                                    <%= siteSettings && siteSettings.contact ? siteSettings.contact.businessHours.time : '9:00 AM - 6:00 PM IST' %>
+                                </p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="mt-5 pt-5 border-top">
-                        <h5 class="mb-3">Follow Us</h5>
-                        <div class="d-flex gap-2">
-                            <a href="#" class="btn btn-sm btn-outline-primary rounded-circle p-2">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm btn-outline-primary rounded-circle p-2">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm btn-outline-primary rounded-circle p-2">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm btn-outline-primary rounded-circle p-2">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
+                    <% if (siteSettings && siteSettings.socialMedia && (siteSettings.socialMedia.facebook || siteSettings.socialMedia.twitter || siteSettings.socialMedia.instagram || siteSettings.socialMedia.linkedin || siteSettings.socialMedia.youtube)) { %>
+                        <div class="mt-5 pt-5 border-top">
+                            <h5 class="mb-3">Follow Us</h5>
+                            <div class="d-flex gap-2">
+                                <% if (siteSettings.socialMedia.facebook) { %>
+                                    <a href="<%= siteSettings.socialMedia.facebook %>" target="_blank" class="btn btn-sm btn-outline-primary rounded-circle p-2">
+                                        <i class="bi bi-facebook"></i>
+                                    </a>
+                                <% } %>
+                                <% if (siteSettings.socialMedia.twitter) { %>
+                                    <a href="<%= siteSettings.socialMedia.twitter %>" target="_blank" class="btn btn-sm btn-outline-primary rounded-circle p-2">
+                                        <i class="bi bi-twitter"></i>
+                                    </a>
+                                <% } %>
+                                <% if (siteSettings.socialMedia.instagram) { %>
+                                    <a href="<%= siteSettings.socialMedia.instagram %>" target="_blank" class="btn btn-sm btn-outline-primary rounded-circle p-2">
+                                        <i class="bi bi-instagram"></i>
+                                    </a>
+                                <% } %>
+                                <% if (siteSettings.socialMedia.linkedin) { %>
+                                    <a href="<%= siteSettings.socialMedia.linkedin %>" target="_blank" class="btn btn-sm btn-outline-primary rounded-circle p-2">
+                                        <i class="bi bi-linkedin"></i>
+                                    </a>
+                                <% } %>
+                                <% if (siteSettings.socialMedia.youtube) { %>
+                                    <a href="<%= siteSettings.socialMedia.youtube %>" target="_blank" class="btn btn-sm btn-outline-primary rounded-circle p-2">
+                                        <i class="bi bi-youtube"></i>
+                                    </a>
+                                <% } %>
+                            </div>
                         </div>
-                    </div>
+                    <% } %>
                 </div>
 
                 <!-- CONTACT FORM -->

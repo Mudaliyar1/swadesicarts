@@ -1,7 +1,16 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-swadesi sticky-top shadow-sm">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">
-            <i class="bi bi-cart3"></i> Swadesi Carts
+        <a class="navbar-brand fw-bold" href="/" style="display: flex; align-items: center;">
+            <% if (siteSettings && siteSettings.logo && siteSettings.logo.url) { %>
+                <% 
+                const hPos = siteSettings.logo.horizontalPosition || 0;
+                const vPos = siteSettings.logo.verticalPosition || 0;
+                %>
+                <img src="<%= siteSettings.logo.url %>" alt="Swadesi Carts" 
+                     style="width: <%= siteSettings.logo.width || 200 %>px; height: <%= siteSettings.logo.height || 50 %>px; object-fit: contain; transform: translate(<%= hPos * 0.5 %>px, <%= vPos * 0.3 %>px);">
+            <% } else { %>
+                <i class="bi bi-cart3"></i> Swadesi Carts
+            <% } %>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>

@@ -7,6 +7,7 @@ const organicProductController = require('../controllers/admin/organicProductCon
 const inquiryController = require('../controllers/admin/inquiryController');
 const adminController = require('../controllers/admin/adminController');
 const storyController = require('../controllers/admin/storyController');
+const websiteSettingController = require('../controllers/admin/websiteSettingController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
 
@@ -90,5 +91,14 @@ router.post('/stories/edit/:id', isAuthenticated, upload.fields([
 ]), storyController.update);
 router.delete('/stories/delete/:id', isAuthenticated, storyController.delete);
 router.post('/stories/:id/toggle', isAuthenticated, storyController.toggleActive);
+
+// Website Settings routes
+router.get('/settings', isAuthenticated, websiteSettingController.getSettings);
+router.post('/settings', isAuthenticated, upload.fields([
+  { name: 'logo', maxCount: 1 },
+  { name: 'aboutImage', maxCount: 1 }
+]), websiteSettingController.updateSettings);
+router.delete('/settings/logo', isAuthenticated, websiteSettingController.deleteLogo);
+router.delete('/settings/about-image', isAuthenticated, websiteSettingController.deleteAboutImage);
 
 module.exports = router;

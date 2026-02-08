@@ -15,8 +15,8 @@
     <!-- PAGE HEADER -->
     <section class="page-header">
         <div class="container">
-            <h1>About Swadesi Carts</h1>
-            <p>Your trusted partner for authentic products and professional solutions</p>
+            <h1><%= siteSettings && siteSettings.about ? siteSettings.about.mainHeading : 'About Swadesi Carts' %></h1>
+            <p><%= siteSettings && siteSettings.about ? (siteSettings.about.headerDescription || siteSettings.about.description) : 'Your trusted partner for authentic products and professional solutions' %></p>
         </div>
     </section>
 
@@ -27,7 +27,7 @@
                 <div class="col-lg-6">
                     <h2>Who We Are</h2>
                     <p class="text-muted-custom fs-5 mb-3">
-                        Swadesi Carts is a premium marketplace dedicated to bringing you the finest selection of seasonal products, professional tech services, and 100% certified organic items all in one convenient platform.
+                        <%= siteSettings && siteSettings.about ? siteSettings.about.description : 'Swadesi Carts is a premium marketplace dedicated to bringing you the finest selection of seasonal products, professional tech services, and 100% certified organic items all in one convenient platform.' %>
                     </p>
                     <p class="text-muted-custom fs-5 mb-3">
                         We believe in quality over quantity, authenticity over compromise, and customer satisfaction as our ultimate goal. With years of experience in sourcing and delivering excellence, we've built a community of satisfied customers who trust us with their needs.
@@ -37,9 +37,13 @@
                     </p>
                 </div>
                 <div class="col-lg-6">
-                    <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); height: 400px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 8rem; opacity: 0.2;">
-                        🌟
-                    </div>
+                    <% if (siteSettings && siteSettings.about && siteSettings.about.image && siteSettings.about.image.url) { %>
+                        <img src="<%= siteSettings.about.image.url %>" alt="About Us" class="img-fluid rounded-3 shadow-sm" style="border-radius: 16px; max-height: 400px; width: 100%; object-fit: cover;">
+                    <% } else { %>
+                        <div style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); height: 400px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 8rem; opacity: 0.2;">
+                            🌟
+                        </div>
+                    <% } %>
                 </div>
             </div>
         </div>
@@ -49,54 +53,70 @@
     <section class="bg-light-custom">
         <div class="container">
             <div class="section-header">
-                <h2>Our Values</h2>
-                <p>What drives us forward</p>
+                <h2><%= siteSettings && siteSettings.about ? siteSettings.about.valuesHeading : 'Our Values' %></h2>
+                <p><%= siteSettings && siteSettings.about ? siteSettings.about.valuesSubheading : 'What drives us forward' %></p>
             </div>
             <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 h-100">
-                        <div class="card-body text-center">
-                            <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
-                                <i class="bi bi-gem"></i>
+                <% if (siteSettings && siteSettings.about && siteSettings.about.values && siteSettings.about.values.length > 0) { %>
+                    <% siteSettings.about.values.forEach(value => { %>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card border-0 h-100">
+                                <div class="card-body text-center">
+                                    <div class="feature-icon" style="margin-left: auto; margin-right: auto; font-size: 2.5rem;">
+                                        <%= value.icon %>
+                                    </div>
+                                    <h5><%= value.title %></h5>
+                                    <p class="text-muted-custom mb-0"><%= value.description %></p>
+                                </div>
                             </div>
-                            <h5>Quality</h5>
-                            <p class="text-muted-custom mb-0">We never compromise on quality. Every product is carefully selected and tested.</p>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
+                                    <i class="bi bi-gem"></i>
+                                </div>
+                                <h5>Quality</h5>
+                                <p class="text-muted-custom mb-0">We never compromise on quality. Every product is carefully selected and tested.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 h-100">
-                        <div class="card-body text-center">
-                            <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
-                                <i class="bi bi-shield-check"></i>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <h5>Authenticity</h5>
+                                <p class="text-muted-custom mb-0">All products come with proper certifications and guarantees.</p>
                             </div>
-                            <h5>Authenticity</h5>
-                            <p class="text-muted-custom mb-0">All products come with proper certifications and guarantees.</p>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 h-100">
-                        <div class="card-body text-center">
-                            <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
-                                <i class="bi bi-heart"></i>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
+                                    <i class="bi bi-heart"></i>
+                                </div>
+                                <h5>Customer Care</h5>
+                                <p class="text-muted-custom mb-0">Your satisfaction is our priority. We're always here to help.</p>
                             </div>
-                            <h5>Customer Care</h5>
-                            <p class="text-muted-custom mb-0">Your satisfaction is our priority. We're always here to help.</p>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card border-0 h-100">
-                        <div class="card-body text-center">
-                            <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
-                                <i class="bi bi-lightning-charge"></i>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <div class="feature-icon" style="margin-left: auto; margin-right: auto;">
+                                    <i class="bi bi-lightning-charge"></i>
+                                </div>
+                                <h5>Innovation</h5>
+                                <p class="text-muted-custom mb-0">We continuously improve our services and offerings.</p>
                             </div>
-                            <h5>Innovation</h5>
-                            <p class="text-muted-custom mb-0">We continuously improve our services and offerings.</p>
                         </div>
                     </div>
-                </div>
+                <% } %>
             </div>
         </div>
     </section>
@@ -107,39 +127,28 @@
             <div class="row text-center">
                 <div class="col-md-3">
                     <div class="stats-box">
-                        <div class="stats-number">500+</div>
-                        <div class="stats-label">Happy Customers</div>
+                        <div class="stats-number"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.customers : '500+' %></div>
+                        <div class="stats-label"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.customersLabel : 'Happy Customers' %></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-box">
-                        <div class="stats-number">1000+</div>
-                        <div class="stats-label">Products & Services</div>
+                        <div class="stats-number"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.products : '1000+' %></div>
+                        <div class="stats-label"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.productsLabel : 'Products & Services' %></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-box">
-                        <div class="stats-number">10+</div>
-                        <div class="stats-label">Years Experience</div>
+                        <div class="stats-number"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.experience : '10+' %></div>
+                        <div class="stats-label"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.experienceLabel : 'Years Experience' %></div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stats-box">
-                        <div class="stats-number">100%</div>
-                        <div class="stats-label">Satisfaction Guaranteed</div>
+                        <div class="stats-number"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.satisfaction : '100%' %></div>
+                        <div class="stats-label"><%= siteSettings && siteSettings.about ? siteSettings.about.stats.satisfactionLabel : 'Satisfaction Guaranteed' %></div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA SECTION -->
-    <section class="bg-primary" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;">
-        <div class="container">
-            <div class="text-center text-white">
-                <h2 class="mb-3">Ready to Experience Excellence?</h2>
-                <p class="fs-5 mb-4">Join our community of satisfied customers and discover the Swadesi Carts difference.</p>
-                <a href="/contact" class="btn btn-light btn-lg">Get in Touch</a>
             </div>
         </div>
     </section>

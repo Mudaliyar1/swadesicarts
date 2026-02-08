@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .settings-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #2c5f2d;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #97c93d;
+        }
+        .image-preview {
+            max-width: 300px;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .value-card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+        }
+        .btn-remove-value {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .nav-tabs .nav-link {
+            color: #2c5f2d;
+        }
+        .nav-tabs .nav-link.active {
+            background-color: #2c5f2d;
+            color: white;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">Website Settings</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
+            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+            <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
+            <li><a href="/admin/settings" class="active" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
+                <li><a href="/admin/settings" class="active"><i class="bi bi-gear"></i> Website Settings</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold mb-0"><i class="bi bi-gear"></i> <%= title %></h2>
+            </div>
+
+                <% if (messages.success && messages.success.length > 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <%= messages.success %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
+
+                <% if (messages.error && messages.error.length > 0) { %>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <%= messages.error %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
+
+                <!-- Settings Tabs -->
+                <ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#logo" type="button">
+                            <i class="bi bi-image"></i> Logo
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#footer" type="button">
+                            <i class="bi bi-footer"></i> Footer
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#contact" type="button">
+                            <i class="bi bi-envelope"></i> Contact Page
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#social" type="button">
+                            <i class="bi bi-share"></i> Social Media
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#about" type="button">
+                            <i class="bi bi-info-circle"></i> About Page
+                        </button>
+                    </li>
+                </ul>
+
+                <form action="/admin/settings" method="POST" enctype="multipart/form-data">
+                    <div class="tab-content">
+                        <!-- Logo Tab -->
+                        <div class="tab-pane fade show active" id="logo">
+                            <div class="settings-section">
+                                <h3 class="section-title">Website Logo</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <% if (settings.logo && settings.logo.url) { %>
+                                            <div class="mb-3">
+                                                <label class="form-label">Current Logo:</label>
+                                                <div id="logoPreviewContainer" style="background: #f8f9fa; padding: 30px; border-radius: 8px; min-height: 150px; display: flex; align-items: center; border: 2px dashed #dee2e6;">
+                                                    <img src="<%= settings.logo.url %>" alt="Website Logo" id="logoPreview" 
+                                                         style="object-fit: contain;">
+                                                </div>
+                                                <button type="button" class="btn btn-danger btn-sm mt-2" onclick="deleteLogo()">
+                                                    <i class="bi bi-trash"></i> Delete Logo
+                                                </button>
+                                            </div>
+                                        <% } %>
+
+                                        <div class="mb-3">
+                                            <label for="logo" class="form-label">Upload New Logo</label>
+                                            <input type="file" class="form-control" id="logoFile" name="logo" accept="image/*" onchange="previewLogoFile(this)">
+                                            <small class="text-muted">Formats: JPG, PNG, SVG</small>
+                                        </div>
+                                    </div>
+
+                                    <% if (settings.logo && settings.logo.url) { %>
+                                        <div class="col-md-6">
+                                            <h5 class="mb-3">Logo Settings</h5>
+                                            
+                                            <div class="mb-3">
+                                                <label for="logo.width" class="form-label">Width: <span id="widthValue"><%= settings.logo.width %></span>px</label>
+                                                <input type="range" class="form-range" id="logo.width" name="logo.width" 
+                                                       min="1" max="1000" value="<%= settings.logo.width %>" 
+                                                       oninput="updateLogoPreview()">
+                                                <small class="text-muted">Range: 1px - 1000px</small>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="logo.height" class="form-label">Height: <span id="heightValue"><%= settings.logo.height %></span>px</label>
+                                                <input type="range" class="form-range" id="logo.height" name="logo.height" 
+                                                       min="1" max="1000" value="<%= settings.logo.height %>" 
+                                                       oninput="updateLogoPreview()">
+                                                <small class="text-muted">Range: 1px - 1000px</small>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="logo.horizontalPosition" class="form-label">
+                                                    Horizontal Position: 
+                                                    <span id="horizontalPosValue"><%= settings.logo.horizontalPosition || 0 %></span>
+                                                    <small class="text-muted">(Left <i class="bi bi-arrow-left-right"></i> Right)</small>
+                                                </label>
+                                                <input type="range" class="form-range" id="logo.horizontalPosition" name="logo.horizontalPosition" 
+                                                       min="-100" max="100" value="<%= settings.logo.horizontalPosition || 0 %>" 
+                                                       oninput="updateLogoPreview()">
+                                                <div class="d-flex justify-content-between">
+                                                    <small class="text-muted">Left (-100)</small>
+                                                    <small class="text-muted">Center (0)</small>
+                                                    <small class="text-muted">Right (+100)</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="logo.verticalPosition" class="form-label">
+                                                    Vertical Position: 
+                                                    <span id="verticalPosValue"><%= settings.logo.verticalPosition || 0 %></span>
+                                                    <small class="text-muted">(Top <i class="bi bi-arrow-down-up"></i> Bottom)</small>
+                                                </label>
+                                                <input type="range" class="form-range" id="logo.verticalPosition" name="logo.verticalPosition" 
+                                                       min="-100" max="100" value="<%= settings.logo.verticalPosition || 0 %>" 
+                                                       oninput="updateLogoPreview()">
+                                                <div class="d-flex justify-content-between">
+                                                    <small class="text-muted">Top (-100)</small>
+                                                    <small class="text-muted">Middle (0)</small>
+                                                    <small class="text-muted">Bottom (+100)</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-info-circle"></i> Preview shows how the logo will appear in the navbar. Use sliders for precise control!
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer Tab -->
+                        <div class="tab-pane fade" id="footer">
+                            <div class="settings-section">
+                                <h3 class="section-title">Footer Information</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="footer.phone" class="form-label">Phone Number</label>
+                                    <input type="text" class="form-control" id="footer.phone" name="footer.phone" 
+                                           value="<%= settings.footer.phone %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="footer.email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="footer.email" name="footer.email" 
+                                           value="<%= settings.footer.email %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="footer.address" class="form-label">Address</label>
+                                    <input type="text" class="form-control" id="footer.address" name="footer.address" 
+                                           value="<%= settings.footer.address %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="footer.description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="footer.description" name="footer.description" 
+                                              rows="3"><%= settings.footer.description %></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Tab -->
+                        <div class="tab-pane fade" id="contact">
+                            <div class="settings-section">
+                                <h3 class="section-title">Contact Page Content</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="contact.heading" class="form-label">Main Heading</label>
+                                    <input type="text" class="form-control" id="contact.heading" name="contact.heading" 
+                                           value="<%= settings.contact.heading %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="contact.subheading" class="form-label">Subheading</label>
+                                    <input type="text" class="form-control" id="contact.subheading" name="contact.subheading" 
+                                           value="<%= settings.contact.subheading %>">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contact.location" class="form-label">Location</label>
+                                        <input type="text" class="form-control" id="contact.location" name="contact.location" 
+                                               value="<%= settings.contact.location %>">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contact.email" class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="contact.email" name="contact.email" 
+                                               value="<%= settings.contact.email %>">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="contact.phone" class="form-label">Phone</label>
+                                    <input type="text" class="form-control" id="contact.phone" name="contact.phone" 
+                                           value="<%= settings.contact.phone %>">
+                                </div>
+
+                                <h4 class="mt-4 mb-3">Business Hours</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contact.businessHours.days" class="form-label">Days</label>
+                                        <input type="text" class="form-control" id="contact.businessHours.days" 
+                                               name="contact.businessHours.days" 
+                                               value="<%= settings.contact.businessHours.days %>">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contact.businessHours.time" class="form-label">Time</label>
+                                        <input type="text" class="form-control" id="contact.businessHours.time" 
+                                               name="contact.businessHours.time" 
+                                               value="<%= settings.contact.businessHours.time %>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Social Media Tab -->
+                        <div class="tab-pane fade" id="social">
+                            <div class="settings-section">
+                                <h3 class="section-title">Social Media Links</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="socialMedia.facebook" class="form-label">
+                                        <i class="bi bi-facebook"></i> Facebook URL
+                                    </label>
+                                    <input type="url" class="form-control" id="socialMedia.facebook" 
+                                           name="socialMedia.facebook" 
+                                           value="<%= settings.socialMedia.facebook %>"
+                                           placeholder="https://facebook.com/yourpage">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="socialMedia.twitter" class="form-label">
+                                        <i class="bi bi-twitter"></i> Twitter URL
+                                    </label>
+                                    <input type="url" class="form-control" id="socialMedia.twitter" 
+                                           name="socialMedia.twitter" 
+                                           value="<%= settings.socialMedia.twitter %>"
+                                           placeholder="https://twitter.com/yourhandle">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="socialMedia.instagram" class="form-label">
+                                        <i class="bi bi-instagram"></i> Instagram URL
+                                    </label>
+                                    <input type="url" class="form-control" id="socialMedia.instagram" 
+                                           name="socialMedia.instagram" 
+                                           value="<%= settings.socialMedia.instagram %>"
+                                           placeholder="https://instagram.com/yourprofile">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="socialMedia.linkedin" class="form-label">
+                                        <i class="bi bi-linkedin"></i> LinkedIn URL
+                                    </label>
+                                    <input type="url" class="form-control" id="socialMedia.linkedin" 
+                                           name="socialMedia.linkedin" 
+                                           value="<%= settings.socialMedia.linkedin %>"
+                                           placeholder="https://linkedin.com/company/yourcompany">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="socialMedia.youtube" class="form-label">
+                                        <i class="bi bi-youtube"></i> YouTube URL
+                                    </label>
+                                    <input type="url" class="form-control" id="socialMedia.youtube" 
+                                           name="socialMedia.youtube" 
+                                           value="<%= settings.socialMedia.youtube %>"
+                                           placeholder="https://youtube.com/channel/yourchannel">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About Tab -->
+                        <div class="tab-pane fade" id="about">
+                            <div class="settings-section">
+                                <h3 class="section-title">About Page Content</h3>
+                                
+                                <div class="mb-3">
+                                    <label for="about.mainHeading" class="form-label">Main Heading</label>
+                                    <input type="text" class="form-control" id="about.mainHeading" 
+                                           name="about.mainHeading" value="<%= settings.about.mainHeading %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="about.headerDescription" class="form-label">Header Description</label>
+                                    <textarea class="form-control" id="about.headerDescription" name="about.headerDescription" 
+                                              rows="2"><%= settings.about.headerDescription || '' %></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="about.description" class="form-label">Description</label>
+                                    <textarea class="form-control" id="about.description" name="about.description" 
+                                              rows="4"><%= settings.about.description %></textarea>
+                                </div>
+
+                                <% if (settings.about.image && settings.about.image.url) { %>
+                                    <div class="mb-3">
+                                        <label class="form-label">Current About Image:</label>
+                                        <div>
+                                            <img src="<%= settings.about.image.url %>" alt="About Image" class="image-preview">
+                                        </div>
+                                        <button type="button" class="btn btn-danger btn-sm mt-2" onclick="deleteAboutImage()">
+                                            <i class="bi bi-trash"></i> Delete Image
+                                        </button>
+                                    </div>
+                                <% } %>
+
+                                <div class="mb-3">
+                                    <label for="aboutImage" class="form-label">Upload About Image</label>
+                                    <input type="file" class="form-control" id="aboutImage" name="aboutImage" accept="image/*">
+                                </div>
+
+                                <h4 class="mt-4 mb-3">Values Section</h4>
+                                <div class="mb-3">
+                                    <label for="about.valuesHeading" class="form-label">Values Heading</label>
+                                    <input type="text" class="form-control" id="about.valuesHeading" 
+                                           name="about.valuesHeading" value="<%= settings.about.valuesHeading %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="about.valuesSubheading" class="form-label">Values Subheading</label>
+                                    <input type="text" class="form-control" id="about.valuesSubheading" 
+                                           name="about.valuesSubheading" value="<%= settings.about.valuesSubheading %>">
+                                </div>
+
+                                <div id="valuesContainer" data-value-count="<%= settings.about.values.length %>">
+                                    <% if (settings.about.values && settings.about.values.length > 0) { %>
+                                        <% settings.about.values.forEach((value, index) => { %>
+                                            <div class="value-card" data-value-index="<%= index %>">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <strong>Value #<%= index + 1 %></strong>
+                                                    <button type="button" class="btn-remove-value" onclick="removeValue(this)">
+                                                        <i class="bi bi-x"></i> Remove
+                                                    </button>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Icon (Emoji)</label>
+                                                    <input type="text" class="form-control" name="values[<%= index %>][icon]" 
+                                                           value="<%= value.icon %>" placeholder="🌟">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Title</label>
+                                                    <input type="text" class="form-control" name="values[<%= index %>][title]" 
+                                                           value="<%= value.title %>">
+                                                </div>
+                                                <div class="mb-2">
+                                                    <label class="form-label">Description</label>
+                                                    <textarea class="form-control" name="values[<%= index %>][description]" 
+                                                              rows="2"><%= value.description %></textarea>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+                                    <% } %>
+                                </div>
+
+                                <button type="button" class="btn btn-secondary mb-4" onclick="addValue()">
+                                    <i class="bi bi-plus"></i> Add Value
+                                </button>
+
+                                <h4 class="mt-4 mb-3">Statistics</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Happy Customers (Number)</label>
+                                        <input type="text" class="form-control" name="stats.customers" 
+                                               value="<%= settings.about.stats.customers %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Happy Customers (Label)</label>
+                                        <input type="text" class="form-control" name="stats.customersLabel" 
+                                               value="<%= settings.about.stats.customersLabel %>">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Products & Services (Number)</label>
+                                        <input type="text" class="form-control" name="stats.products" 
+                                               value="<%= settings.about.stats.products %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Products & Services (Label)</label>
+                                        <input type="text" class="form-control" name="stats.productsLabel" 
+                                               value="<%= settings.about.stats.productsLabel %>">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Experience (Number)</label>
+                                        <input type="text" class="form-control" name="stats.experience" 
+                                               value="<%= settings.about.stats.experience %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Experience (Label)</label>
+                                        <input type="text" class="form-control" name="stats.experienceLabel" 
+                                               value="<%= settings.about.stats.experienceLabel %>">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Satisfaction (Number)</label>
+                                        <input type="text" class="form-control" name="stats.satisfaction" 
+                                               value="<%= settings.about.stats.satisfaction %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Satisfaction (Label)</label>
+                                        <input type="text" class="form-control" name="stats.satisfactionLabel" 
+                                               value="<%= settings.about.stats.satisfactionLabel %>">
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <button type="submit" class="btn btn-swadesi btn-lg">
+                            <i class="bi bi-save"></i> Save All Settings
+                        </button>
+                        <a href="/admin/dashboard" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-x"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        const valuesContainer = document.getElementById('valuesContainer');
+        let valueIndex = Number(valuesContainer?.dataset.valueCount || 0);
+
+        function addValue() {
+            const container = document.getElementById('valuesContainer');
+            const valueCard = document.createElement('div');
+            valueCard.className = 'value-card';
+            valueCard.setAttribute('data-value-index', valueIndex);
+            
+            valueCard.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>Value #${valueIndex + 1}</strong>
+                    <button type="button" class="btn-remove-value" onclick="removeValue(this)">
+                        <i class="bi bi-x"></i> Remove
+                    </button>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Icon (Emoji)</label>
+                    <input type="text" class="form-control" name="values[${valueIndex}][icon]" 
+                           value="🌟" placeholder="🌟">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" name="values[${valueIndex}][title]" value="">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" name="values[${valueIndex}][description]" rows="2"></textarea>
+                </div>
+            `;
+            
+            container.appendChild(valueCard);
+            valueIndex++;
+        }
+
+        function removeValue(button) {
+            if (confirm('Are you sure you want to remove this value?')) {
+                button.closest('.value-card').remove();
+            }
+        }
+
+        function deleteLogo() {
+            if (confirm('Are you sure you want to delete the logo?')) {
+                fetch('/admin/settings/logo', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting logo');
+                    }
+                });
+            }
+        }
+
+        function deleteAboutImage() {
+            if (confirm('Are you sure you want to delete the about image?')) {
+                fetch('/admin/settings/about-image', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting about image');
+                    }
+                });
+            }
+        }
+
+        // Logo preview functions
+        function updateLogoPreview() {
+            const preview = document.getElementById('logoPreview');
+            const container = document.getElementById('logoPreviewContainer');
+            
+            if (!preview || !container) return;
+            
+            // Update size
+            const width = document.getElementById('logo.width').value;
+            const height = document.getElementById('logo.height').value;
+            document.getElementById('widthValue').textContent = width;
+            document.getElementById('heightValue').textContent = height;
+            
+            preview.style.width = width + 'px';
+            preview.style.height = height + 'px';
+            
+            // Update horizontal position (-100 to 100)
+            const horizontalPos = document.getElementById('logo.horizontalPosition').value;
+            document.getElementById('horizontalPosValue').textContent = horizontalPos;
+            
+            // Convert -100 to 100 range to flexbox values
+            // -100 = flex-start, 0 = center, 100 = flex-end
+            if (horizontalPos < -33) {
+                container.style.justifyContent = 'flex-start';
+            } else if (horizontalPos > 33) {
+                container.style.justifyContent = 'flex-end';
+            } else {
+                container.style.justifyContent = 'center';
+            }
+            
+            // Fine-tune with margin for precise positioning
+            const marginLeftPercent = (parseInt(horizontalPos) + 100) / 2; // Convert -100,100 to 0,100
+            preview.style.marginLeft = `${(marginLeftPercent - 50)}px`;
+            
+            // Update vertical position (-100 to 100)
+            const verticalPos = document.getElementById('logo.verticalPosition').value;
+            document.getElementById('verticalPosValue').textContent = verticalPos;
+            
+            // Convert -100 to 100 range to flexbox values
+            if (verticalPos < -33) {
+                container.style.alignItems = 'flex-start';
+            } else if (verticalPos > 33) {
+                container.style.alignItems = 'flex-end';
+            } else {
+                container.style.alignItems = 'center';
+            }
+            
+            // Fine-tune with margin for precise positioning
+            const marginTopPercent = (parseInt(verticalPos) + 100) / 2;
+            preview.style.marginTop = `${(marginTopPercent - 50) / 2}px`;
+        }
+
+        function previewLogoFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const preview = document.getElementById('logoPreview');
+                    if (preview) {
+                        preview.src = e.target.result;
+                    }
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Initialize preview on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLogoPreview();
+        });
+    </script>
+</body>
+</html>

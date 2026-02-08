@@ -6,6 +6,7 @@ const flash = require('express-flash');
 const methodOverride = require('method-override');
 const path = require('path');
 const connectDB = require('./config/database');
+const { loadWebsiteSettings } = require('./middleware/websiteSettings');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,6 +41,9 @@ app.use(session({
 }));
 
 app.use(flash());
+
+// Load website settings for all views
+app.use(loadWebsiteSettings);
 
 // Global variables middleware
 app.use((req, res, next) => {
