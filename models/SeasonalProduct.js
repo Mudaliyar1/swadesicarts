@@ -52,14 +52,13 @@ const seasonalProductSchema = new mongoose.Schema({
 });
 
 // Generate slug before validation
-seasonalProductSchema.pre('validate', function(next) {
+seasonalProductSchema.pre('validate', function() {
   if (this.isModified('title') && !this.slug) {
     this.slug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   }
-  next();
 });
 
 module.exports = mongoose.model('SeasonalProduct', seasonalProductSchema);

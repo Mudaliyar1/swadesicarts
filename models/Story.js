@@ -42,9 +42,8 @@ const storySchema = new mongoose.Schema({
 });
 
 // Update updatedAt on save
-storySchema.pre('save', function(next) {
+storySchema.pre('save', function() {
   this.updatedAt = Date.now();
-  next();
 });
 
 module.exports = mongoose.model('Story', storySchema);

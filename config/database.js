@@ -7,8 +7,6 @@ dns.setServers(['8.8.8.8', '8.8.4.4', '1.1.1.1']);
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       family: 4 // Use IPv4, skip trying IPv6

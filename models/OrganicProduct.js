@@ -63,14 +63,13 @@ const organicProductSchema = new mongoose.Schema({
 });
 
 // Generate slug before validation
-organicProductSchema.pre('validate', function(next) {
+organicProductSchema.pre('validate', function() {
   if (this.isModified('title') && !this.slug) {
     this.slug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   }
-  next();
 });
 
 module.exports = mongoose.model('OrganicProduct', organicProductSchema);

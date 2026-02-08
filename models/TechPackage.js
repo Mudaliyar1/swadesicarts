@@ -68,14 +68,13 @@ const techPackageSchema = new mongoose.Schema({
 });
 
 // Generate slug before validation
-techPackageSchema.pre('validate', function(next) {
+techPackageSchema.pre('validate', function() {
   if (this.isModified('title') && !this.slug) {
     this.slug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
   }
-  next();
 });
 
 module.exports = mongoose.model('TechPackage', techPackageSchema);
