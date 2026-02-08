@@ -122,7 +122,7 @@
                                                 <a href="/admin/seasonal-products/edit/<%= product._id %>" class="btn btn-outline-warning" title="Edit">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <button onclick="confirmDelete('/admin/seasonal-products/delete/<%= product._id %>')" class="btn btn-outline-danger" title="Delete">
+                                                <button onclick="confirmDelete('<%= product._id %>', 'product', '/admin/seasonal-products/<%= product._id %>')" class="btn btn-outline-danger" title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>

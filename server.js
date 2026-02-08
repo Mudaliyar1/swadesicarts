@@ -79,6 +79,33 @@ app.use((req, res) => {
 // Error Handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  
+  // Handle Multer errors
+  if (err.name === 'MulterError') {
+    console.log('Multer Error Details:', err.code, err.field);
+    let errorMessage = 'File upload error';
+    
+    switch(err.code) {
+      case 'LIMIT_FILE_SIZE':
+        errorMessage = 'File size is too large. Maximum size is 2GB per file.';
+        break;
+      case 'LIMIT_FILE_COUNT':
+        errorMessage = 'Too many files uploaded.';
+        break;
+      case 'LIMIT_UNEXPECTED_FILE':
+        errorMessage = `Unexpected file field "${err.field}". Please make sure you are uploading files in the correct fields (Featured Image and Gallery).`;
+        break;
+      case 'LIMIT_FIELD_COUNT':
+        errorMessage = 'Too many form fields.';
+        break;
+      default:
+        errorMessage = 'File upload error: ' + err.message;
+    }
+    
+    req.flash('error', errorMessage);
+    return res.redirect('back');
+  }
+  
   res.status(500).render('public/500', {
     title: 'Server Error',
     currentPage: '',

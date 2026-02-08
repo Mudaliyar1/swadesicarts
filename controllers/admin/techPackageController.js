@@ -183,13 +183,23 @@ exports.delete = async (req, res) => {
     }
 
     if (package.featuredImage && package.featuredImage.publicId) {
-      await cloudinary.uploader.destroy(package.featuredImage.publicId);
+      try {
+        const resourceType = package.featuredImage.type === 'video' ? 'video' : 'image';
+        await cloudinary.uploader.destroy(package.featuredImage.publicId, { resource_type: resourceType });
+      } catch (err) {
+        console.error('Error deleting featured image from Cloudinary:', err);
+      }
     }
 
     if (package.gallery && package.gallery.length > 0) {
       for (const media of package.gallery) {
         if (media.publicId) {
-          await cloudinary.uploader.destroy(media.publicId);
+          try {
+            const resourceType = media.type === 'video' ? 'video' : 'image';
+            await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+          } catch (err) {
+            console.error('Error deleting gallery item from Cloudinary:', err);
+          }
         }
       }
     }
@@ -220,7 +230,12 @@ exports.deleteGalleryItem = async (req, res) => {
     }
 
     if (galleryItem.publicId) {
-      await cloudinary.uploader.destroy(galleryItem.publicId);
+      try {
+        const resourceType = galleryItem.type === 'video' ? 'video' : 'image';
+        await cloudinary.uploader.destroy(galleryItem.publicId, { resource_type: resourceType });
+      } catch (err) {
+        console.error('Error deleting from Cloudinary:', err);
+      }
     }
 
     package.gallery.pull(itemId);

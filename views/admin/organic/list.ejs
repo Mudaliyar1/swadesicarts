@@ -128,7 +128,7 @@
                                                 <a href="/admin/organic-products/edit/<%= product._id %>" class="btn btn-outline-warning" title="Edit">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
-                                                <button onclick="confirmDelete('/admin/organic-products/delete/<%= product._id %>')" class="btn btn-outline-danger" title="Delete">
+                                                <button onclick="confirmDelete('<%= product._id %>', 'product', '/admin/organic-products/<%= product._id %>')" class="btn btn-outline-danger" title="Delete">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>

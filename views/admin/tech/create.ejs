@@ -105,7 +105,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Gallery Images/Videos (Optional)</label>
                                 <input type="file" class="form-control" id="gallery" name="gallery" accept="image/*,video/*" multiple onchange="previewGalleryFiles(event)">
-                                <small class="text-muted d-block mt-2">You can upload multiple images and videos. They will all be visible on the product detail page.</small>
+                                <small class="text-muted d-block mt-2">You can upload up to 10 images/videos. They will all be visible on the product detail page.</small>
                                 
                             <!-- Gallery Carousel Preview -->
                             <div class="col-12 mb-3" id="galleryCarouselContainer" style="display: none;">
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div class="col-12">
-                                <button type="submit" class="btn btn-swadesi"><i class="bi bi-check-circle"></i> Create Package</button>
+                                <button type="submit" class="btn btn-swadesi" id="submitBtn"><i class="bi bi-check-circle"></i> Create Package</button>
                                 <a href="/admin/tech-packages" class="btn btn-outline-secondary">Cancel</a>
                             </div>
                         </div>
@@ -155,9 +155,132 @@
         </div>
     </div>
 
+    <!-- Upload Progress Overlay -->
+    <div id="uploadProgressOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); max-width: 500px; width: 90%; text-align: center;">
+            <div style="font-size: 3rem; color: #2c5f2d; margin-bottom: 20px;">
+                <i class="bi bi-cloud-upload"></i>
+            </div>
+            <h4 style="color: #2c5f2d; margin-bottom: 10px;">Uploading Files...</h4>
+            <p style="color: #666; margin-bottom: 30px; font-size: 0.95rem;"><strong>⚠️ Please don't close this tab or navigate away</strong></p>
+            <div style="width: 100%; background: #e9ecef; border-radius: 10px; height: 30px; overflow: hidden; margin-bottom: 15px;">
+                <div id="progressBar" style="height: 100%; background: linear-gradient(90deg, #2c5f2d, #97c93d); width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;"></div>
+            </div>
+            <div id="progressText" style="color: #2c5f2d; font-weight: 600; font-size: 1.1rem;">0%</div>
+            <div id="uploadSpeed" style="color: #666; font-size: 0.85rem; margin-top: 10px;"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/admin.js"></script>
     <script>
+        // Upload Progress Handler
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressOverlay = document.getElementById('uploadProgressOverlay');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const uploadSpeed = document.getElementById('uploadSpeed');
+        
+        let isUploading = false;
+        let uploadStarted = false;
+        let startTime;
+        let lastLoaded = 0;
+        let lastTime;
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate gallery file count
+            const galleryInput = document.getElementById('gallery');
+            if (galleryInput.files.length > 10) {
+                alert('You can only upload up to 10 gallery files at once.');
+                return;
+            }
+            
+            const formData = new FormData(form);
+            const xhr = new XMLHttpRequest();
+            
+            // Show progress overlay
+            progressOverlay.style.display = 'flex';
+            submitBtn.disabled = true;
+            isUploading = true;
+            uploadStarted = false;
+            
+            // Track upload progress
+            xhr.upload.addEventListener('loadstart', function() {
+                uploadStarted = true;
+                startTime = Date.now();
+                lastTime = startTime;
+                lastLoaded = 0;
+            });
+            
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percentComplete + '%';
+                    progressBar.textContent = percentComplete + '%';
+                    progressText.textContent = percentComplete + '%';
+                    
+                    // Calculate upload speed
+                    const currentTime = Date.now();
+                    const timeDiff = (currentTime - lastTime) / 1000;
+                    const bytesDiff = e.loaded - lastLoaded;
+                    
+                    if (timeDiff > 0.2) {
+                        const speed = bytesDiff / timeDiff;
+                        const speedMB = (speed / (1024 * 1024)).toFixed(2);
+                        const loadedMB = (e.loaded / (1024 * 1024)).toFixed(2);
+                        const totalMB = (e.total / (1024 * 1024)).toFixed(2);
+                        const remaining = e.total - e.loaded;
+                        const remainingTime = speed > 0 ? Math.round(remaining / speed) : 0;
+                        
+                        uploadSpeed.textContent = `${loadedMB}MB / ${totalMB}MB | Speed: ${speedMB} MB/s | ETA: ${remainingTime}s`;
+                        lastLoaded = e.loaded;
+                        lastTime = currentTime;
+                    }
+                }
+            });
+            
+            xhr.addEventListener('load', function() {
+                isUploading = false;
+                if (xhr.status === 200 || xhr.status === 302) {
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100%';
+                    progressText.textContent = '100% - Upload Complete!';
+                    uploadSpeed.textContent = 'Processing on server...';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/admin/tech-packages';
+                    }, 800);
+                } else {
+                    progressOverlay.style.display = 'none';
+                    submitBtn.disabled = false;
+                    alert('Upload failed. Please try again.');
+                }
+            });
+            
+            xhr.addEventListener('error', function() {
+                isUploading = false;
+                progressOverlay.style.display = 'none';
+                submitBtn.disabled = false;
+                alert('Upload failed. Please check your connection and try again.');
+            });
+            
+            xhr.open('POST', form.action);
+            xhr.send(formData);
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (isUploading && uploadStarted) {
+                e.preventDefault();
+                e.returnValue = 'Upload in progress. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+
+        // Original carousel code below
+
         function addFeature() {
             const container = document.getElementById('features-container');
             const div = document.createElement('div');

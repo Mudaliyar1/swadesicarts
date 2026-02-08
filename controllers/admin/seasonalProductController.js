@@ -182,14 +182,24 @@ exports.delete = async (req, res) => {
 
     // Delete featured image from Cloudinary
     if (product.featuredImage && product.featuredImage.publicId) {
-      await cloudinary.uploader.destroy(product.featuredImage.publicId);
+      try {
+        const resourceType = product.featuredImage.type === 'video' ? 'video' : 'image';
+        await cloudinary.uploader.destroy(product.featuredImage.publicId, { resource_type: resourceType });
+      } catch (err) {
+        console.error('Error deleting featured image from Cloudinary:', err);
+      }
     }
 
     // Delete gallery images from Cloudinary
     if (product.gallery && product.gallery.length > 0) {
       for (const media of product.gallery) {
         if (media.publicId) {
-          await cloudinary.uploader.destroy(media.publicId);
+          try {
+            const resourceType = media.type === 'video' ? 'video' : 'image';
+            await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+          } catch (err) {
+            console.error('Error deleting gallery item from Cloudinary:', err);
+          }
         }
       }
     }
@@ -222,7 +232,12 @@ exports.deleteGalleryItem = async (req, res) => {
 
     // Delete from Cloudinary
     if (galleryItem.publicId) {
-      await cloudinary.uploader.destroy(galleryItem.publicId);
+      try {
+        const resourceType = galleryItem.type === 'video' ? 'video' : 'image';
+        await cloudinary.uploader.destroy(galleryItem.publicId, { resource_type: resourceType });
+      } catch (err) {
+        console.error('Error deleting from Cloudinary:', err);
+      }
     }
 
     product.gallery.pull(itemId);
