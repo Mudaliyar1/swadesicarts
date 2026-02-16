@@ -43,10 +43,87 @@
         </div>
     </div>
 
+    <!-- VISITOR INFO MODAL -->
+    <div class="visitor-modal" id="visitorModal">
+        <div class="visitor-modal-content">
+            <button class="visitor-modal-close" id="closeModal" title="Skip">
+                <i class="bi bi-x-lg"></i>
+            </button>
+            <div class="visitor-modal-header">
+                <h2>Welcome to Swadesi Carts! 👋</h2>
+                <p>Help us personalize your experience</p>
+            </div>
+            <form id="visitorForm">
+                <div class="visitor-form-group">
+                    <label for="visitorName">
+                        <i class="bi bi-person-fill"></i> Your Name *
+                    </label>
+                    <input type="text" id="visitorName" name="name" required placeholder="Enter your name">
+                </div>
+                <div class="visitor-form-group">
+                    <label for="visitorEmail">
+                        <i class="bi bi-envelope-fill"></i> Email Address *
+                    </label>
+                    <input type="email" id="visitorEmail" name="email" required placeholder="your.email@example.com">
+                </div>
+                <div class="visitor-form-group">
+                    <label for="visitorMobile">
+                        <i class="bi bi-telephone-fill"></i> Mobile Number *
+                    </label>
+                    <input type="tel" id="visitorMobile" name="mobile" required placeholder="+91 00000 00000" pattern="[0-9+\s-]*">
+                </div>
+                <div class="visitor-form-group">
+                    <label>
+                        <i class="bi bi-heart-fill"></i> What brings you here? *
+                    </label>
+                    <div class="preference-cards">
+                        <label class="preference-card">
+                            <input type="radio" name="preference" value="seasonal" required>
+                            <div class="preference-card-content">
+                                <span class="preference-emoji">🌸</span>
+                                <span class="preference-label">Seasonal Products</span>
+                            </div>
+                        </label>
+                        <label class="preference-card">
+                            <input type="radio" name="preference" value="tech" required>
+                            <div class="preference-card-content">
+                                <span class="preference-emoji">💻</span>
+                                <span class="preference-label">Tech Services</span>
+                            </div>
+                        </label>
+                        <label class="preference-card">
+                            <input type="radio" name="preference" value="organic" required>
+                            <div class="preference-card-content">
+                                <span class="preference-emoji">🥬</span>
+                                <span class="preference-label">Organic Products</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <button type="submit" class="visitor-submit-btn">
+                    <span>Continue</span>
+                    <i class="bi bi-arrow-right-circle-fill"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <%- include('../partials/navbar-new') %>
+
+    <% 
+        const whatsappNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number)
+            || (siteSettings && siteSettings.contact && siteSettings.contact.phone)
+            || (siteSettings && siteSettings.footer && siteSettings.footer.phone)
+            || '';
+        const whatsappMessage = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.message) || '';
+    %>
     
     <!-- HERO CAROUSEL SECTION -->
     <section class="hero-carousel-section">
+        <a href="#" class="test-center-icon" id="testWhatsAppBtn"
+           data-number="<%= whatsappNumber %>"
+           data-message="<%= whatsappMessage %>"
+           aria-label="Chat with us on WhatsApp" target="_blank" rel="noopener"></a>
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
             <!-- Carousel Indicators -->
             <div class="carousel-indicators">
@@ -200,12 +277,12 @@
     <!-- FEATURES SECTION -->
     <section class="bg-light-custom">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header slide-up">
                 <h2>Why Choose Swadesi Carts?</h2>
                 <p>Excellence in every category</p>
             </div>
             <div class="row g-4">
-                <div class="col-md-4">
+                <div class="col-md-4 scroll-animate">
                     <div class="text-center">
                         <div class="feature-icon">
                             <i class="bi bi-shield-check"></i>
@@ -214,7 +291,7 @@
                         <p class="text-muted-custom">100% authentic products with proper certifications and guarantees</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 scroll-animate">
                     <div class="text-center">
                         <div class="feature-icon">
                             <i class="bi bi-lightning-charge"></i>
@@ -223,7 +300,7 @@
                         <p class="text-muted-custom">Professional tech solutions from experienced developers</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 scroll-animate">
                     <div class="text-center">
                         <div class="feature-icon">
                             <i class="bi bi-truck"></i>
@@ -239,14 +316,14 @@
     <!-- SEASONAL PRODUCTS -->
     <section>
         <div class="container">
-            <div class="section-header">
+            <div class="section-header slide-up">
                 <h2>Seasonal Products</h2>
                 <p>Fresh and authentic seasonal items</p>
             </div>
             <% if (featuredSeasonal.length > 0) { %>
                 <div class="row g-4">
                     <% featuredSeasonal.forEach(product => { %>
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 scroll-animate">
                         <div class="card product-card">
                             <div class="product-image-wrapper">
                                 <% if (product.featuredImage && product.featuredImage.url) { %>
@@ -282,14 +359,14 @@
     <!-- TECH PACKAGES -->
     <section class="bg-light-custom">
         <div class="container">
-            <div class="section-header">
+            <div class="section-header slide-up">
                 <h2>Tech Services & Packages</h2>
                 <p>Professional development solutions</p>
             </div>
             <% if (featuredTech.length > 0) { %>
                 <div class="row g-4">
                     <% featuredTech.forEach(package => { %>
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 scroll-animate">
                         <div class="card product-card">
                             <div class="product-image-wrapper">
                                 <% if (package.featuredImage && package.featuredImage.url) { %>
@@ -326,14 +403,14 @@
     <!-- ORGANIC PRODUCTS -->
     <section>
         <div class="container">
-            <div class="section-header">
+            <div class="section-header slide-up">
                 <h2>Organic Products</h2>
                 <p>100% certified organic products for healthy living</p>
             </div>
             <% if (featuredOrganic.length > 0) { %>
                 <div class="row g-4">
                     <% featuredOrganic.forEach(product => { %>
-                    <div class="col-md-6 col-lg-4">
+                    <div class="col-md-6 col-lg-4 scroll-animate">
                         <div class="card product-card">
                             <div class="product-image-wrapper">
                                 <% if (product.featuredImage && product.featuredImage.url) { %>
@@ -369,7 +446,7 @@
     <!-- CTA SECTION -->
     <section class="bg-primary" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;">
         <div class="container">
-            <div class="text-center text-white">
+            <div class="text-center text-white scale-up">
                 <h2 class="mb-3">Ready to Get Started?</h2>
                 <p class="fs-5 mb-4">Join thousands of satisfied customers. Explore our wide range of products and services today.</p>
                 <a href="/contact" class="btn btn-light btn-lg">Contact Us</a>
@@ -378,6 +455,7 @@
     </section>
 
     <%- include('../partials/stories-carousel') %>
+
     <%- include('../partials/footer-new') %>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -403,6 +481,167 @@
                     }, 600);
                 }, 2500);
             }
+        })();
+
+        // Visitor Modal Handler
+        (function() {
+            const visitorModal = document.getElementById('visitorModal');
+            const closeModal = document.getElementById('closeModal');
+            const visitorForm = document.getElementById('visitorForm');
+            
+            // Check if user has already submitted the form
+            const hasSubmitted = sessionStorage.getItem('visitorSubmitted');
+            
+            // Show modal after loader finishes (if not submitted)
+            if (!hasSubmitted) {
+                setTimeout(function() {
+                    visitorModal.style.display = 'flex';
+                    setTimeout(() => {
+                        visitorModal.classList.add('show');
+                    }, 50);
+                }, 3200); // Show 700ms after loader ends
+            }
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                visitorModal.classList.remove('show');
+                setTimeout(() => {
+                    visitorModal.style.display = 'none';
+                    sessionStorage.setItem('visitorSubmitted', 'skipped');
+                }, 300);
+            });
+            
+            // Handle form submission
+            visitorForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const submitBtn = visitorForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+                
+                const formData = {
+                    name: document.getElementById('visitorName').value,
+                    email: document.getElementById('visitorEmail').value,
+                    mobile: document.getElementById('visitorMobile').value,
+                    preference: document.querySelector('input[name="preference"]:checked').value
+                };
+                
+                try {
+                    const response = await fetch('/api/visitor', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        sessionStorage.setItem('visitorSubmitted', 'true');
+                        
+                        // Close modal with success message
+                        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Success!';
+                        submitBtn.classList.add('btn-success');
+                        
+                        setTimeout(() => {
+                            visitorModal.classList.remove('show');
+                            setTimeout(() => {
+                                visitorModal.style.display = 'none';
+                                
+                                // Redirect based on preference
+                                const redirectUrls = {
+                                    'seasonal': '/seasonal-products',
+                                    'tech': '/tech-packages',
+                                    'organic': '/organic-products'
+                                };
+                                
+                                if (redirectUrls[data.preference]) {
+                                    window.location.href = redirectUrls[data.preference];
+                                }
+                            }, 300);
+                        }, 1500);
+                    } else {
+                        throw new Error(data.message || 'Failed to submit');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                    alert('Failed to submit. Please try again.');
+                }
+            });
+        })();
+
+        // Scroll Animation Handler with Intersection Observer
+        (function() {
+            // Configuration for the observer
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px 0px -100px 0px', // Trigger slightly before element is visible
+                threshold: 0.15 // Trigger when 15% of element is visible
+            };
+
+            // Callback function for intersection
+            const handleIntersection = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Add animated class when element is in viewport
+                        entry.target.classList.add('animated');
+                        
+                        // Optional: Stop observing after animation (improves performance)
+                        // Comment this out if you want animations to repeat on scroll
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            // Create the observer
+            const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+            // Select all elements that should be animated
+            const animatedElements = document.querySelectorAll(
+                '.scroll-animate, .fade-in, .slide-up, .slide-right, .slide-left, .scale-up'
+            );
+
+            // Observe each element
+            animatedElements.forEach(element => {
+                observer.observe(element);
+            });
+
+            // Fallback for older browsers that don't support Intersection Observer
+            if (!('IntersectionObserver' in window)) {
+                animatedElements.forEach(element => {
+                    element.classList.add('animated');
+                });
+            }
+        })();
+
+        // WhatsApp Chat Button
+        (function() {
+            const buttons = [
+                document.getElementById('whatsappChatBtn'),
+                document.getElementById('testWhatsAppBtn')
+            ].filter(Boolean);
+
+            if (buttons.length === 0) return;
+
+            buttons.forEach((btn) => {
+                const rawNumber = btn.getAttribute('data-number') || '';
+                const message = btn.getAttribute('data-message') || '';
+                const number = rawNumber.replace(/\D/g, '');
+
+                if (!number) {
+                    btn.href = '#';
+                    btn.classList.add('whatsapp-disabled');
+                    return;
+                }
+
+                const encodedMessage = encodeURIComponent(message);
+                const messageQuery = message ? `?text=${encodedMessage}` : '';
+                btn.href = `https://wa.me/${number}${messageQuery}`;
+            });
         })();
     </script>
 </body>

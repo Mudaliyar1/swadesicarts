@@ -23,6 +23,7 @@ exports.list = async (req, res) => {
       title: 'Organic Products',
       products,
       adminName: req.session.adminName,
+      currentPage: 'organic',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -36,6 +37,7 @@ exports.showCreate = (req, res) => {
   res.render('admin/organic/create', {
     title: 'Add Organic Product',
     adminName: req.session.adminName,
+    currentPage: 'organic',
     error: req.flash('error')
   });
 };
@@ -101,6 +103,7 @@ exports.showEdit = async (req, res) => {
       title: 'Edit Organic Product',
       product,
       adminName: req.session.adminName,
+      currentPage: 'organic',
       error: req.flash('error')
     });
   } catch (error) {

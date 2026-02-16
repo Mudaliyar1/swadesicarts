@@ -23,6 +23,7 @@ exports.list = async (req, res) => {
       title: 'Tech Packages',
       products,
       adminName: req.session.adminName,
+      currentPage: 'tech',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -36,6 +37,7 @@ exports.showCreate = (req, res) => {
   res.render('admin/tech/create', {
     title: 'Add Tech Package',
     adminName: req.session.adminName,
+    currentPage: 'tech',
     error: req.flash('error')
   });
 };
@@ -104,6 +106,7 @@ exports.showEdit = async (req, res) => {
       title: 'Edit Tech Package',
       product,
       adminName: req.session.adminName,
+      currentPage: 'tech',
       error: req.flash('error')
     });
   } catch (error) {

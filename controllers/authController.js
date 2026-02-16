@@ -88,7 +88,8 @@ exports.showDashboard = async (req, res) => {
       title: 'Dashboard',
       stats,
       recentInquiries,
-      adminName: req.session.adminName
+      adminName: req.session.adminName,
+      currentPage: 'dashboard'
     });
   } catch (error) {
     console.error('Dashboard error:', error);

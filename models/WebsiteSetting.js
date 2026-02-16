@@ -32,6 +32,12 @@ const websiteSettingSchema = new mongoose.Schema({
     }
   },
 
+  // WhatsApp Chat Settings
+  whatsapp: {
+    number: { type: String, default: '' },
+    message: { type: String, default: 'Hello! I would like to know more about your products.' }
+  },
+
   // Social Media Links
   socialMedia: {
     facebook: { type: String, default: '' },

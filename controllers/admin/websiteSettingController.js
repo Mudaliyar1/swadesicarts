@@ -55,6 +55,8 @@ exports.getSettings = async (req, res) => {
     res.render('admin/settings/edit', {
       title: 'Website Settings',
       settings,
+      currentPage: 'settings',
+      adminName: req.session.adminName,
       messages: {
         success: req.flash('success'),
         error: req.flash('error')
@@ -94,6 +96,13 @@ exports.updateSettings = async (req, res) => {
         days: req.body['contact.businessHours.days'] || settings.contact.businessHours.days,
         time: req.body['contact.businessHours.time'] || settings.contact.businessHours.time
       }
+    };
+
+    // Update WhatsApp settings
+    const currentWhatsapp = settings.whatsapp || {};
+    settings.whatsapp = {
+      number: req.body['whatsapp.number'] || currentWhatsapp.number || '',
+      message: req.body['whatsapp.message'] || currentWhatsapp.message || ''
     };
 
     // Update social media links

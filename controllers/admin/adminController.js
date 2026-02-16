@@ -9,6 +9,7 @@ exports.list = async (req, res) => {
       title: 'Admin Management',
       admins,
       adminName: req.session.adminName,
+      currentPage: 'admins',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -23,6 +24,7 @@ exports.showCreate = (req, res) => {
   res.render('admin/admins/create', {
     title: 'Add Admin User',
     adminName: req.session.adminName,
+    currentPage: 'admins',
     error: req.flash('error')
   });
 };
@@ -69,6 +71,7 @@ exports.showEdit = async (req, res) => {
       title: 'Edit Admin User',
       admin,
       adminName: req.session.adminName,
+      currentPage: 'admins',
       error: req.flash('error')
     });
   } catch (error) {

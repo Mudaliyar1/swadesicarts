@@ -15,7 +15,7 @@
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <span class="navbar-brand mb-0">Swadesi Admin</span>
+            <span class="navbar-brand mb-0">Visitors</span>
             <a href="/admin/logout" class="btn btn-sm btn-outline-light">
                 <i class="bi bi-box-arrow-right"></i>
             </a>
@@ -126,7 +126,69 @@
 
     <!-- Main Content -->
     <div class="admin-content">
-        <%- body %>
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="bi bi-person-lines-fill"></i> Visitor Information</h1>
+            </div>
+
+            <% if (visitors && visitors.length > 0) { %>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-swadesi text-white">
+                        <i class="bi bi-people me-2"></i>
+                        All Visitors (Total: <%= visitors.length %>)
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Mobile</th>
+                                        <th>Preference</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% visitors.forEach(visitor => { %>
+                                        <tr>
+                                            <td>
+                                                <%= new Date(visitor.visitDate).toLocaleDateString() %><br>
+                                                <small class="text-muted"><%= new Date(visitor.visitDate).toLocaleTimeString() %></small>
+                                            </td>
+                                            <td><%= visitor.name %></td>
+                                            <td><a href="mailto:<%= visitor.email %>"><%= visitor.email %></a></td>
+                                            <td><a href="tel:<%= visitor.mobile %>"><%= visitor.mobile %></a></td>
+                                            <td>
+                                                <% if (visitor.preference === 'seasonal') { %>
+                                                    <span class="badge bg-warning text-dark">🌸 Seasonal</span>
+                                                <% } else if (visitor.preference === 'tech') { %>
+                                                    <span class="badge bg-info">💻 Tech</span>
+                                                <% } else if (visitor.preference === 'organic') { %>
+                                                    <span class="badge bg-success">🥬 Organic</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <button onclick="confirmDelete('<%= visitor._id %>', 'visitor', '/admin/visitors/<%= visitor._id %>')" 
+                                                        class="btn btn-danger btn-sm">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>
+                    No visitor information yet.
+                </div>
+            <% } %>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

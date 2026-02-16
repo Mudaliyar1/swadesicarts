@@ -1,0 +1,63 @@
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mt-4">Visitor Information</h1>
+    </div>
+
+    <% if (visitors && visitors.length > 0) { %>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-users me-1"></i>
+                All Visitors (Total: <%= visitors.length %>)
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Mobile</th>
+                                <th>Preference</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% visitors.forEach(visitor => { %>
+                                <tr>
+                                    <td><%= new Date(visitor.visitDate).toLocaleDateString() %><br>
+                                        <small class="text-muted"><%= new Date(visitor.visitDate).toLocaleTimeString() %></small>
+                                    </td>
+                                    <td><%= visitor.name %></td>
+                                    <td><a href="mailto:<%= visitor.email %>"><%= visitor.email %></a></td>
+                                    <td><a href="tel:<%= visitor.mobile %>"><%= visitor.mobile %></a></td>
+                                    <td>
+                                        <% if (visitor.preference === 'seasonal') { %>
+                                            <span class="badge bg-warning text-dark">🌸 Seasonal</span>
+                                        <% } else if (visitor.preference === 'tech') { %>
+                                            <span class="badge bg-info">💻 Tech</span>
+                                        <% } else if (visitor.preference === 'organic') { %>
+                                            <span class="badge bg-success">🥬 Organic</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="/admin/visitors/<%= visitor._id %>?_method=DELETE" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this visitor record?')">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            No visitor information yet.
+        </div>
+    <% } %>
+</div>

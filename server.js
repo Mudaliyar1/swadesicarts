@@ -21,6 +21,7 @@ app.set('views', path.join(__dirname, 'views'));
 // Middleware - Increase body size limits for large file uploads
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ extended: true, limit: '500mb' }));
+app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
 

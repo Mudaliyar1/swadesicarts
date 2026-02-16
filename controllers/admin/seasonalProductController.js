@@ -25,6 +25,7 @@ exports.list = async (req, res) => {
       title: 'Seasonal Products',
       products,
       adminName: req.session.adminName,
+      currentPage: 'seasonal',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -39,6 +40,7 @@ exports.showCreate = (req, res) => {
   res.render('admin/seasonal/create', {
     title: 'Add Seasonal Product',
     adminName: req.session.adminName,
+    currentPage: 'seasonal',
     error: req.flash('error')
   });
 };
@@ -105,6 +107,7 @@ exports.showEdit = async (req, res) => {
       title: 'Edit Seasonal Product',
       product,
       adminName: req.session.adminName,
+      currentPage: 'seasonal',
       error: req.flash('error')
     });
   } catch (error) {

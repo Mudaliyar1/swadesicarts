@@ -74,6 +74,7 @@
             <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
             <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
             <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+            <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
             <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
             <li><a href="/admin/settings" class="active" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
         </ul>
@@ -97,6 +98,7 @@
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
                 <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
                 <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
                 <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
                 <li><a href="/admin/settings" class="active"><i class="bi bi-gear"></i> Website Settings</a></li>
                 <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
@@ -310,6 +312,20 @@
                                     <label for="contact.phone" class="form-label">Phone</label>
                                     <input type="text" class="form-control" id="contact.phone" name="contact.phone" 
                                            value="<%= settings.contact.phone %>">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="whatsapp.number" class="form-label">WhatsApp Number</label>
+                                    <input type="text" class="form-control" id="whatsapp.number" name="whatsapp.number"
+                                           value="<%= settings.whatsapp ? settings.whatsapp.number : '' %>"
+                                           placeholder="e.g. 919876543210">
+                                    <small class="text-muted">Use country code and numbers only for best results.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="whatsapp.message" class="form-label">WhatsApp Message</label>
+                                    <textarea class="form-control" id="whatsapp.message" name="whatsapp.message" rows="3"
+                                              placeholder="Default message for WhatsApp chat"><%= settings.whatsapp ? settings.whatsapp.message : '' %></textarea>
                                 </div>
 
                                 <h4 class="mt-4 mb-3">Business Hours</h4>

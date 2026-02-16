@@ -30,6 +30,7 @@ exports.list = async (req, res) => {
       inquiries,
       filters: { status, productType, fromDate, toDate },
       adminName: req.session.adminName,
+      currentPage: 'inquiries',
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -52,6 +53,7 @@ exports.view = async (req, res) => {
       title: 'Inquiry Details',
       inquiry,
       adminName: req.session.adminName,
+      currentPage: 'inquiries',
       success: req.flash('success'),
       error: req.flash('error')
     });
