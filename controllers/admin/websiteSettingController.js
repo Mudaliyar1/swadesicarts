@@ -25,6 +25,7 @@ exports.getSettings = async (req, res) => {
     if (!settings) {
       settings = new WebsiteSetting({
         about: {
+          teamMembers: [],
           values: [
             {
               icon: '🌟',
@@ -50,6 +51,44 @@ exports.getSettings = async (req, res) => {
         }
       });
       await settings.save();
+    }
+    
+    // Ensure teamMembers array exists
+    if (!settings.about.teamMembers) {
+      settings.about.teamMembers = [];
+      await settings.save();
+    }
+    
+    // Ensure colors exist with defaults
+    if (!settings.colors) {
+      settings.colors = {
+        primary: '#4C1E4F',
+        accent: '#B5A886',
+        secondary: '#6C8E7F',
+        headingText: '#2c3e50',
+        bodyText: '#495057',
+        linkColor: '#B5A886',
+        headerFooterLinkColor: '#FFD700'
+      };
+      await settings.save();
+    } else {
+      // Ensure text colors exist in existing color objects
+      if (!settings.colors.headingText) {
+        settings.colors.headingText = '#2c3e50';
+        await settings.save();
+      }
+      if (!settings.colors.bodyText) {
+        settings.colors.bodyText = '#495057';
+        await settings.save();
+      }
+      if (!settings.colors.linkColor) {
+        settings.colors.linkColor = '#B5A886';
+        await settings.save();
+      }
+      if (!settings.colors.headerFooterLinkColor) {
+        settings.colors.headerFooterLinkColor = '#FFD700';
+        await settings.save();
+      }
     }
     
     res.render('admin/settings/edit', {
@@ -105,13 +144,19 @@ exports.updateSettings = async (req, res) => {
       message: req.body['whatsapp.message'] || currentWhatsapp.message || ''
     };
 
-    // Update social media links
+    // Update Visitor Modal settings
+    settings.visitorModal = {
+      enabled: req.body['visitorModal.enabled'] === 'true' || req.body['visitorModal.enabled'] === 'on'
+    };
+
+    // Update social media links - preserve existing values
+    const currentSocialMedia = settings.socialMedia || {};
     settings.socialMedia = {
-      facebook: req.body['socialMedia.facebook'] || '',
-      twitter: req.body['socialMedia.twitter'] || '',
-      instagram: req.body['socialMedia.instagram'] || '',
-      linkedin: req.body['socialMedia.linkedin'] || '',
-      youtube: req.body['socialMedia.youtube'] || ''
+      facebook: req.body['socialMedia.facebook'] || currentSocialMedia.facebook || '',
+      twitter: req.body['socialMedia.twitter'] || currentSocialMedia.twitter || '',
+      instagram: req.body['socialMedia.instagram'] || currentSocialMedia.instagram || '',
+      linkedin: req.body['socialMedia.linkedin'] || currentSocialMedia.linkedin || '',
+      youtube: req.body['socialMedia.youtube'] || currentSocialMedia.youtube || ''
     };
 
     // Update about settings
@@ -122,6 +167,8 @@ exports.updateSettings = async (req, res) => {
     settings.about.valuesSubheading = req.body['about.valuesSubheading'] || settings.about.valuesSubheading;
     settings.about.ctaHeading = req.body['about.ctaHeading'] || settings.about.ctaHeading;
     settings.about.ctaDescription = req.body['about.ctaDescription'] || settings.about.ctaDescription;
+    settings.about.teamHeading = req.body['about.teamHeading'] || settings.about.teamHeading;
+    settings.about.teamSubheading = req.body['about.teamSubheading'] || settings.about.teamSubheading;
 
     // Update values
     if (req.body.values && Array.isArray(req.body.values)) {
@@ -169,6 +216,34 @@ exports.updateSettings = async (req, res) => {
     }
     if (req.body['logo.verticalPosition']) {
       settings.logo.verticalPosition = parseInt(req.body['logo.verticalPosition']) || 0;
+    }
+
+    // Update header settings
+    if (req.body['header.height']) {
+      settings.header.height = parseInt(req.body['header.height']) || 72;
+    }
+
+    // Update color scheme
+    if (req.body['colors.primary']) {
+      settings.colors.primary = req.body['colors.primary'];
+    }
+    if (req.body['colors.accent']) {
+      settings.colors.accent = req.body['colors.accent'];
+    }
+    if (req.body['colors.secondary']) {
+      settings.colors.secondary = req.body['colors.secondary'];
+    }
+    if (req.body['colors.headingText']) {
+      settings.colors.headingText = req.body['colors.headingText'];
+    }
+    if (req.body['colors.bodyText']) {
+      settings.colors.bodyText = req.body['colors.bodyText'];
+    }
+    if (req.body['colors.linkColor']) {
+      settings.colors.linkColor = req.body['colors.linkColor'];
+    }
+    if (req.body['colors.headerFooterLinkColor']) {
+      settings.colors.headerFooterLinkColor = req.body['colors.headerFooterLinkColor'];
     }
 
     // Handle about image upload
@@ -240,5 +315,180 @@ exports.deleteAboutImage = async (req, res) => {
   } catch (error) {
     console.error('Error deleting about image:', error);
     return res.status(500).json({ success: false, message: 'Error deleting about image' });
+  }
+};
+
+// Team Members Management
+exports.addTeamMember = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Settings not found' });
+    }
+
+    const { name, role, bio } = req.body;
+    let imageUrl = '';
+    let imagePublicId = '';
+
+    // Upload image if provided
+    if (req.files && req.files.image && req.files.image[0]) {
+      const result = await uploadToCloudinary(req.files.image[0].buffer, 'team-members');
+      imageUrl = result.secure_url;
+      imagePublicId = result.public_id;
+    }
+
+    const newMember = {
+      name,
+      role,
+      bio: bio || '',
+      image: {
+        url: imageUrl,
+        publicId: imagePublicId
+      },
+      isActive: true,
+      order: settings.about.teamMembers.length
+    };
+
+    settings.about.teamMembers.push(newMember);
+    await settings.save();
+
+    req.flash('success', 'Team member added successfully');
+    res.redirect('/admin/settings/team');
+  } catch (error) {
+    console.error('Error adding team member:', error);
+    req.flash('error', 'Error adding team member: ' + error.message);
+    res.redirect('/admin/settings/team');
+  }
+};
+
+exports.updateTeamMember = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Settings not found' });
+    }
+
+    const memberId = req.params.id;
+    const { name, role, bio, isActive } = req.body;
+
+    const member = settings.about.teamMembers.id(memberId);
+    if (!member) {
+      req.flash('error', 'Team member not found');
+      return res.redirect('/admin/settings/team');
+    }
+
+    member.name = name;
+    member.role = role;
+    member.bio = bio || '';
+    member.isActive = isActive === 'true' || isActive === 'on';
+
+    // Upload new image if provided
+    if (req.files && req.files.image && req.files.image[0]) {
+      // Delete old image
+      if (member.image.publicId) {
+        await cloudinary.uploader.destroy(member.image.publicId);
+      }
+
+      const result = await uploadToCloudinary(req.files.image[0].buffer, 'team-members');
+      member.image.url = result.secure_url;
+      member.image.publicId = result.public_id;
+    }
+
+    await settings.save();
+
+    req.flash('success', 'Team member updated successfully');
+    res.redirect('/admin/settings/team');
+  } catch (error) {
+    console.error('Error updating team member:', error);
+    req.flash('error', 'Error updating team member: ' + error.message);
+    res.redirect('/admin/settings/team');
+  }
+};
+
+exports.deleteTeamMember = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Settings not found' });
+    }
+
+    const memberId = req.params.id;
+    const member = settings.about.teamMembers.id(memberId);
+
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Team member not found' });
+    }
+
+    // Delete image from cloudinary
+    if (member.image.publicId) {
+      await cloudinary.uploader.destroy(member.image.publicId);
+    }
+
+    settings.about.teamMembers.pull(memberId);
+    await settings.save();
+
+    return res.status(200).json({ success: true, message: 'Team member deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting team member:', error);
+    return res.status(500).json({ success: false, message: 'Error deleting team member' });
+  }
+};
+
+exports.getTeamMembers = async (req, res) => {
+  try {
+    let settings = await WebsiteSetting.findOne();
+    
+    // If no settings exist, create default settings
+    if (!settings) {
+      settings = new WebsiteSetting({
+        about: {
+          teamMembers: [],
+          values: [
+            {
+              icon: '🌟',
+              title: 'Quality',
+              description: 'We never compromise on quality. Every product is carefully selected and tested.'
+            },
+            {
+              icon: '✓',
+              title: 'Authenticity',
+              description: 'All products come with proper certifications and guarantees.'
+            },
+            {
+              icon: '💙',
+              title: 'Customer Care',
+              description: 'Your satisfaction is our priority. We\'re always here to help.'
+            },
+            {
+              icon: '🚀',
+              title: 'Innovation',
+              description: 'We continuously improve our services and offerings.'
+            }
+          ]
+        }
+      });
+      await settings.save();
+    }
+    
+    // Ensure teamMembers array exists
+    if (!settings.about.teamMembers) {
+      settings.about.teamMembers = [];
+      await settings.save();
+    }
+    
+    res.render('admin/settings/team', {
+      title: 'Team Members',
+      settings,
+      currentPage: 'settings',
+      adminName: req.session.adminName,
+      messages: {
+        success: req.flash('success'),
+        error: req.flash('error')
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching team members:', error);
+    req.flash('error', 'Error loading team members');
+    res.redirect('/admin/settings');
   }
 };

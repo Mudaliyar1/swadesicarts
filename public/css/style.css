@@ -1,7 +1,7 @@
 :root {
-    --swadesi-green: #1e5631;
+    --swadesi-green: #4C1E4F;
     --swadesi-brown: #8B4513;
-    --swadesi-accent: #FF8C00;
+    --swadesi-accent: #B5A886;
     --swadesi-light: #f8f9fa;
     --swadesi-dark: #2c3e50;
 }
@@ -62,9 +62,34 @@ body {
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.navbar-brand {
+.navbar-brand,
+.navbar .navbar-brand,
+.navbar-expand-lg .navbar-brand {
     font-size: 1.5rem;
     font-weight: bold;
+    max-width: none !important;
+    min-width: auto !important;
+    width: auto !important;
+    flex: 0 0 auto !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    overflow: visible !important;
+}
+
+.navbar-brand img,
+.navbar .navbar-brand img,
+.navbar-expand-lg .navbar-brand img {
+    max-width: none !important;
+    min-width: auto !important;
+    flex-shrink: 0 !important;
+    display: block !important;
+}
+
+.navbar .container,
+.navbar .container-fluid {
+    overflow-x: visible !important;
 }
 
 .nav-link {
@@ -173,7 +198,7 @@ body {
 
 /* Page Header */
 .page-header {
-    background: linear-gradient(135deg, var(--swadesi-green) 0%, #2a7a45 100%);
+    background: linear-gradient(135deg, var(--swadesi-green) 0%, #6B2E6F 100%);
     color: white !important;
 }
 

@@ -9,6 +9,7 @@ const loadWebsiteSettings = async (req, res, next) => {
     if (!settings) {
       settings = new WebsiteSetting({
         about: {
+          teamMembers: [],
           values: [
             {
               icon: '🌟',
@@ -34,6 +35,44 @@ const loadWebsiteSettings = async (req, res, next) => {
         }
       });
       await settings.save();
+    }
+    
+    // Ensure teamMembers array exists
+    if (settings && settings.about && !settings.about.teamMembers) {
+      settings.about.teamMembers = [];
+      await settings.save();
+    }
+    
+    // Ensure colors exist with defaults
+    if (settings && !settings.colors) {
+      settings.colors = {
+        primary: '#4C1E4F',
+        accent: '#B5A886',
+        secondary: '#6C8E7F',
+        headingText: '#2c3e50',
+        bodyText: '#495057',
+        linkColor: '#B5A886',
+        headerFooterLinkColor: '#FFD700'
+      };
+      await settings.save();
+    } else if (settings && settings.colors) {
+      // Ensure text colors exist in existing color objects
+      if (!settings.colors.headingText) {
+        settings.colors.headingText = '#2c3e50';
+        await settings.save();
+      }
+      if (!settings.colors.bodyText) {
+        settings.colors.bodyText = '#495057';
+        await settings.save();
+      }
+      if (!settings.colors.linkColor) {
+        settings.colors.linkColor = '#B5A886';
+        await settings.save();
+      }
+      if (!settings.colors.headerFooterLinkColor) {
+        settings.colors.headerFooterLinkColor = '#FFD700';
+        await settings.save();
+      }
     }
     
     // Make settings available to all views

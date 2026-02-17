@@ -153,6 +153,42 @@
         </div>
     </section>
 
+    <!-- TEAM SECTION -->
+    <% if (siteSettings && siteSettings.about && siteSettings.about.teamMembers && siteSettings.about.teamMembers.filter(m => m.isActive).length > 0) { %>
+    <section class="bg-light-custom">
+        <div class="container">
+            <div class="section-header">
+                <h2><%= (siteSettings && siteSettings.about && siteSettings.about.teamHeading) ? siteSettings.about.teamHeading : 'Meet Our Team' %></h2>
+                <p><%= (siteSettings && siteSettings.about && siteSettings.about.teamSubheading) ? siteSettings.about.teamSubheading : 'The people behind the excellence' %></p>
+            </div>
+            <div class="row g-4">
+                <% siteSettings.about.teamMembers.filter(m => m.isActive).sort((a, b) => a.order - b.order).forEach(member => { %>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="team-member-card">
+                            <div class="team-member-image-wrapper">
+                                <% if (member.image && member.image.url) { %>
+                                    <img src="<%= member.image.url %>" alt="<%= member.name %>" class="team-member-image">
+                                <% } else { %>
+                                    <div class="team-member-image team-member-placeholder">
+                                        <i class="bi bi-person-fill"></i>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div class="team-member-info">
+                                <h4 class="team-member-name"><%= member.name %></h4>
+                                <p class="team-member-role"><%= member.role %></p>
+                                <% if (member.bio) { %>
+                                    <p class="team-member-bio"><%= member.bio %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </section>
+    <% } %>
+
     <%- include('../partials/footer-new') %>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

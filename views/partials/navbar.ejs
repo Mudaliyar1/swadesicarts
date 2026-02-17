@@ -1,3 +1,142 @@
+<% if (siteSettings && siteSettings.colors) { %>
+<style>
+    :root {
+        --navbar-offset: <%= siteSettings.header && siteSettings.header.height ? siteSettings.header.height : 72 %>px !important;
+        --primary: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+        --primary-light: <%= siteSettings.colors.primary || '#4C1E4F' %>dd !important;
+        --primary-dark: <%= siteSettings.colors.primary || '#4C1E4F' %>cc !important;
+        --accent: <%= siteSettings.colors.accent || '#B5A886' %> !important;
+        --accent-light: <%= siteSettings.colors.accent || '#B5A886' %>dd !important;
+        --secondary: <%= siteSettings.colors.secondary || '#6C8E7F' %> !important;
+        --swadesi-green: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+        --swadesi-accent: <%= siteSettings.colors.accent || '#B5A886' %> !important;
+    }
+    
+    /* Heading Text Colors */
+    h1, h2, h3, h4, h5, h6,
+    .h1, .h2, .h3, .h4, .h5, .h6,
+    .page-header h1, .page-header h2,
+    .hero h1, .hero h2,
+    .section-title,
+    .card-title,
+    .product-card-title {
+        color: <%= siteSettings.colors.headingText || '#2c3e50' %> !important;
+    }
+    
+    /* Body Text Colors */
+    body,
+    p, .text-muted, .card-text,
+    .product-card-description,
+    .form-label,
+    .list-group-item,
+    .alert,
+    .breadcrumb-item,
+    td, th, li {
+        color: <%= siteSettings.colors.bodyText || '#495057' %> !important;
+    }
+    
+    /* Links in content area */
+    a:not(.btn):not(.nav-link):not(.navbar-brand):not(.footer-link) {
+        color: <%= siteSettings.colors.linkColor || '#B5A886' %>;
+    }
+    
+    a:not(.btn):not(.nav-link):not(.navbar-brand):not(.footer-link):hover {
+        color: <%= siteSettings.colors.linkColor || '#B5A886' %>dd;
+    }
+    
+    /* Override for white text on dark backgrounds */
+    .navbar, .navbar *, 
+    footer, footer *,
+    .page-header, .page-header *,
+    .bg-dark, .bg-dark *,
+    .bg-swadesi, .bg-swadesi *,
+    .btn-primary, .btn-swadesi,
+    .badge {
+        color: white !important;
+    }
+    
+    /* Header and Footer Links */
+    .navbar a:not(.btn),
+    footer a,
+    .nav-link {
+        color: <%= siteSettings.colors.headerFooterLinkColor || '#FFD700' %> !important;
+    }
+    
+    .navbar a:not(.btn):hover,
+    footer a:hover,
+    .nav-link:hover,
+    .nav-link.active {
+        color: rgba(195, 215, 0, 0.8) !important;
+        text-shadow: 0 0 10px <%= siteSettings.colors.headerFooterLinkColor || '#FFD700' %>55 !important;
+    }
+    
+    .navbar,
+    .navbar.bg-swadesi {
+        background: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+        background: linear-gradient(135deg, <%= siteSettings.colors.primary || '#4C1E4F' %> 0%, <%= siteSettings.colors.primary || '#4C1E4F' %>dd 50%, <%= siteSettings.colors.primary || '#4C1E4F' %>bb 100%) !important;
+    }
+    
+    footer {
+        background: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+        background: linear-gradient(135deg, <%= siteSettings.colors.primary || '#4C1E4F' %> 0%, <%= siteSettings.colors.primary || '#4C1E4F' %>dd 50%, <%= siteSettings.colors.primary || '#4C1E4F' %>bb 100%) !important;
+    }
+    
+    .bg-swadesi {
+        background-color: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+    }
+    
+    .text-swadesi {
+        color: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+    }
+    
+    .btn-swadesi,
+    .btn-primary {
+        background-color: <%= siteSettings.colors.accent || '#B5A886' %> !important;
+        border-color: <%= siteSettings.colors.accent || '#B5A886' %> !important;
+    }
+    
+    .btn-swadesi:hover,
+    .btn-primary:hover {
+        background-color: <%= siteSettings.colors.accent || '#B5A886' %>dd !important;
+        border-color: <%= siteSettings.colors.accent || '#B5A886' %>dd !important;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, <%= siteSettings.colors.primary || '#4C1E4F' %> 0%, <%= siteSettings.colors.primary || '#4C1E4F' %>dd 100%) !important;
+    }
+    
+    .border-swadesi {
+        border-color: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+    }
+    
+    .admin-sidebar {
+        background-color: <%= siteSettings.colors.primary || '#4C1E4F' %> !important;
+    }
+    
+    /* Dynamic Header Height - Fixed navbar with body padding */
+    .navbar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        min-height: var(--navbar-offset) !important;
+        width: 100% !important;
+        z-index: 1030 !important;
+        display: flex;
+        align-items: center;
+    }
+    
+    /* Add padding to body to prevent content going under navbar */
+    body {
+        padding-top: var(--navbar-offset) !important;
+    }
+    
+    main {
+        margin-top: 0 !important;
+    }
+</style>
+<% } %>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-swadesi sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand fw-bold" href="/" style="display: flex; align-items: center;">

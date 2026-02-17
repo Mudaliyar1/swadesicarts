@@ -106,4 +106,14 @@ router.post('/settings', isAuthenticated, upload.fields([
 router.delete('/settings/logo', isAuthenticated, websiteSettingController.deleteLogo);
 router.delete('/settings/about-image', isAuthenticated, websiteSettingController.deleteAboutImage);
 
+// Team Members routes
+router.get('/settings/team', isAuthenticated, websiteSettingController.getTeamMembers);
+router.post('/settings/team', isAuthenticated, upload.fields([
+  { name: 'image', maxCount: 1 }
+]), websiteSettingController.addTeamMember);
+router.post('/settings/team/:id', isAuthenticated, upload.fields([
+  { name: 'image', maxCount: 1 }
+]), websiteSettingController.updateTeamMember);
+router.delete('/settings/team/:id', isAuthenticated, websiteSettingController.deleteTeamMember);
+
 module.exports = router;

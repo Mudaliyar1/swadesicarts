@@ -135,6 +135,16 @@
                         </button>
                     </li>
                     <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#header" type="button">
+                            <i class="bi bi-border-top"></i> Header
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#colors" type="button">
+                            <i class="bi bi-palette"></i> Colors
+                        </button>
+                    </li>
+                    <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#footer" type="button">
                             <i class="bi bi-footer"></i> Footer
                         </button>
@@ -246,6 +256,251 @@
                             </div>
                         </div>
 
+                        <!-- Header Tab -->
+                        <div class="tab-pane fade" id="header">
+                            <div class="settings-section">
+                                <h3 class="section-title">Header Settings</h3>
+                                <p class="text-muted mb-4">Manage header appearance and layout settings.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="header.height" class="form-label fw-bold">Header Height</label>
+                                                <p class="text-muted small">Controls the height of the navigation bar (50px - 200px)</p>
+                                                
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <input type="range" class="form-range flex-grow-1" id="header.height" 
+                                                           name="header.height" 
+                                                           min="50" max="200" step="1"
+                                                           value="<%= settings.header && settings.header.height ? settings.header.height : 72 %>"
+                                                           onchange="updateHeaderHeightPreview()">
+                                                    <span id="headerHeightValue" class="badge bg-swadesi" style="font-size: 16px; min-width: 50px;">
+                                                        <%= settings.header && settings.header.height ? settings.header.height : 72 %>px
+                                                    </span>
+                                                </div>
+                                                
+                                                <div class="mt-3 p-3 border rounded" style="background-color: #f8f9fa;">
+                                                    <p class="text-muted small mb-0"><strong>Preview:</strong> The navbar will be <span id="headerHeightPreviewText"><%= settings.header && settings.header.height ? settings.header.height : 72 %></span>px tall</p>
+                                                </div>
+                                                
+                                                <div class="alert alert-info mt-3">
+                                                    <i class="bi bi-info-circle"></i> Larger header heights may be useful for wider logos or more navigation items. The content below will automatically adjust to prevent overlap.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Height Information</h5>
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2"><strong>Current Height:</strong> <span id="headerHeightInfo"><%= settings.header && settings.header.height ? settings.header.height : 72 %></span>px</li>
+                                                    <li class="mb-2"><strong>Recommended Range:</strong> 60px - 100px</li>
+                                                    <li class="mb-2"><strong>Content Padding:</strong> Will be automatically adjusted based on header height</li>
+                                                    <li class="mb-0"><strong>Impact:</strong> All pages will use this height to prevent content overlap</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Colors Tab -->
+                        <div class="tab-pane fade" id="colors">
+                            <div class="settings-section">
+                                <h3 class="section-title">Website Color Scheme</h3>
+                                <p class="text-muted mb-4">Customize the colors used throughout your website. Changes will apply to header, footer, buttons, and other elements.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.primary" class="form-label fw-bold">Primary Color</label>
+                                                <p class="text-muted small">Used for header, footer, and main navigation</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.primary" name="colors.primary" 
+                                                           value="<%= settings.colors ? settings.colors.primary : '#4C1E4F' %>"
+                                                           title="Choose primary color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.primary.text" 
+                                                           value="<%= settings.colors ? settings.colors.primary : '#4C1E4F' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.primary').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded" id="primaryPreview" style="background-color: <%= settings.colors ? settings.colors.primary : '#4C1E4F' %>; color: white; text-align: center;">
+                                                    Preview
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.accent" class="form-label fw-bold">Accent Color</label>
+                                                <p class="text-muted small">Used for buttons, links, and highlights</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.accent" name="colors.accent" 
+                                                           value="<%= settings.colors ? settings.colors.accent : '#B5A886' %>"
+                                                           title="Choose accent color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.accent.text" 
+                                                           value="<%= settings.colors ? settings.colors.accent : '#B5A886' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.accent').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded" id="accentPreview" style="background-color: <%= settings.colors ? settings.colors.accent : '#B5A886' %>; color: white; text-align: center;">
+                                                    Preview
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.secondary" class="form-label fw-bold">Secondary Color</label>
+                                                <p class="text-muted small">Used for secondary elements and backgrounds</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.secondary" name="colors.secondary" 
+                                                           value="<%= settings.colors ? settings.colors.secondary : '#6C8E7F' %>"
+                                                           title="Choose secondary color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.secondary.text" 
+                                                           value="<%= settings.colors ? settings.colors.secondary : '#6C8E7F' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.secondary').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded" id="secondaryPreview" style="background-color: <%= settings.colors ? settings.colors.secondary : '#6C8E7F' %>; color: white; text-align: center;">
+                                                    Preview
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+                                <h5 class="mb-3">Text Colors</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.headingText" class="form-label fw-bold">Heading Text Color</label>
+                                                <p class="text-muted small">Used for all headings and titles (h1, h2, h3, etc.)</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.headingText" name="colors.headingText" 
+                                                           value="<%= settings.colors ? (settings.colors.headingText || '#2c3e50') : '#2c3e50' %>"
+                                                           title="Choose heading text color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.headingText.text" 
+                                                           value="<%= settings.colors ? (settings.colors.headingText || '#2c3e50') : '#2c3e50' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.headingText').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded border" id="headingTextPreview" style="background-color: white;">
+                                                    <h5 style="color: <%= settings.colors ? (settings.colors.headingText || '#2c3e50') : '#2c3e50' %>; margin: 0;">Sample Heading</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.bodyText" class="form-label fw-bold">Body Text Color</label>
+                                                <p class="text-muted small">Used for all body text and content paragraphs</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.bodyText" name="colors.bodyText" 
+                                                           value="<%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>"
+                                                           title="Choose body text color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.bodyText.text" 
+                                                           value="<%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.bodyText').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded border" id="bodyTextPreview" style="background-color: white;">
+                                                    <p style="color: <%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>; margin: 0;">Sample body text content goes here to show the preview.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+                                <h5 class="mb-3">Link Colors</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.linkColor" class="form-label fw-bold">General Links Color</label>
+                                                <p class="text-muted small">Used for links in content, pages, and sidebar</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.linkColor" name="colors.linkColor" 
+                                                           value="<%= settings.colors ? (settings.colors.linkColor || '#B5A886') : '#B5A886' %>"
+                                                           title="Choose link color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.linkColor.text" 
+                                                           value="<%= settings.colors ? (settings.colors.linkColor || '#B5A886') : '#B5A886' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.linkColor').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded border" id="linkColorPreview" style="background-color: white;">
+                                                    <a style="color: <%= settings.colors ? (settings.colors.linkColor || '#B5A886') : '#B5A886' %>; text-decoration: underline;">This is a sample link</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label for="colors.headerFooterLinkColor" class="form-label fw-bold">Header & Footer Links Color</label>
+                                                <p class="text-muted small">Used for links in navbar and footer</p>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.headerFooterLinkColor" name="colors.headerFooterLinkColor" 
+                                                           value="<%= settings.colors ? (settings.colors.headerFooterLinkColor || '#FFD700') : '#FFD700' %>"
+                                                           title="Choose header/footer link color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.headerFooterLinkColor.text" 
+                                                           value="<%= settings.colors ? (settings.colors.headerFooterLinkColor || '#FFD700') : '#FFD700' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.headerFooterLinkColor').value = this.value; updateColorPreview();">
+                                                </div>
+                                                <div class="mt-2 p-3 rounded border" id="headerFooterLinkColorPreview" style="background-color: <%= settings.colors ? settings.colors.primary : '#4C1E4F' %>;">
+                                                    <a style="color: <%= settings.colors ? (settings.colors.headerFooterLinkColor || '#FFD700') : '#FFD700' %>; text-decoration: underline;">This is a sample link</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> 
+                                    <strong>Tip:</strong> You can either use the color picker or type the hex code directly. Use format #RRGGBB (e.g., #B5A886)
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Footer Tab -->
                         <div class="tab-pane fade" id="footer">
                             <div class="settings-section">
@@ -328,6 +583,19 @@
                                               placeholder="Default message for WhatsApp chat"><%= settings.whatsapp ? settings.whatsapp.message : '' %></textarea>
                                 </div>
 
+                                <h4 class="mt-4 mb-3">Visitor Modal</h4>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="visitorModal.enabled" 
+                                               name="visitorModal.enabled" value="true"
+                                               <%= settings.visitorModal && settings.visitorModal.enabled ? 'checked' : '' %>>
+                                        <label class="form-check-label" for="visitorModal.enabled">
+                                            <i class="bi bi-person-badge"></i> Enable Visitor Introduction Form
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">When enabled, first-time visitors will see a welcome form to collect their information.</small>
+                                </div>
+
                                 <h4 class="mt-4 mb-3">Business Hours</h4>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
@@ -358,7 +626,7 @@
                                     </label>
                                     <input type="url" class="form-control" id="socialMedia.facebook" 
                                            name="socialMedia.facebook" 
-                                           value="<%= settings.socialMedia.facebook %>"
+                                           value="<%= settings.socialMedia && settings.socialMedia.facebook ? settings.socialMedia.facebook : '' %>"
                                            placeholder="https://facebook.com/yourpage">
                                 </div>
 
@@ -368,7 +636,7 @@
                                     </label>
                                     <input type="url" class="form-control" id="socialMedia.twitter" 
                                            name="socialMedia.twitter" 
-                                           value="<%= settings.socialMedia.twitter %>"
+                                           value="<%= settings.socialMedia && settings.socialMedia.twitter ? settings.socialMedia.twitter : '' %>"
                                            placeholder="https://twitter.com/yourhandle">
                                 </div>
 
@@ -378,8 +646,9 @@
                                     </label>
                                     <input type="url" class="form-control" id="socialMedia.instagram" 
                                            name="socialMedia.instagram" 
-                                           value="<%= settings.socialMedia.instagram %>"
+                                           value="<%= settings.socialMedia && settings.socialMedia.instagram ? settings.socialMedia.instagram : '' %>"
                                            placeholder="https://instagram.com/yourprofile">
+                                    <small class="text-muted">This link will appear in the "Chat with us" popup on your website.</small>
                                 </div>
 
                                 <div class="mb-3">
@@ -388,7 +657,7 @@
                                     </label>
                                     <input type="url" class="form-control" id="socialMedia.linkedin" 
                                            name="socialMedia.linkedin" 
-                                           value="<%= settings.socialMedia.linkedin %>"
+                                           value="<%= settings.socialMedia && settings.socialMedia.linkedin ? settings.socialMedia.linkedin : '' %>"
                                            placeholder="https://linkedin.com/company/yourcompany">
                                 </div>
 
@@ -398,7 +667,7 @@
                                     </label>
                                     <input type="url" class="form-control" id="socialMedia.youtube" 
                                            name="socialMedia.youtube" 
-                                           value="<%= settings.socialMedia.youtube %>"
+                                           value="<%= settings.socialMedia && settings.socialMedia.youtube ? settings.socialMedia.youtube : '' %>"
                                            placeholder="https://youtube.com/channel/yourchannel">
                                 </div>
                             </div>
@@ -407,7 +676,12 @@
                         <!-- About Tab -->
                         <div class="tab-pane fade" id="about">
                             <div class="settings-section">
-                                <h3 class="section-title">About Page Content</h3>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h3 class="section-title mb-0">About Page Content</h3>
+                                    <a href="/admin/settings/team" class="btn btn-primary">
+                                        <i class="bi bi-people-fill"></i> Manage Team Members
+                                    </a>
+                                </div>
                                 
                                 <div class="mb-3">
                                     <label for="about.mainHeading" class="form-label">Main Heading</label>
@@ -542,6 +816,24 @@
                                         <input type="text" class="form-control" name="stats.satisfactionLabel" 
                                                value="<%= settings.about.stats.satisfactionLabel %>">
                                     </div>
+                                </div>
+
+                                <h4 class="mt-4 mb-3">Team Section</h4>
+                                <div class="mb-3">
+                                    <label for="about.teamHeading" class="form-label">Team Section Heading</label>
+                                    <input type="text" class="form-control" id="about.teamHeading" 
+                                           name="about.teamHeading" 
+                                           value="<%= settings.about.teamHeading || 'Meet Our Team' %>"
+                                           placeholder="Meet Our Team">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="about.teamSubheading" class="form-label">Team Section Subheading</label>
+                                    <input type="text" class="form-control" id="about.teamSubheading" 
+                                           name="about.teamSubheading" 
+                                           value="<%= settings.about.teamSubheading || 'The people behind the excellence' %>"
+                                           placeholder="The people behind the excellence">
+                                    <small class="text-muted">Use the "Manage Team Members" button above to add/edit team members.</small>
                                 </div>
 
                             </div>
@@ -689,6 +981,186 @@
             const marginTopPercent = (parseInt(verticalPos) + 100) / 2;
             preview.style.marginTop = `${(marginTopPercent - 50) / 2}px`;
         }
+
+        // Header height preview functions
+        function updateHeaderHeightPreview() {
+            const heightInput = document.getElementById('header.height');
+            if (!heightInput) return;
+            
+            const height = heightInput.value;
+            document.getElementById('headerHeightValue').textContent = height + 'px';
+            document.getElementById('headerHeightPreviewText').textContent = height;
+            document.getElementById('headerHeightInfo').textContent = height;
+        }
+        function updateColorPreview() {
+            // Update primary color
+            const primaryPicker = document.getElementById('colors.primary');
+            const primaryText = document.getElementById('colors.primary.text');
+            const primaryPreview = document.getElementById('primaryPreview');
+            
+            if (primaryPicker && primaryText && primaryPreview) {
+                primaryText.value = primaryPicker.value.toUpperCase();
+                primaryPreview.style.backgroundColor = primaryPicker.value;
+            }
+            
+            // Update accent color
+            const accentPicker = document.getElementById('colors.accent');
+            const accentText = document.getElementById('colors.accent.text');
+            const accentPreview = document.getElementById('accentPreview');
+            
+            if (accentPicker && accentText && accentPreview) {
+                accentText.value = accentPicker.value.toUpperCase();
+                accentPreview.style.backgroundColor = accentPicker.value;
+            }
+            
+            // Update secondary color
+            const secondaryPicker = document.getElementById('colors.secondary');
+            const secondaryText = document.getElementById('colors.secondary.text');
+            const secondaryPreview = document.getElementById('secondaryPreview');
+            
+            if (secondaryPicker && secondaryText && secondaryPreview) {
+                secondaryText.value = secondaryPicker.value.toUpperCase();
+                secondaryPreview.style.backgroundColor = secondaryPicker.value;
+            }
+            
+            // Update heading text color
+            const headingTextPicker = document.getElementById('colors.headingText');
+            const headingTextText = document.getElementById('colors.headingText.text');
+            const headingTextPreview = document.getElementById('headingTextPreview');
+            
+            if (headingTextPicker && headingTextText && headingTextPreview) {
+                headingTextText.value = headingTextPicker.value.toUpperCase();
+                const h5 = headingTextPreview.querySelector('h5');
+                if (h5) h5.style.color = headingTextPicker.value;
+            }
+            
+            // Update body text color
+            const bodyTextPicker = document.getElementById('colors.bodyText');
+            const bodyTextText = document.getElementById('colors.bodyText.text');
+            const bodyTextPreview = document.getElementById('bodyTextPreview');
+            
+            if (bodyTextPicker && bodyTextText && bodyTextPreview) {
+                bodyTextText.value = bodyTextPicker.value.toUpperCase();
+                const p = bodyTextPreview.querySelector('p');
+                if (p) p.style.color = bodyTextPicker.value;
+            }
+            
+            // Update link color
+            const linkColorPicker = document.getElementById('colors.linkColor');
+            const linkColorText = document.getElementById('colors.linkColor.text');
+            const linkColorPreview = document.getElementById('linkColorPreview');
+            
+            if (linkColorPicker && linkColorText && linkColorPreview) {
+                linkColorText.value = linkColorPicker.value.toUpperCase();
+                const a = linkColorPreview.querySelector('a');
+                if (a) a.style.color = linkColorPicker.value;
+            }
+            
+            // Update header/footer link color
+            const headerFooterLinkColorPicker = document.getElementById('colors.headerFooterLinkColor');
+            const headerFooterLinkColorText = document.getElementById('colors.headerFooterLinkColor.text');
+            const headerFooterLinkColorPreview = document.getElementById('headerFooterLinkColorPreview');
+            
+            if (headerFooterLinkColorPicker && headerFooterLinkColorText && headerFooterLinkColorPreview) {
+                headerFooterLinkColorText.value = headerFooterLinkColorPicker.value.toUpperCase();
+                const a = headerFooterLinkColorPreview.querySelector('a');
+                if (a) a.style.color = headerFooterLinkColorPicker.value;
+            }
+        }
+
+        // Sync color picker with text input
+        document.addEventListener('DOMContentLoaded', function() {
+            // Primary color sync
+            const primaryPicker = document.getElementById('colors.primary');
+            const primaryText = document.getElementById('colors.primary.text');
+            if (primaryPicker && primaryText) {
+                primaryPicker.addEventListener('input', updateColorPreview);
+                primaryText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        primaryPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Accent color sync
+            const accentPicker = document.getElementById('colors.accent');
+            const accentText = document.getElementById('colors.accent.text');
+            if (accentPicker && accentText) {
+                accentPicker.addEventListener('input', updateColorPreview);
+                accentText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        accentPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Secondary color sync
+            const secondaryPicker = document.getElementById('colors.secondary');
+            const secondaryText = document.getElementById('colors.secondary.text');
+            if (secondaryPicker && secondaryText) {
+                secondaryPicker.addEventListener('input', updateColorPreview);
+                secondaryText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        secondaryPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Heading text color sync
+            const headingTextPicker = document.getElementById('colors.headingText');
+            const headingTextText = document.getElementById('colors.headingText.text');
+            if (headingTextPicker && headingTextText) {
+                headingTextPicker.addEventListener('input', updateColorPreview);
+                headingTextText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        headingTextPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Body text color sync
+            const bodyTextPicker = document.getElementById('colors.bodyText');
+            const bodyTextText = document.getElementById('colors.bodyText.text');
+            if (bodyTextPicker && bodyTextText) {
+                bodyTextPicker.addEventListener('input', updateColorPreview);
+                bodyTextText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        bodyTextPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Link color sync
+            const linkColorPicker = document.getElementById('colors.linkColor');
+            const linkColorText = document.getElementById('colors.linkColor.text');
+            if (linkColorPicker && linkColorText) {
+                linkColorPicker.addEventListener('input', updateColorPreview);
+                linkColorText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        linkColorPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+            
+            // Header/Footer link color sync
+            const headerFooterLinkColorPicker = document.getElementById('colors.headerFooterLinkColor');
+            const headerFooterLinkColorText = document.getElementById('colors.headerFooterLinkColor.text');
+            if (headerFooterLinkColorPicker && headerFooterLinkColorText) {
+                headerFooterLinkColorPicker.addEventListener('input', updateColorPreview);
+                headerFooterLinkColorText.addEventListener('input', function() {
+                    if (/^#[0-9A-Fa-f]{6}$/.test(this.value)) {
+                        headerFooterLinkColorPicker.value = this.value;
+                        updateColorPreview();
+                    }
+                });
+            }
+        });
 
         function previewLogoFile(input) {
             if (input.files && input.files[0]) {

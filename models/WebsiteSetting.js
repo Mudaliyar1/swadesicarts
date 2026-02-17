@@ -11,6 +11,22 @@ const websiteSettingSchema = new mongoose.Schema({
     verticalPosition: { type: Number, default: 0, min: -100, max: 100 }
   },
 
+  // Header Settings
+  header: {
+    height: { type: Number, default: 72 } // Header height in pixels
+  },
+
+  // Color Scheme
+  colors: {
+    primary: { type: String, default: '#4C1E4F' }, // Header/Footer color
+    accent: { type: String, default: '#B5A886' },  // Accent/highlight color
+    secondary: { type: String, default: '#6C8E7F' }, // Secondary elements
+    headingText: { type: String, default: '#2c3e50' }, // Heading/Title text color
+    bodyText: { type: String, default: '#495057' }, // Body/Content text color
+    linkColor: { type: String, default: '#B5A886' }, // Link color for general content
+    headerFooterLinkColor: { type: String, default: '#FFD700' } // Link color for header/footer
+  },
+
   // Footer Settings
   footer: {
     phone: { type: String, default: '+91-000-0000000' },
@@ -36,6 +52,11 @@ const websiteSettingSchema = new mongoose.Schema({
   whatsapp: {
     number: { type: String, default: '' },
     message: { type: String, default: 'Hello! I would like to know more about your products.' }
+  },
+
+  // Visitor Modal Settings
+  visitorModal: {
+    enabled: { type: Boolean, default: true }
   },
 
   // Social Media Links
@@ -79,7 +100,23 @@ const websiteSettingSchema = new mongoose.Schema({
     },
     // Call to Action
     ctaHeading: { type: String, default: 'Ready to Experience Excellence?' },
-    ctaDescription: { type: String, default: 'Join our community of satisfied customers and discover the Swadesi Carts difference.' }
+    ctaDescription: { type: String, default: 'Join our community of satisfied customers and discover the Swadesi Carts difference.' },
+    // Team Members
+    teamHeading: { type: String, default: 'Meet Our Team' },
+    teamSubheading: { type: String, default: 'The people behind the excellence' },
+    teamMembers: [
+      {
+        name: { type: String, required: true },
+        role: { type: String, required: true },
+        bio: { type: String, default: '' },
+        image: {
+          url: { type: String, default: '' },
+          publicId: { type: String, default: '' }
+        },
+        isActive: { type: Boolean, default: true },
+        order: { type: Number, default: 0 }
+      }
+    ]
   }
 }, {
   timestamps: true

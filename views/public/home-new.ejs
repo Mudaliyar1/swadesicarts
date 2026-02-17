@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
 </head>
-<body>
+<body class="home-page">
     <!-- LOADING ANIMATION -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-content">
@@ -116,14 +116,57 @@
             || (siteSettings && siteSettings.footer && siteSettings.footer.phone)
             || '';
         const whatsappMessage = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.message) || '';
+        const instagramUrl = (siteSettings && siteSettings.socialMedia && siteSettings.socialMedia.instagram) || '';
+        const visitorModalEnabled = (siteSettings && siteSettings.visitorModal && siteSettings.visitorModal.enabled !== false) ? true : false;
     %>
     
     <!-- HERO CAROUSEL SECTION -->
     <section class="hero-carousel-section">
-        <a href="#" class="test-center-icon" id="testWhatsAppBtn"
-           data-number="<%= whatsappNumber %>"
-           data-message="<%= whatsappMessage %>"
-           aria-label="Chat with us on WhatsApp" target="_blank" rel="noopener"></a>
+        <!-- Chat with Us Capsule Button & Popup -->
+        <div class="chat-popup-wrapper">
+            <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
+                <i class="bi bi-chat-dots-fill"></i>
+                <span>Chat with us</span>
+            </button>
+            
+            <div class="chat-popup" id="chatPopup">
+                <div class="chat-popup-content">
+                    <button class="chat-popup-close" id="chatPopupClose" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    
+                    <div class="chat-options">
+                        <% if (whatsappNumber) { %>
+                            <a href="#" class="chat-option whatsapp-option" id="whatsappLink" 
+                               data-number="<%= whatsappNumber %>"
+                               data-message="<%= whatsappMessage %>"
+                               aria-label="Chat on WhatsApp">
+                                <div class="chat-option-icon">
+                                    <i class="bi bi-whatsapp"></i>
+                                </div>
+                                <div class="chat-option-text">
+                                    <span class="chat-option-title">WhatsApp</span>
+                                    <span class="chat-option-desc">Chat directly</span>
+                                </div>
+                            </a>
+                        <% } %>
+                        
+                        <% if (instagramUrl) { %>
+                            <a href="<%= instagramUrl %>" target="_blank" rel="noopener" class="chat-option instagram-option"
+                               aria-label="Follow on Instagram">
+                                <div class="chat-option-icon">
+                                    <i class="bi bi-instagram"></i>
+                                </div>
+                                <div class="chat-option-text">
+                                    <span class="chat-option-title">Instagram</span>
+                                    <span class="chat-option-desc">Follow us</span>
+                                </div>
+                            </a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
             <!-- Carousel Indicators -->
             <div class="carousel-indicators">
@@ -485,9 +528,15 @@
 
         // Visitor Modal Handler
         (function() {
+            const visitorModalEnabled = <%= visitorModalEnabled %>;
             const visitorModal = document.getElementById('visitorModal');
             const closeModal = document.getElementById('closeModal');
             const visitorForm = document.getElementById('visitorForm');
+            
+            // Only run if visitor modal is enabled in settings
+            if (!visitorModalEnabled) {
+                return;
+            }
             
             // Check if user has already submitted the form
             const hasSubmitted = sessionStorage.getItem('visitorSubmitted');
@@ -618,30 +667,57 @@
             }
         })();
 
-        // WhatsApp Chat Button
+        // Chat Capsule Popup Button
         (function() {
-            const buttons = [
-                document.getElementById('whatsappChatBtn'),
-                document.getElementById('testWhatsAppBtn')
-            ].filter(Boolean);
-
-            if (buttons.length === 0) return;
-
-            buttons.forEach((btn) => {
-                const rawNumber = btn.getAttribute('data-number') || '';
-                const message = btn.getAttribute('data-message') || '';
-                const number = rawNumber.replace(/\D/g, '');
-
-                if (!number) {
-                    btn.href = '#';
-                    btn.classList.add('whatsapp-disabled');
-                    return;
-                }
-
-                const encodedMessage = encodeURIComponent(message);
-                const messageQuery = message ? `?text=${encodedMessage}` : '';
-                btn.href = `https://wa.me/${number}${messageQuery}`;
+            const chatCapsuleBtn = document.getElementById('chatCapsuleBtn');
+            const chatPopup = document.getElementById('chatPopup');
+            const chatPopupClose = document.getElementById('chatPopupClose');
+            const whatsappLink = document.getElementById('whatsappLink');
+            
+            if (!chatCapsuleBtn) return;
+            
+            // Open popup on button click
+            chatCapsuleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                chatPopup.classList.toggle('active');
             });
+            
+            // Close popup on close button click
+            if (chatPopupClose) {
+                chatPopupClose.addEventListener('click', () => {
+                    chatPopup.classList.remove('active');
+                });
+            }
+            
+            // Close popup when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.chat-popup-wrapper')) {
+                    chatPopup.classList.remove('active');
+                }
+            });
+            
+            // Handle WhatsApp link
+            if (whatsappLink) {
+                whatsappLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const rawNumber = whatsappLink.getAttribute('data-number') || '';
+                    const message = whatsappLink.getAttribute('data-message') || '';
+                    const number = rawNumber.replace(/\D/g, '');
+                    
+                    if (!number) {
+                        alert('WhatsApp number is not configured');
+                        return;
+                    }
+                    
+                    const encodedMessage = encodeURIComponent(message);
+                    const messageQuery = message ? `?text=${encodedMessage}` : '';
+                    const whatsappUrl = `https://wa.me/${number}${messageQuery}`;
+                    window.open(whatsappUrl, '_blank', 'noopener');
+                    
+                    // Close popup after opening WhatsApp
+                    chatPopup.classList.remove('active');
+                });
+            }
         })();
     </script>
 </body>
