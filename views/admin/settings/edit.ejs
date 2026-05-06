@@ -69,6 +69,7 @@
         </div>
         <ul class="sidebar-nav flex-grow-1">
             <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/site-editor" title="Website Editor"><i class="bi bi-cursor"></i><span class="sidebar-text">Website Editor</span></a></li>
             <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
             <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
             <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
@@ -93,6 +94,7 @@
         <div class="offcanvas-body p-0">
             <ul class="sidebar-nav-mobile">
                 <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/site-editor"><i class="bi bi-cursor"></i> Website Editor</a></li>
                 <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
                 <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
@@ -163,6 +165,11 @@
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#about" type="button">
                             <i class="bi bi-info-circle"></i> About Page
                         </button>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/settings/carousel">
+                            <i class="bi bi-sliders"></i> Carousel
+                        </a>
                     </li>
                 </ul>
 
@@ -255,6 +262,49 @@
                                 </div>
                             </div>
                         </div>
+
+                        <script>
+                            function updateColorPreview() {
+                                const color = document.getElementById('colors.bodyBackgroundColor').value;
+                                document.getElementById('colors.bodyBackgroundColor.text').value = color;
+                                document.getElementById('bodyBackgroundPreview').style.background = color;
+                            }
+
+                            function updateGradientPreview() {
+                                const stop1 = document.getElementById('gradient.stop1').value;
+                                const stop2 = document.getElementById('gradient.stop2').value;
+                                const custom = document.getElementById('colors.backgroundGradient').value.trim();
+                                const grad = custom || `linear-gradient(135deg, ${stop1} 0%, ${stop2} 100%)`;
+                                document.getElementById('bodyBackgroundPreview').style.background = grad;
+                                document.getElementById('colors.backgroundGradient').value = custom;
+                            }
+
+                            document.addEventListener('DOMContentLoaded', () => {
+                                const bgColor = document.getElementById('colors.bodyBackgroundColor');
+                                const bgText = document.getElementById('colors.bodyBackgroundColor.text');
+                                const stop1 = document.getElementById('gradient.stop1');
+                                const stop2 = document.getElementById('gradient.stop2');
+                                const bgTypeColor = document.getElementById('bgTypeColor');
+                                const bgTypeGradient = document.getElementById('bgTypeGradient');
+
+                                bgColor && bgColor.addEventListener('input', updateColorPreview);
+                                bgText && bgText.addEventListener('change', updateColorPreview);
+                                stop1 && stop1.addEventListener('input', updateGradientPreview);
+                                stop2 && stop2.addEventListener('input', updateGradientPreview);
+                                document.getElementById('colors.backgroundGradient') && document.getElementById('colors.backgroundGradient').addEventListener('change', updateGradientPreview);
+
+                                function toggleBgControls() {
+                                    const isGrad = bgTypeGradient.checked;
+                                    document.getElementById('bgGradientControls').style.display = isGrad ? 'block' : 'none';
+                                    document.getElementById('bgColorControls').style.display = isGrad ? 'none' : 'flex';
+                                    updateGradientPreview();
+                                    updateColorPreview();
+                                }
+
+                                bgTypeColor && bgTypeColor.addEventListener('change', toggleBgControls);
+                                bgTypeGradient && bgTypeGradient.addEventListener('change', toggleBgControls);
+                            });
+                        </script>
 
                         <!-- Header Tab -->
                         <div class="tab-pane fade" id="header">
@@ -494,12 +544,94 @@
                                     </div>
                                 </div>
 
+                                <hr class="my-4">
+                                <h5 class="mb-3">Website Background</h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <label class="form-label fw-bold">Body Background</label>
+                                                <p class="text-muted small">Choose a solid color or provide a custom gradient for the site background.</p>
+                                                <div class="mb-2">
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="colors.backgroundType" id="bgTypeColor" value="color" <%= (settings.colors && settings.colors.backgroundType === 'color') || !settings.colors ? 'checked' : '' %>>
+                                                        <label class="form-check-label" for="bgTypeColor">Solid Color</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="colors.backgroundType" id="bgTypeGradient" value="gradient" <%= settings.colors && settings.colors.backgroundType === 'gradient' ? 'checked' : '' %>>
+                                                        <label class="form-check-label" for="bgTypeGradient">Gradient</label>
+                                                    </div>
+                                                </div>
+
+                                                <div id="bgColorControls" class="d-flex align-items-center gap-2">
+                                                    <input type="color" class="form-control form-control-color" 
+                                                           id="colors.bodyBackgroundColor" name="colors.bodyBackgroundColor" 
+                                                           value="<%= settings.colors ? (settings.colors.bodyBackgroundColor || '#ffffff') : '#ffffff' %>"
+                                                           title="Choose body background color">
+                                                    <input type="text" class="form-control" 
+                                                           id="colors.bodyBackgroundColor.text" 
+                                                           value="<%= settings.colors ? (settings.colors.bodyBackgroundColor || '#ffffff') : '#ffffff' %>"
+                                                           pattern="^#[0-9A-Fa-f]{6}$"
+                                                           maxlength="7"
+                                                           onchange="document.getElementById('colors.bodyBackgroundColor').value = this.value; updateColorPreview();">
+                                                </div>
+
+                                                <div id="bgGradientControls" style="display: <%= settings.colors && settings.colors.backgroundType === 'gradient' ? 'block' : 'none' %>;">
+                                                    <div class="mb-2 d-flex gap-2">
+                                                        <input type="color" class="form-control form-control-color" id="gradient.stop1" value="<%= settings.colors && settings.colors.backgroundGradient ? (settings.colors.backgroundGradientStop1 || '#000000') : '#000000' %>">
+                                                        <input type="color" class="form-control form-control-color" id="gradient.stop2" value="<%= settings.colors && settings.colors.backgroundGradient ? (settings.colors.backgroundGradientStop2 || '#444444') : '#444444' %>">
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label for="colors.backgroundGradient" class="form-label small">Custom gradient CSS (optional)</label>
+                                                        <input type="text" class="form-control" id="colors.backgroundGradient" name="colors.backgroundGradient" value="<%= settings.colors ? (settings.colors.backgroundGradient || '') : '' %>" placeholder="e.g. linear-gradient(135deg,#1f305e 0%,#003399 100%)">
+                                                    </div>
+                                                    <small class="text-muted">If left empty, gradient will be built from the two color pickers above.</small>
+                                                </div>
+
+                                                <div class="mt-2 p-3 rounded border" id="bodyBackgroundPreview" style="background: <%= settings.colors && settings.colors.backgroundType === 'gradient' ? (settings.colors.backgroundGradient || 'linear-gradient(180deg, #000000, #444444)') : (settings.colors ? (settings.colors.bodyBackgroundColor || '#ffffff') : '#ffffff') %>; color: <%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>;">
+                                                    <p style="margin:0;">Website background preview</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="alert alert-info">
                                     <i class="bi bi-info-circle"></i> 
                                     <strong>Tip:</strong> You can either use the color picker or type the hex code directly. Use format #RRGGBB (e.g., #B5A886)
                                 </div>
                             </div>
                         </div>
+
+                                    <hr class="my-4">
+                                    <h5 class="mb-3">Carousel Section Header</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card mb-3">
+                                                <div class="card-body">
+                                                    <div class="form-check form-switch mb-3">
+                                                        <input class="form-check-input" type="checkbox" id="carousel.showHeader" name="carouselSection.showHeader" <%= settings.carouselSection && settings.carouselSection.showHeader ? 'checked' : '' %>>
+                                                        <label class="form-check-label" for="carousel.showHeader">Show header above Featured Carousel</label>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="carousel.heading" class="form-label">Header Title</label>
+                                                        <input type="text" class="form-control" id="carousel.heading" name="carouselSection.heading" value="<%= settings.carouselSection ? settings.carouselSection.heading : 'Featured Carousel' %>">
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label for="carousel.subheading" class="form-label">Subheading</label>
+                                                        <input type="text" class="form-control" id="carousel.subheading" name="carouselSection.subheading" value="<%= settings.carouselSection ? settings.carouselSection.subheading : 'Updates, offers, and highlights you can control from the admin panel' %>">
+                                                    </div>
+
+                                                    <div class="alert alert-info">
+                                                        <i class="bi bi-info-circle"></i> Toggle this on to display a short heading and description above the carousel to attract customers.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                         <!-- Footer Tab -->
                         <div class="tab-pane fade" id="footer">
@@ -849,6 +981,20 @@
                         </a>
                     </div>
                 </form>
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h5 class="mb-1 fw-bold"><i class="bi bi-sliders"></i> Homepage Carousel</h5>
+                            <p class="text-muted mb-0">Add images, videos, text, and link buttons for the homepage slider.</p>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="badge bg-swadesi fs-6"><%= settings.carousel ? settings.carousel.length : 0 %> slides</span>
+                            <a href="/admin/settings/carousel" class="btn btn-primary">
+                                <i class="bi bi-pencil-square"></i> Manage Carousel
+                            </a>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 

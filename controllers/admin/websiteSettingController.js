@@ -2,6 +2,57 @@ const WebsiteSetting = require('../../models/WebsiteSetting');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
 
+const buildDefaultDesignEditor = () => ({ rules: [] });
+
+const editorPreviewPages = [
+  { label: 'Home', path: '/' },
+  { label: 'About', path: '/about' },
+  { label: 'Contact', path: '/contact' },
+  { label: 'Seasonal Products', path: '/seasonal-products' },
+  { label: 'Tech Packages', path: '/tech-packages' },
+  { label: 'Organic Products', path: '/organic-products' }
+];
+
+const normalizeEditorRule = (rule) => {
+  if (!rule || typeof rule !== 'object') return null;
+
+  const selector = typeof rule.selector === 'string' ? rule.selector.trim() : '';
+  if (!selector) return null;
+
+  const styles = rule.styles && typeof rule.styles === 'object' ? rule.styles : {};
+  const inferredTextMode = styles.textMode || (styles.textGradientStart && styles.textGradientEnd ? 'gradient' : 'color');
+  const inferredBackgroundMode = styles.backgroundMode || (styles.backgroundGradientStart && styles.backgroundGradientEnd ? 'gradient' : (styles.backgroundColor ? 'color' : 'none'));
+
+  return {
+    selector,
+    styles: {
+      color: styles.color || '',
+      backgroundColor: styles.backgroundColor || '',
+      textMode: inferredTextMode,
+      textGradientStart: styles.textGradientStart || '',
+      textGradientEnd: styles.textGradientEnd || '',
+      textGradientDirection: styles.textGradientDirection || '135deg',
+      backgroundMode: inferredBackgroundMode,
+      backgroundGradientStart: styles.backgroundGradientStart || '',
+      backgroundGradientEnd: styles.backgroundGradientEnd || '',
+      backgroundGradientDirection: styles.backgroundGradientDirection || '135deg',
+      borderRadius: styles.borderRadius || '',
+      fontSize: styles.fontSize || '',
+      fontFamily: styles.fontFamily || '',
+      fontWeight: styles.fontWeight || '',
+      fontStyle: styles.fontStyle || '',
+      lineHeight: styles.lineHeight || '',
+      letterSpacing: styles.letterSpacing || ''
+    }
+  };
+};
+
+const normalizePreviewPath = (value) => {
+  if (typeof value !== 'string' || !value.trim()) return '/';
+  const trimmed = value.trim();
+  return trimmed.startsWith('/') ? trimmed : '/';
+};
+
 // Helper function to upload buffer to Cloudinary
 const uploadToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
@@ -15,6 +66,8 @@ const uploadToCloudinary = (buffer, folder) => {
     streamifier.createReadStream(buffer).pipe(uploadStream);
   });
 };
+
+const normalizeBoolean = (value) => value === 'true' || value === 'on' || value === true;
 
 // Get or create website settings
 exports.getSettings = async (req, res) => {
@@ -56,6 +109,11 @@ exports.getSettings = async (req, res) => {
     // Ensure teamMembers array exists
     if (!settings.about.teamMembers) {
       settings.about.teamMembers = [];
+      await settings.save();
+    }
+
+    if (!settings.carousel) {
+      settings.carousel = [];
       await settings.save();
     }
     
@@ -105,6 +163,266 @@ exports.getSettings = async (req, res) => {
     console.error('Error fetching settings:', error);
     req.flash('error', 'Error loading settings');
     res.redirect('/admin/dashboard');
+  }
+};
+
+exports.getSiteEditor = async (req, res) => {
+  try {
+    let settings = await WebsiteSetting.findOne();
+
+    if (!settings) {
+      settings = new WebsiteSetting({
+        designEditor: buildDefaultDesignEditor()
+      });
+      await settings.save();
+    }
+
+    if (!settings.designEditor) {
+      settings.designEditor = buildDefaultDesignEditor();
+      await settings.save();
+    }
+
+    if (!Array.isArray(settings.designEditor.rules)) {
+      settings.designEditor.rules = [];
+      await settings.save();
+    }
+
+    const selectedPage = normalizePreviewPath(req.query.page || '/');
+
+    res.render('admin/site-editor', {
+      title: 'Website Editor',
+      settings,
+      currentPage: 'site-editor',
+      adminName: req.session.adminName,
+      previewPages: editorPreviewPages,
+      selectedPage,
+      rulesJson: JSON.stringify(settings.designEditor.rules || []),
+      messages: {
+        success: req.flash('success'),
+        error: req.flash('error')
+      }
+    });
+  } catch (error) {
+    console.error('Error loading site editor:', error);
+    req.flash('error', 'Error loading website editor');
+    res.redirect('/admin/dashboard');
+  }
+};
+
+exports.saveSiteEditor = async (req, res) => {
+  try {
+    let settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      settings = new WebsiteSetting();
+    }
+
+    let parsedRules = [];
+    if (typeof req.body.rulesJson === 'string' && req.body.rulesJson.trim()) {
+      try {
+        const candidateRules = JSON.parse(req.body.rulesJson);
+        if (Array.isArray(candidateRules)) {
+          parsedRules = candidateRules.map(normalizeEditorRule).filter(Boolean);
+        }
+      } catch (parseError) {
+        console.error('Invalid site editor rules JSON:', parseError);
+        req.flash('error', 'Could not save editor styles because the rule data was invalid');
+        return res.redirect(`/admin/site-editor?page=${encodeURIComponent(normalizePreviewPath(req.body.previewPage || '/'))}`);
+      }
+    }
+
+    settings.designEditor = settings.designEditor || buildDefaultDesignEditor();
+    settings.designEditor.rules = parsedRules;
+    await settings.save();
+
+    req.flash('success', 'Website editor styles saved successfully');
+    res.redirect(`/admin/site-editor?page=${encodeURIComponent(normalizePreviewPath(req.body.previewPage || '/'))}`);
+  } catch (error) {
+    console.error('Error saving site editor:', error);
+    req.flash('error', 'Error saving website editor styles: ' + error.message);
+    res.redirect(`/admin/site-editor?page=${encodeURIComponent(normalizePreviewPath(req.body.previewPage || '/'))}`);
+  }
+};
+
+exports.resetSiteEditor = async (req, res) => {
+  try {
+    let settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      settings = new WebsiteSetting();
+    }
+
+    // Clear all design editor rules to restore default theme
+    settings.designEditor = buildDefaultDesignEditor();
+    await settings.save();
+
+    req.flash('success', 'Website has been reset to default theme');
+    res.redirect('/admin/site-editor');
+  } catch (error) {
+    console.error('Error resetting site editor:', error);
+    req.flash('error', 'Error resetting website theme: ' + error.message);
+    res.redirect('/admin/site-editor');
+  }
+};
+
+exports.getCarousel = async (req, res) => {
+  try {
+    let settings = await WebsiteSetting.findOne();
+
+    if (!settings) {
+      settings = new WebsiteSetting({ carousel: [] });
+      await settings.save();
+    }
+
+    if (!settings.carousel) {
+      settings.carousel = [];
+      await settings.save();
+    }
+
+    const editId = req.query.edit || '';
+    const editItem = editId ? settings.carousel.id(editId) : null;
+
+    res.render('admin/settings/carousel', {
+      title: 'Website Carousel',
+      settings,
+      carouselEditItem: editItem,
+      currentPage: 'settings',
+      adminName: req.session.adminName,
+      messages: {
+        success: req.flash('success'),
+        error: req.flash('error')
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching carousel:', error);
+    req.flash('error', 'Error loading carousel');
+    res.redirect('/admin/settings');
+  }
+};
+
+exports.addCarouselItem = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      req.flash('error', 'Settings not found');
+      return res.redirect('/admin/settings/carousel');
+    }
+
+    const { title, description, linkText, linkUrl, order, textLeft, textTop } = req.body;
+
+    if (!req.files || !req.files.media || !req.files.media[0]) {
+      req.flash('error', 'Please upload a media file for the carousel item');
+      return res.redirect('/admin/settings/carousel');
+    }
+
+    const file = req.files.media[0];
+    const result = await uploadToCloudinary(file.buffer, 'swadesi-carts/settings/carousel');
+    const mediaType = file.mimetype.startsWith('video/') ? 'video' : 'image';
+
+    settings.carousel.push({
+      title: title || '',
+      description: description || '',
+      linkText: linkText || '',
+      linkUrl: linkUrl || '',
+      textPosition: {
+        left: Number.parseInt(textLeft, 10) || 50,
+        top: Number.parseInt(textTop, 10) || 50
+      },
+      media: {
+        url: result.secure_url,
+        publicId: result.public_id,
+        type: mediaType
+      },
+      order: parseInt(order) || 0,
+      isActive: normalizeBoolean(req.body.isActive)
+    });
+
+    await settings.save();
+    req.flash('success', 'Carousel item added successfully');
+    res.redirect('/admin/settings/carousel');
+  } catch (error) {
+    console.error('Error adding carousel item:', error);
+    req.flash('error', 'Error adding carousel item: ' + error.message);
+    res.redirect('/admin/settings/carousel');
+  }
+};
+
+exports.updateCarouselItem = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      req.flash('error', 'Settings not found');
+      return res.redirect('/admin/settings/carousel');
+    }
+
+    const item = settings.carousel.id(req.params.id);
+    if (!item) {
+      req.flash('error', 'Carousel item not found');
+      return res.redirect('/admin/settings/carousel');
+    }
+
+    const { title, description, linkText, linkUrl, order, textLeft, textTop } = req.body;
+
+    item.title = title || '';
+    item.description = description || '';
+    item.linkText = linkText || '';
+    item.linkUrl = linkUrl || '';
+    item.order = parseInt(order) || 0;
+    item.isActive = normalizeBoolean(req.body.isActive);
+    item.textPosition = {
+      left: Number.parseInt(textLeft, 10) || item.textPosition?.left || 50,
+      top: Number.parseInt(textTop, 10) || item.textPosition?.top || 50
+    };
+
+    if (req.files && req.files.media && req.files.media[0]) {
+      if (item.media && item.media.publicId) {
+        await cloudinary.uploader.destroy(item.media.publicId, {
+          resource_type: item.media.type === 'video' ? 'video' : 'image'
+        });
+      }
+
+      const file = req.files.media[0];
+      const result = await uploadToCloudinary(file.buffer, 'swadesi-carts/settings/carousel');
+      item.media = {
+        url: result.secure_url,
+        publicId: result.public_id,
+        type: file.mimetype.startsWith('video/') ? 'video' : 'image'
+      };
+    }
+
+    await settings.save();
+    req.flash('success', 'Carousel item updated successfully');
+    res.redirect('/admin/settings/carousel');
+  } catch (error) {
+    console.error('Error updating carousel item:', error);
+    req.flash('error', 'Error updating carousel item: ' + error.message);
+    res.redirect('/admin/settings/carousel');
+  }
+};
+
+exports.deleteCarouselItem = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne();
+    if (!settings) {
+      return res.status(404).json({ success: false, message: 'Settings not found' });
+    }
+
+    const item = settings.carousel.id(req.params.id);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Carousel item not found' });
+    }
+
+    if (item.media && item.media.publicId) {
+      await cloudinary.uploader.destroy(item.media.publicId, {
+        resource_type: item.media.type === 'video' ? 'video' : 'image'
+      });
+    }
+
+    settings.carousel.pull(req.params.id);
+    await settings.save();
+
+    return res.status(200).json({ success: true, message: 'Carousel item deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting carousel item:', error);
+    return res.status(500).json({ success: false, message: 'Error deleting carousel item' });
   }
 };
 
@@ -244,6 +562,18 @@ exports.updateSettings = async (req, res) => {
     }
     if (req.body['colors.headerFooterLinkColor']) {
       settings.colors.headerFooterLinkColor = req.body['colors.headerFooterLinkColor'];
+    }
+    // Carousel section header settings
+    if (!settings.carouselSection) settings.carouselSection = {};
+    settings.carouselSection.showHeader = req.body['carouselSection.showHeader'] === 'on' || req.body['carouselSection.showHeader'] === 'true';
+    if (typeof req.body['carouselSection.heading'] !== 'undefined') {
+      settings.carouselSection.heading = req.body['carouselSection.heading'] || settings.carouselSection.heading || 'Featured Carousel';
+    }
+    if (typeof req.body['carouselSection.subheading'] !== 'undefined') {
+      settings.carouselSection.subheading = req.body['carouselSection.subheading'] || settings.carouselSection.subheading || 'Updates, offers, and highlights you can control from the admin panel';
+    }
+    if (req.body['colors.bodyBackgroundColor']) {
+      settings.colors.bodyBackgroundColor = req.body['colors.bodyBackgroundColor'];
     }
 
     // Handle about image upload

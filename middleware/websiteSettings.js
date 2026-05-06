@@ -1,4 +1,5 @@
 const WebsiteSetting = require('../models/WebsiteSetting');
+const cloudinary = require('../config/cloudinary');
 
 // Middleware to load website settings for all views
 const loadWebsiteSettings = async (req, res, next) => {
@@ -42,6 +43,29 @@ const loadWebsiteSettings = async (req, res, next) => {
       settings.about.teamMembers = [];
       await settings.save();
     }
+
+    if (settings && !settings.carousel) {
+      settings.carousel = [];
+      await settings.save();
+    }
+    // Ensure carouselSection exists
+    if (settings && !settings.carouselSection) {
+      settings.carouselSection = {
+        showHeader: false,
+        heading: 'Featured Carousel',
+        subheading: 'Updates, offers, and highlights you can control from the admin panel'
+      };
+      await settings.save();
+    }
+
+    if (settings && !settings.designEditor) {
+      settings.designEditor = { rules: [] };
+      await settings.save();
+    }
+    if (settings && settings.designEditor && !Array.isArray(settings.designEditor.rules)) {
+      settings.designEditor.rules = [];
+      await settings.save();
+    }
     
     // Ensure colors exist with defaults
     if (settings && !settings.colors) {
@@ -52,7 +76,10 @@ const loadWebsiteSettings = async (req, res, next) => {
         headingText: '#2c3e50',
         bodyText: '#495057',
         linkColor: '#B5A886',
-        headerFooterLinkColor: '#FFD700'
+        headerFooterLinkColor: '#FFD700',
+        bodyBackgroundColor: '#ffffff',
+        backgroundType: 'color',
+        backgroundGradient: ''
       };
       await settings.save();
     } else if (settings && settings.colors) {
@@ -73,9 +100,46 @@ const loadWebsiteSettings = async (req, res, next) => {
         settings.colors.headerFooterLinkColor = '#FFD700';
         await settings.save();
       }
+      if (!settings.colors.bodyBackgroundColor) {
+        settings.colors.bodyBackgroundColor = '#ffffff';
+        await settings.save();
+      }
+      if (!settings.colors.backgroundType) {
+        settings.colors.backgroundType = 'color';
+        await settings.save();
+      }
+      if (!settings.colors.backgroundGradient) {
+        settings.colors.backgroundGradient = '';
+        await settings.save();
+      }
     }
     
     // Make settings available to all views
+    // Add transformed media URLs for carousel items (do not persist)
+    try {
+      if (settings && settings.carousel && Array.isArray(settings.carousel)) {
+        settings.carousel.forEach(item => {
+          try {
+            if (item.media && item.media.publicId) {
+              const resourceType = item.media.type === 'video' ? 'video' : 'image';
+              item.media.transformedUrl = cloudinary.url(item.media.publicId, {
+                resource_type: resourceType,
+                width: 1600,
+                quality: 'auto',
+                fetch_format: 'auto',
+                dpr: 'auto'
+              });
+            }
+          } catch (err) {
+            // ignore transformation errors and leave original url
+            item.media.transformedUrl = item.media.url || '';
+          }
+        });
+      }
+    } catch (e) {
+      // ignore
+    }
+
     res.locals.siteSettings = settings;
     next();
   } catch (error) {

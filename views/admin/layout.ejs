@@ -36,6 +36,12 @@
                 </a>
             </li>
             <li>
+                <a href="/admin/site-editor" class="<%= typeof currentPage !== 'undefined' && currentPage === 'site-editor' ? 'active' : '' %>" title="Website Editor">
+                    <i class="bi bi-cursor"></i>
+                    <span class="sidebar-text">Website Editor</span>
+                </a>
+            </li>
+            <li>
                 <a href="/admin/seasonal-products" class="<%= typeof currentPage !== 'undefined' && currentPage === 'seasonal' ? 'active' : '' %>" title="Seasonal Products">
                     <i class="bi bi-calendar3"></i>
                     <span class="sidebar-text">Seasonal Products</span>
@@ -110,6 +116,7 @@
         <div class="offcanvas-body p-0">
             <ul class="sidebar-nav-mobile">
                 <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/site-editor"><i class="bi bi-cursor"></i> Website Editor</a></li>
                 <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
                 <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>

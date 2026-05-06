@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
+    <%- include('../partials/dynamic-styles') %>
 </head>
 <body class="home-page">
     <!-- LOADING ANIMATION -->
@@ -118,10 +119,13 @@
         const whatsappMessage = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.message) || '';
         const instagramUrl = (siteSettings && siteSettings.socialMedia && siteSettings.socialMedia.instagram) || '';
         const visitorModalEnabled = (siteSettings && siteSettings.visitorModal && siteSettings.visitorModal.enabled !== false) ? true : false;
+        const websiteCarouselItems = (siteSettings && siteSettings.carousel ? siteSettings.carousel : [])
+            .filter(item => item && item.isActive !== false && item.media && item.media.url)
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
     %>
     
     <!-- HERO CAROUSEL SECTION -->
-    <section class="hero-carousel-section">
+    <section class="hero-carousel-section <%= websiteCarouselItems.length > 0 ? 'd-none' : '' %>">
         <!-- Chat with Us Capsule Button & Popup -->
         <div class="chat-popup-wrapper">
             <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
@@ -316,6 +320,75 @@
             </button>
         </div>
     </section>
+
+    <% if (websiteCarouselItems.length > 0) { %>
+    <!-- WEBSITE CAROUSEL SECTION -->
+    <section class="py-5 bg-light-custom">
+        <div class="container">
+            <% if (siteSettings && siteSettings.carouselSection && siteSettings.carouselSection.showHeader) { %>
+            <div class="section-header slide-up">
+                <h2><%= siteSettings.carouselSection.heading || 'Featured Carousel' %></h2>
+                <p><%= siteSettings.carouselSection.subheading || 'Updates, offers, and highlights you can control from the admin panel' %></p>
+            </div>
+            <% } %>
+
+            <div id="websiteCarousel" class="carousel slide shadow-sm overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <% websiteCarouselItems.forEach((item, index) => { %>
+                        <button type="button" data-bs-target="#websiteCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" aria-label="Slide <%= index + 1 %>"></button>
+                    <% }); %>
+                </div>
+
+                <div class="carousel-inner rounded-4 overflow-hidden">
+                    <% websiteCarouselItems.forEach((item, index) => { %>
+                        <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                            <div class="position-relative carousel-slide-wrapper" style="min-height: 460px; background: #0f1115; overflow: hidden;" data-slide-index="<%= index %>">
+                                <% const mediaSrc = (item.media && item.media.transformedUrl) ? item.media.transformedUrl : (item.media && item.media.url ? item.media.url : ''); %>
+                                <% if (item.media.type === 'video') { %>
+                                    <video class="w-100 h-100 position-absolute top-0 start-0" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: contain; background: #0f1115;"></video>
+                                <% } else { %>
+                                    <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="carousel-slide-image w-100 h-100 position-absolute top-0 start-0" style="object-fit: contain; background: #0f1115;">
+                                <% } %>
+                                <div class="carousel-overlay position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(90deg, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.28) 55%, rgba(0,0,0,0.06) 100%);"></div>
+                                <!-- Animated SVG Accents -->
+                                <svg class="carousel-svg-accent" viewBox="0 0 100 100" style="position: absolute; bottom: 10%; right: 5%; width: 80px; height: 80px; opacity: 0.15; z-index: 1;">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="2" class="svg-pulse" />
+                                    <path d="M 30 50 Q 50 30 70 50" fill="none" stroke="white" stroke-width="2" class="svg-wave" />
+                                </svg>
+                                <div class="position-absolute" style="left: <%= item.textPosition && typeof item.textPosition.left === 'number' ? item.textPosition.left : 50 %>%; top: <%= item.textPosition && typeof item.textPosition.top === 'number' ? item.textPosition.top : 50 %>%; transform: translate(-50%, -50%); z-index: 2; max-width: min(560px, 85vw);">
+                                    <div class="text-white">
+                                        <% if (item.title) { %>
+                                            <h2 class="display-6 fw-bold mb-3"><%= item.title %></h2>
+                                        <% } %>
+                                        <% if (item.description) { %>
+                                            <p class="lead mb-4"><%= item.description %></p>
+                                        <% } %>
+                                        <% if (item.linkUrl) { %>
+                                            <a href="<%= item.linkUrl %>" class="btn btn-accent btn-lg">
+                                                <%= item.linkText || 'Learn More' %>
+                                            </a>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <% if (websiteCarouselItems.length > 1) { %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#websiteCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#websiteCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    <% } %>
 
     <!-- FEATURES SECTION -->
     <section class="bg-light-custom">
@@ -718,6 +791,38 @@
                     chatPopup.classList.remove('active');
                 });
             }
+        })();
+
+        // Carousel Image Height Detection - Hide overlay on short images
+        (function() {
+            const carouselSlideWrappers = document.querySelectorAll('.carousel-slide-wrapper');
+            
+            carouselSlideWrappers.forEach(wrapper => {
+                const img = wrapper.querySelector('.carousel-slide-image');
+                if (!img) return; // Skip if no image
+                
+                const checkImageHeight = () => {
+                    const containerHeight = wrapper.offsetHeight;
+                    const imageHeight = img.naturalHeight;
+                    
+                    // If image is shorter than container (with 50px tolerance), hide the overlay
+                    if (imageHeight > 0 && imageHeight < containerHeight - 50) {
+                        wrapper.classList.add('image-short');
+                    } else {
+                        wrapper.classList.remove('image-short');
+                    }
+                };
+                
+                // Check on image load
+                if (img.complete) {
+                    checkImageHeight();
+                } else {
+                    img.addEventListener('load', checkImageHeight);
+                }
+                
+                // Recheck on window resize
+                window.addEventListener('resize', checkImageHeight);
+            });
         })();
     </script>
 </body>

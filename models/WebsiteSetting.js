@@ -24,7 +24,10 @@ const websiteSettingSchema = new mongoose.Schema({
     headingText: { type: String, default: '#2c3e50' }, // Heading/Title text color
     bodyText: { type: String, default: '#495057' }, // Body/Content text color
     linkColor: { type: String, default: '#B5A886' }, // Link color for general content
-    headerFooterLinkColor: { type: String, default: '#FFD700' } // Link color for header/footer
+    headerFooterLinkColor: { type: String, default: '#FFD700' }, // Link color for header/footer
+    bodyBackgroundColor: { type: String, default: '#ffffff' }, // Body/Website background color
+    backgroundType: { type: String, enum: ['color','gradient'], default: 'color' },
+    backgroundGradient: { type: String, default: '' } // Custom CSS gradient string
   },
 
   // Footer Settings
@@ -57,6 +60,58 @@ const websiteSettingSchema = new mongoose.Schema({
   // Visitor Modal Settings
   visitorModal: {
     enabled: { type: Boolean, default: true }
+  },
+
+  // Website Carousel
+  carousel: [{
+    title: { type: String, default: '' },
+    description: { type: String, default: '' },
+    linkText: { type: String, default: '' },
+    linkUrl: { type: String, default: '' },
+    textPosition: {
+      left: { type: Number, default: 50, min: 0, max: 100 },
+      top: { type: Number, default: 50, min: 0, max: 100 }
+    },
+    media: {
+      url: { type: String, default: '' },
+      publicId: { type: String, default: '' },
+      type: { type: String, enum: ['image', 'video'], default: 'image' }
+    },
+    order: { type: Number, default: 0 },
+    isActive: { type: Boolean, default: true }
+  }],
+
+  // Carousel Section Settings (header visibility and text)
+  carouselSection: {
+    showHeader: { type: Boolean, default: false },
+    heading: { type: String, default: 'Featured Carousel' },
+    subheading: { type: String, default: 'Updates, offers, and highlights you can control from the admin panel' }
+  },
+
+  // Visual Website Editor Rules
+  designEditor: {
+    rules: [{
+      selector: { type: String, default: '' },
+      styles: {
+        color: { type: String, default: '' },
+        backgroundColor: { type: String, default: '' },
+        textMode: { type: String, default: 'color' },
+        textGradientStart: { type: String, default: '' },
+        textGradientEnd: { type: String, default: '' },
+        textGradientDirection: { type: String, default: '135deg' },
+        backgroundMode: { type: String, default: 'none' },
+        backgroundGradientStart: { type: String, default: '' },
+        backgroundGradientEnd: { type: String, default: '' },
+        backgroundGradientDirection: { type: String, default: '135deg' },
+        borderRadius: { type: String, default: '' },
+        fontSize: { type: String, default: '' },
+        fontFamily: { type: String, default: '' },
+        fontWeight: { type: String, default: '' },
+        fontStyle: { type: String, default: '' },
+        lineHeight: { type: String, default: '' },
+        letterSpacing: { type: String, default: '' }
+      }
+    }]
   },
 
   // Social Media Links

@@ -106,6 +106,19 @@ router.post('/settings', isAuthenticated, upload.fields([
 router.delete('/settings/logo', isAuthenticated, websiteSettingController.deleteLogo);
 router.delete('/settings/about-image', isAuthenticated, websiteSettingController.deleteAboutImage);
 
+router.get('/site-editor', isAuthenticated, websiteSettingController.getSiteEditor);
+router.post('/site-editor', isAuthenticated, websiteSettingController.saveSiteEditor);
+router.post('/reset-site-editor', isAuthenticated, websiteSettingController.resetSiteEditor);
+
+router.get('/settings/carousel', isAuthenticated, websiteSettingController.getCarousel);
+router.post('/settings/carousel', isAuthenticated, upload.fields([
+  { name: 'media', maxCount: 1 }
+]), websiteSettingController.addCarouselItem);
+router.post('/settings/carousel/:id', isAuthenticated, upload.fields([
+  { name: 'media', maxCount: 1 }
+]), websiteSettingController.updateCarouselItem);
+router.delete('/settings/carousel/:id', isAuthenticated, websiteSettingController.deleteCarouselItem);
+
 // Team Members routes
 router.get('/settings/team', isAuthenticated, websiteSettingController.getTeamMembers);
 router.post('/settings/team', isAuthenticated, upload.fields([

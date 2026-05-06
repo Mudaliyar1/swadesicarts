@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .editor-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.95fr);
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        .editor-toolbar,
+        .editor-panel,
+        .preview-panel {
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .editor-toolbar {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-panel {
+            overflow: hidden;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: calc(100vh - 190px);
+            min-height: 700px;
+            border: 0;
+            background: #f8fafc;
+        }
+
+        .editor-panel {
+            padding: 1rem;
+            position: sticky;
+            top: 1rem;
+        }
+
+        .selector-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.65rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            color: #334155;
+            word-break: break-all;
+        }
+
+        .rule-list {
+            max-height: 320px;
+            overflow: auto;
+        }
+
+        .rule-list-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+
+        .rule-list-item + .rule-list-item {
+            margin-top: 0.6rem;
+        }
+
+        .rule-list-item code {
+            white-space: normal;
+            word-break: break-word;
+            background: transparent;
+            padding: 0;
+            color: #0f172a;
+        }
+
+        .gradient-panel {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #f8fafc;
+            padding: 0.85rem;
+        }
+
+        .gradient-panel + .gradient-panel {
+            margin-top: 0.75rem;
+        }
+
+        .mini-action-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .editor-note {
+            border-left: 4px solid #4C1E4F;
+            background: #f8f5f9;
+        }
+
+        @media (max-width: 1200px) {
+            .editor-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-panel {
+                position: static;
+            }
+
+            .preview-frame {
+                height: 72vh;
+                min-height: 560px;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">Website Editor</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/site-editor" class="active" title="Website Editor"><i class="bi bi-cursor"></i><span class="sidebar-text">Website Editor</span></a></li>
+            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
+            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+            <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
+            <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
+            <li><a href="/admin/settings" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/site-editor" class="active"><i class="bi bi-cursor"></i> Website Editor</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
+                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
+                <li><a href="/admin/settings"><i class="bi bi-gear"></i> Website Settings</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="fw-bold mb-1"><i class="bi bi-cursor"></i> Website Editor</h2>
+                    <p class="text-muted mb-0">Click any element on the live preview, then change its color, background, font, size, or radius.</p>
+                </div>
+                <a href="/admin/dashboard" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <% if (messages.success && messages.success.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <%= messages.success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <% if (messages.error && messages.error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <%= messages.error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <form id="siteEditorForm" action="/admin/site-editor" method="POST">
+                <input type="hidden" name="rulesJson" id="rulesJson" value='<%- rulesJson %>'>
+                <input type="hidden" name="previewPage" id="previewPage" value="<%= selectedPage %>">
+
+                <div class="editor-toolbar">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-lg-4">
+                            <label for="pagePreset" class="form-label fw-semibold">Preview Page</label>
+                            <select id="pagePreset" class="form-select">
+                                <% previewPages.forEach(function(page) { %>
+                                    <option value="<%= page.path %>" <%= page.path === selectedPage ? 'selected' : '' %>><%= page.label %></option>
+                                <% }); %>
+                                <option value="custom" <%= previewPages.some(function(page) { return page.path === selectedPage; }) ? '' : 'selected' %>>Custom path</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-5">
+                            <label for="customPagePath" class="form-label fw-semibold">Custom Path</label>
+                            <input type="text" class="form-control" id="customPagePath" value="<%= selectedPage %>" placeholder="/ or /contact">
+                        </div>
+                        <div class="col-lg-3 d-flex gap-2">
+                            <button type="button" id="loadPreviewBtn" class="btn btn-outline-primary flex-grow-1">
+                                <i class="bi bi-arrow-repeat"></i> Load Preview
+                            </button>
+                            <button type="submit" class="btn btn-swadesi flex-grow-1">
+                                <i class="bi bi-save"></i> Save Styles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editor-shell">
+                    <div class="preview-panel">
+                        <iframe id="sitePreviewFrame" class="preview-frame" src="<%= selectedPage %>"></iframe>
+                    </div>
+
+                    <div class="editor-panel">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold mb-0">Style Inspector</h5>
+                            <span class="badge bg-secondary" id="ruleCountBadge"><%= (settings.designEditor && settings.designEditor.rules ? settings.designEditor.rules.length : 0) %> rules</span>
+                        </div>
+
+                        <div class="editor-note rounded-3 p-3 mb-3 small text-muted">
+                            Click an element in the preview to select it. The rule you create will apply across the whole site.
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Selected Selector</label>
+                            <div class="selector-pill" id="selectedSelectorLabel">No element selected</div>
+                            <input type="hidden" id="selectedSelectorInput" value="">
+                        </div>
+
+                        <div class="mb-3 mini-action-row">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="selectParentBtn" disabled>
+                                <i class="bi bi-arrow-up"></i> Select Parent
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="clearSelectionBtn">
+                                <i class="bi bi-x-circle"></i> Clear Selection
+                            </button>
+                        </div>
+
+                        <div class="gradient-panel mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold mb-0" for="textMode">Text Style</label>
+                                <select class="form-select form-select-sm w-auto" id="textMode">
+                                    <option value="color">Solid Color</option>
+                                    <option value="gradient">Gradient</option>
+                                </select>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label for="styleColor" class="form-label">Text Color</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="styleColor" value="#1f2937">
+                                </div>
+                                <div class="col-6">
+                                    <label for="textGradientDirection" class="form-label">Direction</label>
+                                    <select class="form-select" id="textGradientDirection">
+                                        <option value="135deg">Diagonal</option>
+                                        <option value="90deg">Left to Right</option>
+                                        <option value="180deg">Top to Bottom</option>
+                                        <option value="45deg">Reverse Diagonal</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label for="textGradientStart" class="form-label">Gradient Start</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="textGradientStart" value="#4C1E4F">
+                                </div>
+                                <div class="col-6">
+                                    <label for="textGradientEnd" class="form-label">Gradient End</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="textGradientEnd" value="#B5A886">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gradient-panel mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label fw-semibold mb-0" for="backgroundMode">Background Style</label>
+                                <select class="form-select form-select-sm w-auto" id="backgroundMode">
+                                    <option value="none">None</option>
+                                    <option value="color">Solid Color</option>
+                                    <option value="gradient">Gradient</option>
+                                </select>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label for="styleBackground" class="form-label">Background Color</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="styleBackground" value="#ffffff">
+                                </div>
+                                <div class="col-6">
+                                    <label for="backgroundGradientDirection" class="form-label">Direction</label>
+                                    <select class="form-select" id="backgroundGradientDirection">
+                                        <option value="135deg">Diagonal</option>
+                                        <option value="90deg">Left to Right</option>
+                                        <option value="180deg">Top to Bottom</option>
+                                        <option value="45deg">Reverse Diagonal</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label for="backgroundGradientStart" class="form-label">Gradient Start</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="backgroundGradientStart" value="#ffffff">
+                                </div>
+                                <div class="col-6">
+                                    <label for="backgroundGradientEnd" class="form-label">Gradient End</label>
+                                    <input type="color" class="form-control form-control-color w-100" id="backgroundGradientEnd" value="#f1f5f9">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label for="styleRadius" class="form-label">Border Radius</label>
+                                <input type="text" class="form-control" id="styleRadius" placeholder="12px">
+                            </div>
+                            <div class="col-6">
+                                <label for="styleFontSize" class="form-label">Font Size</label>
+                                <input type="text" class="form-control" id="styleFontSize" placeholder="16px">
+                            </div>
+                            <div class="col-6">
+                                <label for="styleFontFamily" class="form-label">Font Family</label>
+                                <input type="text" class="form-control" id="styleFontFamily" placeholder="Inter, sans-serif">
+                            </div>
+                            <div class="col-6">
+                                <label for="styleFontWeight" class="form-label">Font Weight</label>
+                                <select class="form-select" id="styleFontWeight">
+                                    <option value="">Default</option>
+                                    <option value="300">300</option>
+                                    <option value="400">400</option>
+                                    <option value="500">500</option>
+                                    <option value="600">600</option>
+                                    <option value="700">700</option>
+                                    <option value="800">800</option>
+                                    <option value="900">900</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="styleFontStyle" class="form-label">Font Style</label>
+                                <select class="form-select" id="styleFontStyle">
+                                    <option value="">Default</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="italic">Italic</option>
+                                    <option value="oblique">Oblique</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label for="styleLineHeight" class="form-label">Line Height</label>
+                                <input type="text" class="form-control" id="styleLineHeight" placeholder="1.5">
+                            </div>
+                            <div class="col-6">
+                                <label for="styleLetterSpacing" class="form-label">Letter Spacing</label>
+                                <input type="text" class="form-control" id="styleLetterSpacing" placeholder="0.02em">
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mb-4">
+                            <button type="button" id="applyStyleBtn" class="btn btn-primary flex-grow-1" disabled>
+                                <i class="bi bi-paint-bucket"></i> Apply to Preview
+                            </button>
+                            <button type="button" id="removeStyleBtn" class="btn btn-outline-danger" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <button type="button" id="resetThemeBtn" class="btn btn-outline-warning w-100 btn-sm" data-bs-toggle="modal" data-bs-target="#resetConfirmModal">
+                                <i class="bi bi-arrow-clockwise"></i> Reset to Default Theme
+                            </button>
+                        </div>
+
+                        <div class="mb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0">Saved Rules</h6>
+                            <span class="text-muted small">Click to edit again</span>
+                        </div>
+                        <div id="ruleList" class="rule-list"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        const previewPages = <%- JSON.stringify(previewPages) %>;
+        const initialRules = <%- rulesJson %>;
+        const iframe = document.getElementById('sitePreviewFrame');
+        const pagePreset = document.getElementById('pagePreset');
+        const customPagePath = document.getElementById('customPagePath');
+        const loadPreviewBtn = document.getElementById('loadPreviewBtn');
+        const previewPageInput = document.getElementById('previewPage');
+        const rulesJsonInput = document.getElementById('rulesJson');
+        const selectedSelectorLabel = document.getElementById('selectedSelectorLabel');
+        const selectedSelectorInput = document.getElementById('selectedSelectorInput');
+        const selectParentBtn = document.getElementById('selectParentBtn');
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const applyStyleBtn = document.getElementById('applyStyleBtn');
+        const removeStyleBtn = document.getElementById('removeStyleBtn');
+        const ruleList = document.getElementById('ruleList');
+        const ruleCountBadge = document.getElementById('ruleCountBadge');
+        const textMode = document.getElementById('textMode');
+        const styleColor = document.getElementById('styleColor');
+        const textGradientStart = document.getElementById('textGradientStart');
+        const textGradientEnd = document.getElementById('textGradientEnd');
+        const textGradientDirection = document.getElementById('textGradientDirection');
+        const backgroundMode = document.getElementById('backgroundMode');
+        const styleBackground = document.getElementById('styleBackground');
+        const backgroundGradientStart = document.getElementById('backgroundGradientStart');
+        const backgroundGradientEnd = document.getElementById('backgroundGradientEnd');
+        const backgroundGradientDirection = document.getElementById('backgroundGradientDirection');
+        const styleRadius = document.getElementById('styleRadius');
+        const styleFontSize = document.getElementById('styleFontSize');
+        const styleFontFamily = document.getElementById('styleFontFamily');
+        const styleFontWeight = document.getElementById('styleFontWeight');
+        const styleFontStyle = document.getElementById('styleFontStyle');
+        const styleLineHeight = document.getElementById('styleLineHeight');
+        const styleLetterSpacing = document.getElementById('styleLetterSpacing');
+        const siteEditorForm = document.getElementById('siteEditorForm');
+
+        let selectedElement = null;
+        let selectedSelector = '';
+        let rules = Array.isArray(initialRules) ? initialRules.slice() : [];
+
+        const selectionStyleId = 'site-editor-selection-style';
+        const editorStyleId = 'site-editor-preview-style';
+
+        function updateRuleCount() {
+            ruleCountBadge.textContent = `${rules.length} rules`;
+        }
+
+        function escapeCssText(value) {
+            return String(value || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function toHex(color) {
+            if (!color) return '#ffffff';
+            if (color.startsWith('#')) return color;
+
+            const match = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+            if (!match) return '#ffffff';
+
+            return [match[1], match[2], match[3]].map(function(component) {
+                return Number(component).toString(16).padStart(2, '0');
+            }).reduce(function(result, component) {
+                return result + component;
+            }, '#');
+        }
+
+        function parseComputedColor(value, fallback) {
+            if (!value || value === 'transparent' || value === 'rgba(0, 0, 0, 0)') {
+                return fallback;
+            }
+            return toHex(value);
+        }
+
+        function getRuleBySelector(selector) {
+            return rules.find(function(rule) {
+                return rule.selector === selector;
+            }) || null;
+        }
+
+        function syncFormFromRule(rule, computedStyle) {
+            const colorValue = rule && rule.styles && rule.styles.color ? rule.styles.color : parseComputedColor(computedStyle.color, '#1f2937');
+            const inferredTextMode = rule && rule.styles && rule.styles.textMode ? rule.styles.textMode : ((rule && rule.styles && rule.styles.textGradientStart && rule.styles.textGradientEnd) ? 'gradient' : 'color');
+            const inferredBackgroundMode = rule && rule.styles && rule.styles.backgroundMode ? rule.styles.backgroundMode : ((rule && rule.styles && rule.styles.backgroundGradientStart && rule.styles.backgroundGradientEnd) ? 'gradient' : (rule && rule.styles && rule.styles.backgroundColor ? 'color' : 'none'));
+
+            textMode.value = inferredTextMode;
+            styleColor.value = colorValue;
+            textGradientStart.value = rule && rule.styles && rule.styles.textGradientStart ? rule.styles.textGradientStart : '#4C1E4F';
+            textGradientEnd.value = rule && rule.styles && rule.styles.textGradientEnd ? rule.styles.textGradientEnd : '#B5A886';
+            textGradientDirection.value = rule && rule.styles && rule.styles.textGradientDirection ? rule.styles.textGradientDirection : '135deg';
+
+            backgroundMode.value = inferredBackgroundMode;
+            styleBackground.value = rule && rule.styles && rule.styles.backgroundColor ? rule.styles.backgroundColor : '#ffffff';
+            backgroundGradientStart.value = rule && rule.styles && rule.styles.backgroundGradientStart ? rule.styles.backgroundGradientStart : '#ffffff';
+            backgroundGradientEnd.value = rule && rule.styles && rule.styles.backgroundGradientEnd ? rule.styles.backgroundGradientEnd : '#f1f5f9';
+            backgroundGradientDirection.value = rule && rule.styles && rule.styles.backgroundGradientDirection ? rule.styles.backgroundGradientDirection : '135deg';
+            styleRadius.value = rule && rule.styles ? (rule.styles.borderRadius || computedStyle.borderRadius || '') : (computedStyle.borderRadius || '');
+            styleFontSize.value = rule && rule.styles ? (rule.styles.fontSize || computedStyle.fontSize || '') : (computedStyle.fontSize || '');
+            styleFontFamily.value = rule && rule.styles ? (rule.styles.fontFamily || computedStyle.fontFamily || '') : (computedStyle.fontFamily || '');
+            styleFontWeight.value = rule && rule.styles ? (rule.styles.fontWeight || computedStyle.fontWeight || '') : (computedStyle.fontWeight || '');
+            styleFontStyle.value = rule && rule.styles ? (rule.styles.fontStyle || computedStyle.fontStyle || '') : (computedStyle.fontStyle || '');
+            styleLineHeight.value = rule && rule.styles ? (rule.styles.lineHeight || computedStyle.lineHeight || '') : (computedStyle.lineHeight || '');
+            styleLetterSpacing.value = rule && rule.styles ? (rule.styles.letterSpacing || computedStyle.letterSpacing || '') : (computedStyle.letterSpacing || '');
+        }
+
+        function getSelector(element, doc) {
+            if (!element || element === doc.body) {
+                return 'body';
+            }
+
+            if (element.id) {
+                return '#' + element.id;
+            }
+
+            const parts = [];
+            let current = element;
+
+            while (current && current.nodeType === 1 && current !== doc.body) {
+                let selector = current.tagName.toLowerCase();
+                let index = 1;
+                let sibling = current;
+
+                while ((sibling = sibling.previousElementSibling)) {
+                    if (sibling.tagName === current.tagName) {
+                        index += 1;
+                    }
+                }
+
+                selector += ':nth-of-type(' + index + ')';
+                parts.unshift(selector);
+                current = current.parentElement;
+            }
+
+            return parts.join(' > ') || 'body';
+        }
+
+        function getSelectorElements(doc, selector) {
+            try {
+                return doc.querySelectorAll(selector);
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function generateCssForRule(rule) {
+            if (!rule || !rule.selector || !rule.styles) return '';
+
+            const declarations = [];
+
+            const textModeValue = rule.styles.textMode || ((rule.styles.textGradientStart && rule.styles.textGradientEnd) ? 'gradient' : 'color');
+            const backgroundModeValue = rule.styles.backgroundMode || ((rule.styles.backgroundGradientStart && rule.styles.backgroundGradientEnd) ? 'gradient' : (rule.styles.backgroundColor ? 'color' : 'none'));
+
+            if (textModeValue === 'gradient' && rule.styles.textGradientStart && rule.styles.textGradientEnd) {
+                declarations.push('  background-image: linear-gradient(' + (rule.styles.textGradientDirection || '135deg') + ', ' + rule.styles.textGradientStart + ', ' + rule.styles.textGradientEnd + ') !important;');
+                declarations.push('  -webkit-background-clip: text !important;');
+                declarations.push('  background-clip: text !important;');
+                declarations.push('  color: transparent !important;');
+                declarations.push('  -webkit-text-fill-color: transparent !important;');
+            } else if (rule.styles.color) {
+                declarations.push('  color: ' + rule.styles.color + ' !important;');
+            }
+
+            if (backgroundModeValue === 'gradient' && rule.styles.backgroundGradientStart && rule.styles.backgroundGradientEnd) {
+                declarations.push('  background-image: linear-gradient(' + (rule.styles.backgroundGradientDirection || '135deg') + ', ' + rule.styles.backgroundGradientStart + ', ' + rule.styles.backgroundGradientEnd + ') !important;');
+                declarations.push('  background-size: cover !important;');
+                declarations.push('  background-repeat: no-repeat !important;');
+                declarations.push('  background-position: center !important;');
+            } else if (backgroundModeValue === 'color' && rule.styles.backgroundColor) {
+                declarations.push('  background-color: ' + rule.styles.backgroundColor + ' !important;');
+            }
+
+            if (rule.styles.borderRadius) declarations.push('  border-radius: ' + rule.styles.borderRadius + ' !important;');
+            if (rule.styles.fontSize) declarations.push('  font-size: ' + rule.styles.fontSize + ' !important;');
+            if (rule.styles.fontFamily) declarations.push('  font-family: ' + rule.styles.fontFamily + ' !important;');
+            if (rule.styles.fontWeight) declarations.push('  font-weight: ' + rule.styles.fontWeight + ' !important;');
+            if (rule.styles.fontStyle) declarations.push('  font-style: ' + rule.styles.fontStyle + ' !important;');
+            if (rule.styles.lineHeight) declarations.push('  line-height: ' + rule.styles.lineHeight + ' !important;');
+            if (rule.styles.letterSpacing) declarations.push('  letter-spacing: ' + rule.styles.letterSpacing + ' !important;');
+
+            if (declarations.length === 0) return '';
+            return rule.selector + ' {\n' + declarations.join('\n') + '\n}';
+        }
+
+        function renderInjectedStyles() {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (!doc || !doc.head) return;
+
+            let selectionStyle = doc.getElementById(selectionStyleId);
+            if (!selectionStyle) {
+                selectionStyle = doc.createElement('style');
+                selectionStyle.id = selectionStyleId;
+                doc.head.appendChild(selectionStyle);
+            }
+            selectionStyle.textContent = '.site-editor-selected-element { outline: 3px solid #f59e0b !important; outline-offset: 2px !important; }';
+
+            let styleTag = doc.getElementById(editorStyleId);
+            if (!styleTag) {
+                styleTag = doc.createElement('style');
+                styleTag.id = editorStyleId;
+                doc.head.appendChild(styleTag);
+            }
+
+            styleTag.textContent = rules.map(generateCssForRule).filter(Boolean).join('\n\n');
+            rulesJsonInput.value = JSON.stringify(rules);
+            updateRuleCount();
+        }
+
+        function renderRuleList() {
+            ruleList.innerHTML = '';
+
+            if (rules.length === 0) {
+                ruleList.innerHTML = '<div class="text-muted small">No saved rules yet.</div>';
+                return;
+            }
+
+            rules.forEach(function(rule) {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'rule-list-item text-start';
+                item.innerHTML = '<code>' + escapeCssText(rule.selector) + '</code><span class="badge bg-light text-dark">Edit</span>';
+                item.addEventListener('click', function() {
+                    selectRule(rule.selector);
+                });
+                ruleList.appendChild(item);
+            });
+        }
+
+        function clearSelection() {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (doc) {
+                const previous = doc.querySelector('.site-editor-selected-element');
+                if (previous) previous.classList.remove('site-editor-selected-element');
+            }
+            selectedElement = null;
+            selectedSelector = '';
+            selectedSelectorLabel.textContent = 'No element selected';
+            selectedSelectorInput.value = '';
+            applyStyleBtn.disabled = true;
+            removeStyleBtn.disabled = true;
+            selectParentBtn.disabled = true;
+        }
+
+        function selectRule(selector) {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (!doc) return;
+
+            const target = doc.querySelector(selector);
+            if (!target) {
+                alert('That element is no longer available on the current preview page.');
+                return;
+            }
+            selectElement(target);
+        }
+
+        function selectElement(element) {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (!doc || !element) return;
+
+            const previous = doc.querySelector('.site-editor-selected-element');
+            if (previous) previous.classList.remove('site-editor-selected-element');
+
+            element.classList.add('site-editor-selected-element');
+            selectedElement = element;
+            selectedSelector = getSelector(element, doc);
+            selectedSelectorLabel.textContent = selectedSelector;
+            selectedSelectorInput.value = selectedSelector;
+            selectParentBtn.disabled = !element.parentElement || element.parentElement.tagName.toLowerCase() === 'html';
+
+            const computedStyle = (doc.defaultView || window).getComputedStyle(element);
+            syncFormFromRule(getRuleBySelector(selectedSelector), computedStyle);
+            applyStyleBtn.disabled = false;
+            removeStyleBtn.disabled = !getRuleBySelector(selectedSelector);
+        }
+
+        function getCurrentStylePayload() {
+            const payload = {
+                textMode: textMode.value,
+                color: textMode.value === 'color' ? styleColor.value || '' : '',
+                textGradientStart: textMode.value === 'gradient' ? textGradientStart.value || '' : '',
+                textGradientEnd: textMode.value === 'gradient' ? textGradientEnd.value || '' : '',
+                textGradientDirection: textMode.value === 'gradient' ? textGradientDirection.value || '135deg' : '135deg',
+                backgroundMode: backgroundMode.value,
+                backgroundColor: backgroundMode.value === 'color' ? styleBackground.value || '' : '',
+                backgroundGradientStart: backgroundMode.value === 'gradient' ? backgroundGradientStart.value || '' : '',
+                backgroundGradientEnd: backgroundMode.value === 'gradient' ? backgroundGradientEnd.value || '' : '',
+                backgroundGradientDirection: backgroundMode.value === 'gradient' ? backgroundGradientDirection.value || '135deg' : '135deg',
+                borderRadius: styleRadius.value.trim(),
+                fontSize: styleFontSize.value.trim(),
+                fontFamily: styleFontFamily.value.trim(),
+                fontWeight: styleFontWeight.value || '',
+                fontStyle: styleFontStyle.value || '',
+                lineHeight: styleLineHeight.value.trim(),
+                letterSpacing: styleLetterSpacing.value.trim()
+            };
+
+            return payload;
+        }
+
+        function applySelectedStyles() {
+            if (!selectedSelector) {
+                alert('Select an element in the preview first.');
+                return;
+            }
+
+            const styles = getCurrentStylePayload();
+            const existingRuleIndex = rules.findIndex(function(rule) {
+                return rule.selector === selectedSelector;
+            });
+
+            const nextRule = {
+                selector: selectedSelector,
+                styles: styles
+            };
+
+            if (existingRuleIndex >= 0) {
+                rules[existingRuleIndex] = nextRule;
+            } else {
+                rules.push(nextRule);
+            }
+
+            renderInjectedStyles();
+            renderRuleList();
+            removeStyleBtn.disabled = false;
+        }
+
+        function removeSelectedRule() {
+            if (!selectedSelector) return;
+
+            const beforeCount = rules.length;
+            rules = rules.filter(function(rule) {
+                return rule.selector !== selectedSelector;
+            });
+
+            if (rules.length === beforeCount) return;
+
+            renderInjectedStyles();
+            renderRuleList();
+            clearSelection();
+        }
+
+        function attachInspector() {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (!doc || !doc.body) return;
+
+            renderInjectedStyles();
+
+            doc.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                selectElement(event.target);
+            }, true);
+        }
+
+        selectParentBtn.addEventListener('click', function() {
+            if (!selectedElement || !selectedElement.parentElement) return;
+            selectElement(selectedElement.parentElement);
+        });
+
+        clearSelectionBtn.addEventListener('click', function() {
+            clearSelection();
+        });
+
+        [textMode, backgroundMode].forEach(function(control) {
+            control.addEventListener('change', function() {
+                if (selectedSelector) {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    const target = doc ? doc.querySelector(selectedSelector) : null;
+                    if (target) {
+                        syncFormFromRule(getRuleBySelector(selectedSelector), (doc.defaultView || window).getComputedStyle(target));
+                    }
+                }
+            });
+        });
+
+        function loadPreview(path) {
+            const nextPath = path && path.startsWith('/') ? path : '/';
+            previewPageInput.value = nextPath;
+            customPagePath.value = nextPath;
+            iframe.src = nextPath;
+        }
+
+        pagePreset.addEventListener('change', function() {
+            if (pagePreset.value === 'custom') {
+                customPagePath.focus();
+                return;
+            }
+            customPagePath.value = pagePreset.value;
+        });
+
+        loadPreviewBtn.addEventListener('click', function() {
+            const chosenPath = pagePreset.value === 'custom' ? customPagePath.value.trim() : pagePreset.value;
+            loadPreview(chosenPath);
+            clearSelection();
+        });
+
+        iframe.addEventListener('load', function() {
+            attachInspector();
+            clearSelection();
+        });
+
+        applyStyleBtn.addEventListener('click', applySelectedStyles);
+        removeStyleBtn.addEventListener('click', removeSelectedRule);
+
+        siteEditorForm.addEventListener('submit', function() {
+            rulesJsonInput.value = JSON.stringify(rules);
+            previewPageInput.value = customPagePath.value.trim().startsWith('/') ? customPagePath.value.trim() : '/';
+        });
+
+        renderRuleList();
+        updateRuleCount();
+        loadPreview(previewPageInput.value || '/');
+    </script>
+
+    <!-- Reset Theme Confirmation Modal -->
+    <div class="modal fade" id="resetConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-warning"></i> Reset to Default Theme
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">This will <strong>remove all custom styles and gradients</strong> from your website and restore the default theme.</p>
+                    <p class="text-muted mb-0">This action cannot be undone. Are you sure?</p>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i> Cancel
+                    </button>
+                    <form action="/admin/reset-site-editor" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-warning">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Theme
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
