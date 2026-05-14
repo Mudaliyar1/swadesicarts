@@ -323,8 +323,12 @@
 
     <% if (websiteCarouselItems.length > 0) { %>
     <!-- WEBSITE CAROUSEL SECTION -->
+    <%- '<style>' %>
+        .carousel-slide-wrapper { height: 320px; }
+        @media (min-width: 768px) { .carousel-slide-wrapper { height: 450px; } }
+        @media (min-width: 992px) { .carousel-slide-wrapper { height: clamp(500px, 75vh, 850px); } }
+    <%- '</style>' %>
     <section class="mb-5 p-0 m-0">
-
         <div class="container-fluid px-0">
             <div id="websiteCarousel" class="carousel slide overflow-hidden" data-bs-ride="carousel" style="padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;">
                 <div class="carousel-indicators">
@@ -336,7 +340,7 @@
                 <div class="carousel-inner overflow-hidden">
                     <% websiteCarouselItems.forEach((item, index) => { %>
                         <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                            <div class="position-relative carousel-slide-wrapper" style="background: transparent; overflow: hidden;" data-slide-index="<%= index %>">
+                            <div class="position-relative carousel-slide-wrapper" style="background: #050505; overflow: hidden;" data-slide-index="<%= index %>">
                                 <% const mediaSrc = (item.media && item.media.transformedUrl) ? item.media.transformedUrl : (item.media && item.media.url ? item.media.url : ''); %>
                                 
                                 <!-- Decorative Blurred Background (PC Only) -->
@@ -351,9 +355,9 @@
                                 <!-- Main Media Layer -->
                                 <div class="position-relative w-100 h-100" style="z-index: 1;">
                                     <% if (item.media.type === 'video') { %>
-                                        <video class="d-block w-100 mx-auto" src="<%= mediaSrc %>" autoplay muted loop playsinline style="max-height: 85vh; object-fit: contain; background: transparent;"></video>
+                                        <video class="d-block w-100 h-100 mx-auto" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: contain; background: transparent;"></video>
                                     <% } else { %>
-                                        <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="d-block w-100 mx-auto" style="max-height: 85vh; object-fit: contain; background: transparent;">
+                                        <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="d-block w-100 h-100 mx-auto" style="object-fit: contain; background: transparent;">
                                     <% } %>
                                 <% if (item.title || item.description || (item.linkUrl && item.linkText)) { %>
                                     <%
