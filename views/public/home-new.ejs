@@ -1,22 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
 </head>
+
 <body class="home-page">
     <!-- LOADING ANIMATION -->
     <div class="page-loader" id="pageLoader">
         <div class="loader-content">
             <!-- Animated Background -->
             <div class="loader-bg"></div>
-            
+
             <!-- Bouncing Icons Container -->
             <div class="icons-container">
                 <div class="bouncing-icon" data-icon="0">
@@ -32,12 +38,12 @@
                     <p class="category-name">Seasonal</p>
                 </div>
             </div>
-            
+
             <!-- Progress Indicator -->
             <div class="loader-progress">
                 <div class="progress-bar"></div>
             </div>
-            
+
             <!-- Brand Text -->
             <h1 class="loader-title">Swadesi Carts</h1>
             <p class="loader-subtitle">Nature's Finest Collection</p>
@@ -71,7 +77,8 @@
                     <label for="visitorMobile">
                         <i class="bi bi-telephone-fill"></i> Mobile Number *
                     </label>
-                    <input type="tel" id="visitorMobile" name="mobile" required placeholder="+91 00000 00000" pattern="[0-9+\s-]*">
+                    <input type="tel" id="visitorMobile" name="mobile" required placeholder="+91 00000 00000"
+                        pattern="[0-9+\s-]*">
                 </div>
                 <div class="visitor-form-group">
                     <label>
@@ -111,741 +118,943 @@
 
     <%- include('../partials/navbar-new') %>
 
-    <% 
-        const whatsappNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number)
-            || (siteSettings && siteSettings.contact && siteSettings.contact.phone)
-            || (siteSettings && siteSettings.footer && siteSettings.footer.phone)
-            || '';
-        const whatsappMessage = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.message) || '';
-        const instagramUrl = (siteSettings && siteSettings.socialMedia && siteSettings.socialMedia.instagram) || '';
-        const visitorModalEnabled = (siteSettings && siteSettings.visitorModal && siteSettings.visitorModal.enabled !== false) ? true : false;
-        const websiteCarouselItems = (siteSettings && siteSettings.carousel ? siteSettings.carousel : [])
-            .filter(item => item && item.isActive !== false && item.media && item.media.url)
+        <% const whatsappNumber=(siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings
+            && siteSettings.contact && siteSettings.contact.phone) || (siteSettings && siteSettings.footer &&
+            siteSettings.footer.phone) || '' ; const whatsappMessage=(siteSettings && siteSettings.whatsapp &&
+            siteSettings.whatsapp.message) || '' ; const instagramUrl=(siteSettings && siteSettings.socialMedia &&
+            siteSettings.socialMedia.instagram) || '' ; const visitorModalEnabled=(siteSettings &&
+            siteSettings.visitorModal && siteSettings.visitorModal.enabled !==false) ? true : false; const
+            websiteCarouselItems=(siteSettings && siteSettings.carousel ? siteSettings.carousel : []) .filter(item=>
+            item && item.isActive !== false && item.media && item.media.url)
             .sort((a, b) => (a.order || 0) - (b.order || 0));
-    %>
-    
-    <!-- HERO CAROUSEL SECTION -->
-    <section class="hero-carousel-section <%= websiteCarouselItems.length > 0 ? 'd-none' : '' %>">
-        <!-- Chat with Us Capsule Button & Popup -->
-        <div class="chat-popup-wrapper">
-            <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
-                <i class="bi bi-chat-dots-fill"></i>
-                <span>Chat with us</span>
-            </button>
-            
-            <div class="chat-popup" id="chatPopup">
-                <div class="chat-popup-content">
-                    <button class="chat-popup-close" id="chatPopupClose" aria-label="Close">
-                        <i class="bi bi-x-lg"></i>
+            %>
+
+            <!-- HERO CAROUSEL SECTION -->
+            <section class="hero-carousel-section <%= websiteCarouselItems.length > 0 ? 'd-none' : '' %>">
+                <!-- Chat with Us Capsule Button & Popup -->
+                <div class="chat-popup-wrapper">
+                    <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
+                        <i class="bi bi-chat-dots-fill"></i>
+                        <span>Chat with us</span>
                     </button>
-                    
-                    <div class="chat-options">
-                        <% if (whatsappNumber) { %>
-                            <a href="#" class="chat-option whatsapp-option" id="whatsappLink" 
-                               data-number="<%= whatsappNumber %>"
-                               data-message="<%= whatsappMessage %>"
-                               aria-label="Chat on WhatsApp">
-                                <div class="chat-option-icon">
-                                    <i class="bi bi-whatsapp"></i>
-                                </div>
-                                <div class="chat-option-text">
-                                    <span class="chat-option-title">WhatsApp</span>
-                                    <span class="chat-option-desc">Chat directly</span>
-                                </div>
-                            </a>
-                        <% } %>
-                        
-                        <% if (instagramUrl) { %>
-                            <a href="<%= instagramUrl %>" target="_blank" rel="noopener" class="chat-option instagram-option"
-                               aria-label="Follow on Instagram">
-                                <div class="chat-option-icon">
-                                    <i class="bi bi-instagram"></i>
-                                </div>
-                                <div class="chat-option-text">
-                                    <span class="chat-option-title">Instagram</span>
-                                    <span class="chat-option-desc">Follow us</span>
-                                </div>
-                            </a>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4000">
-            <!-- Carousel Indicators -->
-            <div class="carousel-indicators">
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
-                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="4"></button>
-            </div>
 
-            <!-- Carousel Slides -->
-            <div class="carousel-inner">
-                <!-- Slide 1: Organic Products -->
-                <div class="carousel-item active">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        position: relative; overflow: hidden;">
-                        <div class="hero-pattern"></div>
-                        <div class="container h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-lg-6">
-                                    <div class="hero-content-carousel">
-                                        <span class="hero-tag-modern">🌿 ORGANIC VIBES</span>
-                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Nature's Best,<br>Your Wellness First 💚</h1>
-                                        <p class="hero-subtitle mb-4">100% certified organic from farm to your doorstep. No cap, just pure vibes! 🌱✨</p>
-                                        <a href="/organic-products" class="btn btn-genz btn-lg px-5">Shop Organic <i class="bi bi-arrow-right ms-2"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <div class="hero-image-wrapper floating">
-                                        <div class="hero-emoji">🌿</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <div class="chat-popup" id="chatPopup">
+                        <div class="chat-popup-content">
+                            <button class="chat-popup-close" id="chatPopupClose" aria-label="Close">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
 
-                <!-- Slide 2: Tech Solutions -->
-                <div class="carousel-item">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-                        position: relative; overflow: hidden;">
-                        <div class="hero-pattern"></div>
-                        <div class="container h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-lg-6">
-                                    <div class="hero-content-carousel">
-                                        <span class="hero-tag-modern">💻 TECH THAT SLAPS</span>
-                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Code. Create.<br>Conquer. 🚀</h1>
-                                        <p class="hero-subtitle mb-4">Next-level dev solutions that hit different. Built by devs who get it. Period. 💯</p>
-                                        <a href="/tech-packages" class="btn btn-genz btn-lg px-5">Let's Build <i class="bi bi-lightning-charge-fill ms-2"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <div class="hero-image-wrapper floating">
-                                        <div class="hero-emoji">💻</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 3: Seasonal Products -->
-                <div class="carousel-item">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                        position: relative; overflow: hidden;">
-                        <div class="hero-pattern"></div>
-                        <div class="container h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-lg-6">
-                                    <div class="hero-content-carousel">
-                                        <span class="hero-tag-modern">🔥 TRENDING NOW</span>
-                                        <h1 class="display-3 fw-bold mb-4 glitch-text">This Season's<br>Main Character 🌟</h1>
-                                        <p class="hero-subtitle mb-4">Limited drops that everyone's talking about. Get yours before they're gone! No FOMO. 🎯</p>
-                                        <a href="/seasonal-products" class="btn btn-genz btn-lg px-5">Shop Drops <i class="bi bi-fire ms-2"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <div class="hero-image-wrapper floating">
-                                        <div class="hero-emoji">✨</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 4: Quality Assurance -->
-                <div class="carousel-item">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-                        position: relative; overflow: hidden;">
-                        <div class="hero-pattern"></div>
-                        <div class="container h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-lg-6">
-                                    <div class="hero-content-carousel">
-                                        <span class="hero-tag-modern">✓ 100% LEGIT</span>
-                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Real Talk,<br>Real Quality 💎</h1>
-                                        <p class="hero-subtitle mb-4">Certified, verified, and straight fire. We only do authentic—no sketchy vibes here! 🎯</p>
-                                        <a href="/about" class="btn btn-genz btn-lg px-5">Our Story <i class="bi bi-star-fill ms-2"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <div class="hero-image-wrapper floating">
-                                        <div class="hero-emoji">💎</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide 5: Customer First -->
-                <div class="carousel-item">
-                    <div class="hero-slide" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                        position: relative; overflow: hidden;">
-                        <div class="hero-pattern"></div>
-                        <div class="container h-100">
-                            <div class="row align-items-center h-100">
-                                <div class="col-lg-6">
-                                    <div class="hero-content-carousel">
-                                        <span class="hero-tag-modern">⚡ FAST AF</span>
-                                        <h1 class="display-3 fw-bold mb-4 glitch-text">Order Today,<br>Flex Tomorrow 📦</h1>
-                                        <p class="hero-subtitle mb-4">Lightning-fast shipping + secure packaging. Your order lands on your doorstep like *that*. 🏃‍♂️💨</p>
-                                        <a href="/contact" class="btn btn-genz btn-lg px-5">Hit Us Up <i class="bi bi-chat-dots-fill ms-2"></i></a>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 text-center">
-                                    <div class="hero-image-wrapper floating">
-                                        <div class="hero-emoji">⚡</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Carousel Controls -->
-            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
-        </div>
-    </section>
-
-    <% if (websiteCarouselItems.length > 0) { %>
-    <!-- WEBSITE CAROUSEL SECTION -->
-    <%- '<style>' %>
-        .carousel-slide-wrapper { height: 320px; }
-        @media (min-width: 768px) { .carousel-slide-wrapper { height: 450px; } }
-        @media (min-width: 992px) { .carousel-slide-wrapper { height: clamp(500px, 75vh, 850px); } }
-    <%- '</style>' %>
-    <section class="mb-5 p-0 m-0">
-        <div class="container-fluid px-0">
-            <div id="websiteCarousel" class="carousel slide overflow-hidden" data-bs-ride="carousel" style="padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;">
-                <div class="carousel-indicators">
-                    <% websiteCarouselItems.forEach((item, index) => { %>
-                        <button type="button" data-bs-target="#websiteCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" aria-label="Slide <%= index + 1 %>"></button>
-                    <% }); %>
-                </div>
-
-                <div class="carousel-inner overflow-hidden">
-                    <% websiteCarouselItems.forEach((item, index) => { %>
-                        <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                            <div class="position-relative carousel-slide-wrapper" style="background: #050505; overflow: hidden;" data-slide-index="<%= index %>">
-                                <% const mediaSrc = (item.media && item.media.transformedUrl) ? item.media.transformedUrl : (item.media && item.media.url ? item.media.url : ''); %>
-                                
-                                <!-- Decorative Blurred Background (PC Only) -->
-                                <div class="position-absolute top-0 start-0 w-100 h-100 d-none d-md-block" style="z-index: 0; overflow: hidden; pointer-events: none;">
-                                    <% if (item.media.type === 'video') { %>
-                                        <video class="w-100 h-100" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: cover; filter: blur(35px) brightness(0.4); transform: scale(1.1);"></video>
-                                    <% } else { %>
-                                        <img src="<%= mediaSrc %>" class="w-100 h-100" style="object-fit: cover; filter: blur(35px) brightness(0.4); transform: scale(1.1);">
+                            <div class="chat-options">
+                                <% if (whatsappNumber) { %>
+                                    <a href="#" class="chat-option whatsapp-option" id="whatsappLink"
+                                        data-number="<%= whatsappNumber %>" data-message="<%= whatsappMessage %>"
+                                        aria-label="Chat on WhatsApp">
+                                        <div class="chat-option-icon">
+                                            <i class="bi bi-whatsapp"></i>
+                                        </div>
+                                        <div class="chat-option-text">
+                                            <span class="chat-option-title">WhatsApp</span>
+                                            <span class="chat-option-desc">Chat directly</span>
+                                        </div>
+                                    </a>
                                     <% } %>
-                                </div>
 
-                                <!-- Main Media Layer -->
-                                <div class="position-relative w-100 h-100" style="z-index: 1;">
-                                    <% if (item.media.type === 'video') { %>
-                                        <video class="d-block w-100 h-100 mx-auto" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: contain; background: transparent;"></video>
-                                    <% } else { %>
-                                        <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="d-block w-100 h-100 mx-auto" style="object-fit: contain; background: transparent;">
-                                    <% } %>
-                                <% if (item.title || item.description || (item.linkUrl && item.linkText)) { %>
-                                    <%
-                                        const leftPos = item.textPosition && typeof item.textPosition.left === 'number' ? item.textPosition.left : 50;
-                                        const topPos = item.textPosition && typeof item.textPosition.top === 'number' ? item.textPosition.top : 50;
-                                        const attr = `style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); z-index: 2; max-width: min(560px, 85vw);"`;
-                                        const boxBg = item.boxBgColor || 'rgba(0, 0, 0, 0.55)';
-                                        const txtCol = item.textColor || '#ffffff';
-                                        const linkTxtCol = item.linkColor || '#ffffff';
-                                        const linkBg = item.linkBgColor || 'var(--primary)';
-                                        const titleSz = item.titleFontSize || '2.5rem';
-                                        const descSz = item.descFontSize || '1.25rem';
-                                        const boxAttr = `style="background: ${boxBg}; backdrop-filter: blur(8px); color: ${txtCol};"`;
-                                        const titleAttr = `style="font-size: ${titleSz}; color: ${txtCol};"`;
-                                        const descAttr = `style="font-size: ${descSz}; color: ${txtCol};"`;
-                                        const linkAttr = `style="background: ${linkBg}; color: ${linkTxtCol}; border: none;"`;
-                                    %>
-                                    <div class="position-absolute" <%- attr %>>
-                                        <div class="p-3 p-md-4 rounded shadow" <%- boxAttr %>>
-                                            <% if (item.title) { %>
-                                                <h2 class="fw-bold mb-3" <%- titleAttr %>><%= item.title %></h2>
+                                        <% if (instagramUrl) { %>
+                                            <a href="<%= instagramUrl %>" target="_blank" rel="noopener"
+                                                class="chat-option instagram-option" aria-label="Follow on Instagram">
+                                                <div class="chat-option-icon">
+                                                    <i class="bi bi-instagram"></i>
+                                                </div>
+                                                <div class="chat-option-text">
+                                                    <span class="chat-option-title">Instagram</span>
+                                                    <span class="chat-option-desc">Follow us</span>
+                                                </div>
+                                            </a>
                                             <% } %>
-                                            <% if (item.description) { %>
-                                                <p class="mb-4" <%- descAttr %>><%= item.description %></p>
-                                            <% } %>
-                                            <% if (item.linkUrl) { %>
-                                                <a href="<%= item.linkUrl %>" class="btn btn-lg" <%- linkAttr %>>
-                                                    <%= item.linkText || 'Learn More' %>
-                                                </a>
-                                            <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
+                    data-bs-interval="4000">
+                    <!-- Carousel Indicators -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0"
+                            class="active"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="4"></button>
+                    </div>
+
+                    <!-- Carousel Slides -->
+                    <div class="carousel-inner">
+                        <!-- Slide 1: Organic Products -->
+                        <div class="carousel-item active">
+                            <div class="hero-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        position: relative; overflow: hidden;">
+                                <div class="hero-pattern"></div>
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100">
+                                        <div class="col-lg-6">
+                                            <div class="hero-content-carousel">
+                                                <span class="hero-tag-modern">🌿 ORGANIC VIBES</span>
+                                                <h1 class="display-3 fw-bold mb-4 glitch-text">Nature's Best,<br>Your
+                                                    Wellness First 💚</h1>
+                                                <p class="hero-subtitle mb-4">100% certified organic from farm to your
+                                                    doorstep. No cap, just pure vibes! 🌱✨</p>
+                                                <a href="/organic-products" class="btn btn-genz btn-lg px-5">Shop
+                                                    Organic <i class="bi bi-arrow-right ms-2"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <div class="hero-image-wrapper floating">
+                                                <div class="hero-emoji">🌿</div>
+                                            </div>
                                         </div>
                                     </div>
-                                <% } %>
                                 </div>
                             </div>
                         </div>
-                    <% }); %>
-                </div>
 
-                <% if (websiteCarouselItems.length > 1) { %>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#websiteCarousel" data-bs-slide="prev">
+                        <!-- Slide 2: Tech Solutions -->
+                        <div class="carousel-item">
+                            <div class="hero-slide" style="background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+                        position: relative; overflow: hidden;">
+                                <div class="hero-pattern"></div>
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100">
+                                        <div class="col-lg-6">
+                                            <div class="hero-content-carousel">
+                                                <span class="hero-tag-modern">💻 TECH THAT SLAPS</span>
+                                                <h1 class="display-3 fw-bold mb-4 glitch-text">Code. Create.<br>Conquer.
+                                                    🚀</h1>
+                                                <p class="hero-subtitle mb-4">Next-level dev solutions that hit
+                                                    different. Built by devs who get it. Period. 💯</p>
+                                                <a href="/tech-packages" class="btn btn-genz btn-lg px-5">Let's Build <i
+                                                        class="bi bi-lightning-charge-fill ms-2"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <div class="hero-image-wrapper floating">
+                                                <div class="hero-emoji">💻</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: Seasonal Products -->
+                        <div class="carousel-item">
+                            <div class="hero-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                        position: relative; overflow: hidden;">
+                                <div class="hero-pattern"></div>
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100">
+                                        <div class="col-lg-6">
+                                            <div class="hero-content-carousel">
+                                                <span class="hero-tag-modern">🔥 TRENDING NOW</span>
+                                                <h1 class="display-3 fw-bold mb-4 glitch-text">This Season's<br>Main
+                                                    Character 🌟</h1>
+                                                <p class="hero-subtitle mb-4">Limited drops that everyone's talking
+                                                    about. Get yours before they're gone! No FOMO. 🎯</p>
+                                                <a href="/seasonal-products" class="btn btn-genz btn-lg px-5">Shop Drops
+                                                    <i class="bi bi-fire ms-2"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <div class="hero-image-wrapper floating">
+                                                <div class="hero-emoji">✨</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 4: Quality Assurance -->
+                        <div class="carousel-item">
+                            <div class="hero-slide" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                        position: relative; overflow: hidden;">
+                                <div class="hero-pattern"></div>
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100">
+                                        <div class="col-lg-6">
+                                            <div class="hero-content-carousel">
+                                                <span class="hero-tag-modern">✓ 100% LEGIT</span>
+                                                <h1 class="display-3 fw-bold mb-4 glitch-text">Real Talk,<br>Real
+                                                    Quality 💎</h1>
+                                                <p class="hero-subtitle mb-4">Certified, verified, and straight fire. We
+                                                    only do authentic—no sketchy vibes here! 🎯</p>
+                                                <a href="/about" class="btn btn-genz btn-lg px-5">Our Story <i
+                                                        class="bi bi-star-fill ms-2"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <div class="hero-image-wrapper floating">
+                                                <div class="hero-emoji">💎</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 5: Customer First -->
+                        <div class="carousel-item">
+                            <div class="hero-slide" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                        position: relative; overflow: hidden;">
+                                <div class="hero-pattern"></div>
+                                <div class="container h-100">
+                                    <div class="row align-items-center h-100">
+                                        <div class="col-lg-6">
+                                            <div class="hero-content-carousel">
+                                                <span class="hero-tag-modern">⚡ FAST AF</span>
+                                                <h1 class="display-3 fw-bold mb-4 glitch-text">Order Today,<br>Flex
+                                                    Tomorrow 📦</h1>
+                                                <p class="hero-subtitle mb-4">Lightning-fast shipping + secure
+                                                    packaging. Your order lands on your doorstep like *that*. 🏃‍♂️💨
+                                                </p>
+                                                <a href="/contact" class="btn btn-genz btn-lg px-5">Hit Us Up <i
+                                                        class="bi bi-chat-dots-fill ms-2"></i></a>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 text-center">
+                                            <div class="hero-image-wrapper floating">
+                                                <div class="hero-emoji">⚡</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="prev">
                         <span class="carousel-control-prev-icon"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#websiteCarousel" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide="next">
                         <span class="carousel-control-next-icon"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
-                <% } %>
-            </div>
-        </div>
-    </section>
-    <% } %>
+                </div>
+            </section>
 
-    <!-- FEATURES SECTION -->
-    <section class="bg-light-custom">
-        <div class="container">
-            <div class="section-header slide-up">
-                <h2>Why Choose Swadesi Carts?</h2>
-                <p>Excellence in every category</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-4 scroll-animate">
-                    <div class="text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-shield-check"></i>
-                        </div>
-                        <h5>Authentic & Certified</h5>
-                        <p class="text-muted-custom">100% authentic products with proper certifications and guarantees</p>
-                    </div>
-                </div>
-                <div class="col-md-4 scroll-animate">
-                    <div class="text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-lightning-charge"></i>
-                        </div>
-                        <h5>Expert Services</h5>
-                        <p class="text-muted-custom">Professional tech solutions from experienced developers</p>
-                    </div>
-                </div>
-                <div class="col-md-4 scroll-animate">
-                    <div class="text-center">
-                        <div class="feature-icon">
-                            <i class="bi bi-truck"></i>
-                        </div>
-                        <h5>Fast Delivery</h5>
-                        <p class="text-muted-custom">Quick and reliable shipping to your doorstep</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SEASONAL PRODUCTS -->
-    <section>
-        <div class="container">
-            <div class="section-header slide-up">
-                <h2>Seasonal Products</h2>
-                <p>Fresh and authentic seasonal items</p>
-            </div>
-            <% if (featuredSeasonal.length > 0) { %>
-                <div class="row g-4">
-                    <% featuredSeasonal.forEach(product => { %>
-                    <div class="col-md-6 col-lg-4 scroll-animate">
-                        <div class="card product-card">
-                            <div class="product-image-wrapper">
-                                <% if (product.featuredImage && product.featuredImage.url) { %>
-                                    <img src="<%= product.featuredImage.url %>" alt="<%= product.title %>">
-                                <% } else { %>
-                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
-                                        🛍️
+            <% if (websiteCarouselItems.length> 0) { %>
+                <!-- WEBSITE CAROUSEL SECTION -->
+                <%- '<style>' %>
+                    .carousel-slide-wrapper { 
+                        width: 100%; 
+                        background: #050505; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center;
+                        border-radius: 0 !important;
+                    }
+                    .carousel-slide-wrapper img, .carousel-slide-wrapper video {
+                        width: 100%;
+                        height: auto;
+                        max-height: 85vh;
+                        object-fit: contain;
+                        border-radius: 0 !important;
+                    }
+                    @media (max-width: 768px) { 
+                        .carousel-slide-wrapper img, .carousel-slide-wrapper video {
+                            max-height: 55vh;
+                        }
+                    }
+                    .carousel-inner { border-radius: 0 !important; }
+                    <%- '</style>' %>
+                        <section class="mb-5 p-0 m-0">
+                            <div class="container-fluid px-0">
+                                <div id="websiteCarousel" class="carousel slide overflow-hidden" data-bs-ride="carousel"
+                                    style="padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;">
+                                    <div class="carousel-indicators">
+                                        <% websiteCarouselItems.forEach((item, index)=> { %>
+                                            <button type="button" data-bs-target="#websiteCarousel"
+                                                data-bs-slide-to="<%= index %>"
+                                                class="<%= index === 0 ? 'active' : '' %>"
+                                                aria-current="<%= index === 0 ? 'true' : 'false' %>"
+                                                aria-label="Slide <%= index + 1 %>"></button>
+                                            <% }); %>
                                     </div>
-                                <% } %>
-                                <span class="product-badge">New</span>
-                            </div>
-                            <div class="product-card-body">
-                                <span class="product-category"><%= product.category %></span>
-                                <h5 class="product-card-title"><%= product.title %></h5>
-                                <p class="product-card-description"><%= product.shortDescription %></p>
-                                <div class="product-card-footer">
-                                    <a href="/seasonal-products/<%= product.slug %>" class="btn btn-primary">View Details</a>
+
+                                    <div class="carousel-inner overflow-hidden">
+                                        <% websiteCarouselItems.forEach((item, index)=> { %>
+                                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                                <div class="position-relative carousel-slide-wrapper"
+                                                    style="background: #050505; overflow: hidden;"
+                                                    data-slide-index="<%= index %>">
+                                                    <% const mediaSrc=(item.media && item.media.transformedUrl) ?
+                                                        item.media.transformedUrl : (item.media && item.media.url ?
+                                                        item.media.url : '' ); %>
+                                                        <!-- Main Media Layer -->
+                                                        <div class="position-relative w-100" style="z-index: 1; border-radius: 0 !important;">
+                                                            <% if (item.media.type==='video' ) { %>
+                                                                <video class="d-block mx-auto"
+                                                                    src="<%= mediaSrc %>" autoplay muted
+                                                                    playsinline style="border-radius: 0 !important;"></video>
+                                                                <button class="btn position-absolute top-0 end-0 m-3 rounded-circle shadow video-mute-btn" 
+                                                                        data-video-index="<%= index %>"
+                                                                        style="z-index: 10; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(4px); cursor: pointer;"
+                                                                        aria-label="Toggle Mute">
+                                                                    <i class="bi bi-volume-mute-fill text-dark fs-5" style="line-height: 1;"></i>
+                                                                </button>
+                                                                <% } else { %>
+                                                                    <img src="<%= mediaSrc %>"
+                                                                        alt="<%= item.title || 'Carousel slide' %>"
+                                                                        class="d-block mx-auto" style="border-radius: 0 !important;">
+                                                                    <% } %>
+                                                                        <% if (item.title || item.description ||
+                                                                            (item.linkUrl && item.linkText)) { %>
+                                                                            <% const leftPos=item.textPosition && typeof
+                                                                                item.textPosition.left==='number' ?
+                                                                                item.textPosition.left : 50; const
+                                                                                topPos=item.textPosition && typeof
+                                                                                item.textPosition.top==='number' ?
+                                                                                item.textPosition.top : 50; const
+                                                                                attr=`style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); z-index: 2; max-width: min(560px, 85vw);"
+                                                                                `; const boxBg=item.boxBgColor
+                                                                                || 'rgba(0, 0, 0, 0.55)' ; const
+                                                                                txtCol=item.textColor || '#ffffff' ;
+                                                                                const linkTxtCol=item.linkColor
+                                                                                || '#ffffff' ; const
+                                                                                linkBg=item.linkBgColor
+                                                                                || 'var(--primary)' ; const
+                                                                                titleSz=item.titleFontSize || '2.5rem' ;
+                                                                                const descSz=item.descFontSize
+                                                                                || '1.25rem' ; const
+                                                                                boxAttr=`style="background: ${boxBg}; backdrop-filter: blur(8px); color: ${txtCol};"
+                                                                                `; const
+                                                                                titleAttr=`style="font-size: ${titleSz}; color: ${txtCol};"
+                                                                                `; const
+                                                                                descAttr=`style="font-size: ${descSz}; color: ${txtCol};"
+                                                                                `; const
+                                                                                linkAttr=`style="background: ${linkBg}; color: ${linkTxtCol}; border: none;"
+                                                                                `; %>
+                                                                                <div class="position-absolute" <%- attr
+                                                                                    %>>
+                                                                                    <div class="p-3 p-md-4 rounded shadow"
+                                                                                        <%- boxAttr %>>
+                                                                                        <% if (item.title) { %>
+                                                                                            <h2 class="fw-bold mb-3" <%-
+                                                                                                titleAttr %>><%=
+                                                                                                    item.title %>
+                                                                                            </h2>
+                                                                                            <% } %>
+                                                                                                <% if (item.description)
+                                                                                                    { %>
+                                                                                                    <p class="mb-4" <%-
+                                                                                                        descAttr %>><%=
+                                                                                                            item.description
+                                                                                                            %>
+                                                                                                    </p>
+                                                                                                    <% } %>
+                                                                                                        <% if
+                                                                                                            (item.linkUrl)
+                                                                                                            { %>
+                                                                                                            <a href="<%= item.linkUrl %>"
+                                                                                                                class="btn btn-lg"
+                                                                                                                <%-
+                                                                                                                linkAttr
+                                                                                                                %>>
+                                                                                                                <%= item.linkText
+                                                                                                                    || 'Learn More'
+                                                                                                                    %>
+                                                                                                            </a>
+                                                                                                            <% } %>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <% } %>
+                                                        </div>
+                                                </div>
+                                            </div>
+                                            <% }); %>
+                                    </div>
+
+                                    <% if (websiteCarouselItems.length> 1) { %>
+                                        <button class="carousel-control-prev" type="button"
+                                            data-bs-target="#websiteCarousel" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                            <span class="visually-hidden">Previous</span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button"
+                                            data-bs-target="#websiteCarousel" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                            <span class="visually-hidden">Next</span>
+                                        </button>
+                                        <% } %>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <% }); %>
-                </div>
-                <div class="text-center mt-4">
-                    <a href="/seasonal-products" class="btn btn-accent btn-lg">View All Seasonal Products</a>
-                </div>
-            <% } else { %>
-                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
-            <% } %>
-        </div>
-    </section>
+                        </section>
+                        <% } %>
 
-    <!-- TECH PACKAGES -->
-    <section class="bg-light-custom">
-        <div class="container">
-            <div class="section-header slide-up">
-                <h2>Tech Services & Packages</h2>
-                <p>Professional development solutions</p>
-            </div>
-            <% if (featuredTech.length > 0) { %>
-                <div class="row g-4">
-                    <% featuredTech.forEach(package => { %>
-                    <div class="col-md-6 col-lg-4 scroll-animate">
-                        <div class="card product-card">
-                            <div class="product-image-wrapper">
-                                <% if (package.featuredImage && package.featuredImage.url) { %>
-                                    <img src="<%= package.featuredImage.url %>" alt="<%= package.title %>">
-                                <% } else { %>
-                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
-                                        💻
+                            <!-- FEATURES SECTION -->
+                            <section class="bg-light-custom">
+                                <div class="container">
+                                    <div class="section-header slide-up">
+                                        <h2>Why Choose Swadesi Carts?</h2>
+                                        <p>Excellence in every category</p>
                                     </div>
-                                <% } %>
-                                <span class="product-badge">Featured</span>
-                            </div>
-                            <div class="product-card-body">
-                                <span class="product-category"><%= package.category %></span>
-                                <h5 class="product-card-title"><%= package.title %></h5>
-                                <p class="product-card-description"><%= package.shortDescription %></p>
-                                <div class="product-price"><%= package.price.displayText || package.price %></div>
-                                <div class="product-card-footer">
-                                    <a href="/tech-packages/<%= package.slug %>" class="btn btn-primary">View Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% }); %>
-                </div>
-                <div class="text-center mt-4">
-                    <a href="/tech-packages" class="btn btn-accent btn-lg">View All Tech Packages</a>
-                </div>
-            <% } else { %>
-                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
-            <% } %>
-        </div>
-    </section>
-
-    <!-- ORGANIC PRODUCTS -->
-    <section>
-        <div class="container">
-            <div class="section-header slide-up">
-                <h2>Organic Products</h2>
-                <p>100% certified organic products for healthy living</p>
-            </div>
-            <% if (featuredOrganic.length > 0) { %>
-                <div class="row g-4">
-                    <% featuredOrganic.forEach(product => { %>
-                    <div class="col-md-6 col-lg-4 scroll-animate">
-                        <div class="card product-card">
-                            <div class="product-image-wrapper">
-                                <% if (product.featuredImage && product.featuredImage.url) { %>
-                                    <img src="<%= product.featuredImage.url %>" alt="<%= product.title %>">
-                                <% } else { %>
-                                    <div style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
-                                        🌱
+                                    <div class="row g-4">
+                                        <div class="col-md-4 scroll-animate">
+                                            <div class="text-center">
+                                                <div class="feature-icon">
+                                                    <i class="bi bi-shield-check"></i>
+                                                </div>
+                                                <h5>Authentic & Certified</h5>
+                                                <p class="text-muted-custom">100% authentic products with proper
+                                                    certifications and guarantees</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 scroll-animate">
+                                            <div class="text-center">
+                                                <div class="feature-icon">
+                                                    <i class="bi bi-lightning-charge"></i>
+                                                </div>
+                                                <h5>Expert Services</h5>
+                                                <p class="text-muted-custom">Professional tech solutions from
+                                                    experienced developers</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 scroll-animate">
+                                            <div class="text-center">
+                                                <div class="feature-icon">
+                                                    <i class="bi bi-truck"></i>
+                                                </div>
+                                                <h5>Fast Delivery</h5>
+                                                <p class="text-muted-custom">Quick and reliable shipping to your
+                                                    doorstep</p>
+                                            </div>
+                                        </div>
                                     </div>
-                                <% } %>
-                                <span class="product-badge">Organic</span>
-                            </div>
-                            <div class="product-card-body">
-                                <span class="product-category"><%= product.category %></span>
-                                <h5 class="product-card-title"><%= product.title %></h5>
-                                <p class="product-card-description"><%= product.shortDescription %></p>
-                                <div class="product-card-footer">
-                                    <a href="/organic-products/<%= product.slug %>" class="btn btn-primary">View Details</a>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <% }); %>
-                </div>
-                <div class="text-center mt-4">
-                    <a href="/organic-products" class="btn btn-accent btn-lg">View All Organic Products</a>
-                </div>
-            <% } else { %>
-                <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i> Coming soon</div>
-            <% } %>
-        </div>
-    </section>
+                            </section>
 
-    <!-- CTA SECTION -->
-    <section class="bg-primary" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;">
-        <div class="container">
-            <div class="text-center text-white scale-up">
-                <h2 class="mb-3">Ready to Get Started?</h2>
-                <p class="fs-5 mb-4">Join thousands of satisfied customers. Explore our wide range of products and services today.</p>
-                <a href="/contact" class="btn btn-light btn-lg">Contact Us</a>
-            </div>
-        </div>
-    </section>
+                            <!-- SEASONAL PRODUCTS -->
+                            <section>
+                                <div class="container">
+                                    <div class="section-header slide-up">
+                                        <h2>Seasonal Products</h2>
+                                        <p>Fresh and authentic seasonal items</p>
+                                    </div>
+                                    <% if (featuredSeasonal.length> 0) { %>
+                                        <div class="row g-4">
+                                            <% featuredSeasonal.forEach(product=> { %>
+                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                    <div class="card product-card">
+                                                        <div class="product-image-wrapper">
+                                                            <% if (product.featuredImage && product.featuredImage.url) {
+                                                                %>
+                                                                <img src="<%= product.featuredImage.url %>"
+                                                                    alt="<%= product.title %>">
+                                                                <% } else { %>
+                                                                    <div
+                                                                        style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                                                        🛍️
+                                                                    </div>
+                                                                    <% } %>
+                                                                        <span class="product-badge">New</span>
+                                                        </div>
+                                                        <div class="product-card-body">
+                                                            <span class="product-category">
+                                                                <%= product.category %>
+                                                            </span>
+                                                            <h5 class="product-card-title">
+                                                                <%= product.title %>
+                                                            </h5>
+                                                            <p class="product-card-description">
+                                                                <%= product.shortDescription %>
+                                                            </p>
+                                                            <div class="product-card-footer">
+                                                                <a href="/seasonal-products/<%= product.slug %>"
+                                                                    class="btn btn-primary">View Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <a href="/seasonal-products" class="btn btn-accent btn-lg">View All Seasonal
+                                                Products</a>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i>
+                                                Coming soon</div>
+                                            <% } %>
+                                </div>
+                            </section>
 
-    <%- include('../partials/stories-carousel') %>
+                            <!-- TECH PACKAGES -->
+                            <section class="bg-light-custom">
+                                <div class="container">
+                                    <div class="section-header slide-up">
+                                        <h2>Tech Services & Packages</h2>
+                                        <p>Professional development solutions</p>
+                                    </div>
+                                    <% if (featuredTech.length> 0) { %>
+                                        <div class="row g-4">
+                                            <% featuredTech.forEach(package=> { %>
+                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                    <div class="card product-card">
+                                                        <div class="product-image-wrapper">
+                                                            <% if (package.featuredImage && package.featuredImage.url) {
+                                                                %>
+                                                                <img src="<%= package.featuredImage.url %>"
+                                                                    alt="<%= package.title %>">
+                                                                <% } else { %>
+                                                                    <div
+                                                                        style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                                                        💻
+                                                                    </div>
+                                                                    <% } %>
+                                                                        <span class="product-badge">Featured</span>
+                                                        </div>
+                                                        <div class="product-card-body">
+                                                            <span class="product-category">
+                                                                <%= package.category %>
+                                                            </span>
+                                                            <h5 class="product-card-title">
+                                                                <%= package.title %>
+                                                            </h5>
+                                                            <p class="product-card-description">
+                                                                <%= package.shortDescription %>
+                                                            </p>
+                                                            <div class="product-price">
+                                                                <%= package.price.displayText || package.price %>
+                                                            </div>
+                                                            <div class="product-card-footer">
+                                                                <a href="/tech-packages/<%= package.slug %>"
+                                                                    class="btn btn-primary">View Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <a href="/tech-packages" class="btn btn-accent btn-lg">View All Tech
+                                                Packages</a>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i>
+                                                Coming soon</div>
+                                            <% } %>
+                                </div>
+                            </section>
 
-    <%- include('../partials/footer-new') %>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Page Loader Animation
-        (function() {
-            const pageLoader = document.getElementById('pageLoader');
-            
-            // Check if already shown this session
-            const hasSeenLoader = sessionStorage.getItem('loaderShown');
-            
-            if (hasSeenLoader) {
-                // Hide immediately if already seen
-                pageLoader.style.display = 'none';
-            } else {
-                // Hide loader after 2.5 seconds
-                setTimeout(function() {
-                    pageLoader.classList.add('fade-out');
-                    setTimeout(function() {
-                        pageLoader.style.display = 'none';
-                        sessionStorage.setItem('loaderShown', 'true');
-                    }, 600);
-                }, 2500);
-            }
-        })();
+                            <!-- ORGANIC PRODUCTS -->
+                            <section>
+                                <div class="container">
+                                    <div class="section-header slide-up">
+                                        <h2>Organic Products</h2>
+                                        <p>100% certified organic products for healthy living</p>
+                                    </div>
+                                    <% if (featuredOrganic.length> 0) { %>
+                                        <div class="row g-4">
+                                            <% featuredOrganic.forEach(product=> { %>
+                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                    <div class="card product-card">
+                                                        <div class="product-image-wrapper">
+                                                            <% if (product.featuredImage && product.featuredImage.url) {
+                                                                %>
+                                                                <img src="<%= product.featuredImage.url %>"
+                                                                    alt="<%= product.title %>">
+                                                                <% } else { %>
+                                                                    <div
+                                                                        style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 4rem; opacity: 0.3;">
+                                                                        🌱
+                                                                    </div>
+                                                                    <% } %>
+                                                                        <span class="product-badge">Organic</span>
+                                                        </div>
+                                                        <div class="product-card-body">
+                                                            <span class="product-category">
+                                                                <%= product.category %>
+                                                            </span>
+                                                            <h5 class="product-card-title">
+                                                                <%= product.title %>
+                                                            </h5>
+                                                            <p class="product-card-description">
+                                                                <%= product.shortDescription %>
+                                                            </p>
+                                                            <div class="product-card-footer">
+                                                                <a href="/organic-products/<%= product.slug %>"
+                                                                    class="btn btn-primary">View Details</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <% }); %>
+                                        </div>
+                                        <div class="text-center mt-4">
+                                            <a href="/organic-products" class="btn btn-accent btn-lg">View All Organic
+                                                Products</a>
+                                        </div>
+                                        <% } else { %>
+                                            <div class="alert alert-info text-center"><i class="bi bi-info-circle"></i>
+                                                Coming soon</div>
+                                            <% } %>
+                                </div>
+                            </section>
 
-        // Visitor Modal Handler
-        (function() {
-            const isVisitorModalEnabled = ("<%= visitorModalEnabled ? 'true' : 'false' %>" === "true");
-            const visitorModal = document.getElementById('visitorModal');
-            const closeModal = document.getElementById('closeModal');
-            const visitorForm = document.getElementById('visitorForm');
-            
-            // Only run if visitor modal is enabled in settings
-            if (!isVisitorModalEnabled) {
-                return;
-            }
-            
-            // Check if user has already submitted the form
-            const hasSubmitted = sessionStorage.getItem('visitorSubmitted');
-            
-            // Show modal after loader finishes (if not submitted)
-            if (!hasSubmitted) {
-                setTimeout(function() {
-                    visitorModal.style.display = 'flex';
-                    setTimeout(() => {
-                        visitorModal.classList.add('show');
-                    }, 50);
-                }, 3200); // Show 700ms after loader ends
-            }
-            
-            // Close modal
-            closeModal.addEventListener('click', function() {
-                visitorModal.classList.remove('show');
-                setTimeout(() => {
-                    visitorModal.style.display = 'none';
-                    sessionStorage.setItem('visitorSubmitted', 'skipped');
-                }, 300);
-            });
-            
-            // Handle form submission
-            visitorForm.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                const submitBtn = visitorForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-                
-                const formData = {
-                    name: document.getElementById('visitorName').value,
-                    email: document.getElementById('visitorEmail').value,
-                    mobile: document.getElementById('visitorMobile').value,
-                    preference: document.querySelector('input[name="preference"]:checked').value
-                };
-                
-                try {
-                    const response = await fetch('/api/visitor', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        sessionStorage.setItem('visitorSubmitted', 'true');
-                        
-                        // Close modal with success message
-                        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Success!';
-                        submitBtn.classList.add('btn-success');
-                        
-                        setTimeout(() => {
-                            visitorModal.classList.remove('show');
-                            setTimeout(() => {
-                                visitorModal.style.display = 'none';
-                                
-                                // Redirect based on preference
-                                const redirectUrls = {
-                                    'seasonal': '/seasonal-products',
-                                    'tech': '/tech-packages',
-                                    'organic': '/organic-products'
-                                };
-                                
-                                if (redirectUrls[data.preference]) {
-                                    window.location.href = redirectUrls[data.preference];
-                                }
-                            }, 300);
-                        }, 1500);
-                    } else {
-                        throw new Error(data.message || 'Failed to submit');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                    alert('Failed to submit. Please try again.');
-                }
-            });
-        })();
+                            <!-- CTA SECTION -->
+                            <section class="bg-primary"
+                                style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%) !important;">
+                                <div class="container">
+                                    <div class="text-center text-white scale-up">
+                                        <h2 class="mb-3">Ready to Get Started?</h2>
+                                        <p class="fs-5 mb-4">Join thousands of satisfied customers. Explore our wide
+                                            range of products and services today.</p>
+                                        <a href="/contact" class="btn btn-light btn-lg">Contact Us</a>
+                                    </div>
+                                </div>
+                            </section>
 
-        // Scroll Animation Handler with Intersection Observer
-        (function() {
-            // Configuration for the observer
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px 0px -100px 0px', // Trigger slightly before element is visible
-                threshold: 0.15 // Trigger when 15% of element is visible
-            };
+                            <%- include('../partials/stories-carousel') %>
 
-            // Callback function for intersection
-            const handleIntersection = (entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Add animated class when element is in viewport
-                        entry.target.classList.add('animated');
-                        
-                        // Optional: Stop observing after animation (improves performance)
-                        // Comment this out if you want animations to repeat on scroll
-                        observer.unobserve(entry.target);
-                    }
-                });
-            };
+                                <%- include('../partials/footer-new') %>
 
-            // Create the observer
-            const observer = new IntersectionObserver(handleIntersection, observerOptions);
+                                    <script
+                                        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-            // Select all elements that should be animated
-            const animatedElements = document.querySelectorAll(
-                '.scroll-animate, .fade-in, .slide-up, .slide-right, .slide-left, .scale-up'
-            );
+                                    <script>
+                                        // Page Loader Animation
+                                        (function () {
+                                            const pageLoader = document.getElementById('pageLoader');
 
-            // Observe each element
-            animatedElements.forEach(element => {
-                observer.observe(element);
-            });
+                                            // Check if already shown this session
+                                            const hasSeenLoader = sessionStorage.getItem('loaderShown');
 
-            // Fallback for older browsers that don't support Intersection Observer
-            if (!('IntersectionObserver' in window)) {
-                animatedElements.forEach(element => {
-                    element.classList.add('animated');
-                });
-            }
-        })();
+                                            if (hasSeenLoader) {
+                                                // Hide immediately if already seen
+                                                pageLoader.style.display = 'none';
+                                            } else {
+                                                // Hide loader after 2.5 seconds
+                                                setTimeout(function () {
+                                                    pageLoader.classList.add('fade-out');
+                                                    setTimeout(function () {
+                                                        pageLoader.style.display = 'none';
+                                                        sessionStorage.setItem('loaderShown', 'true');
+                                                    }, 600);
+                                                }, 2500);
+                                            }
+                                        })();
 
-        // Chat Capsule Popup Button
-        (function() {
-            const chatCapsuleBtn = document.getElementById('chatCapsuleBtn');
-            const chatPopup = document.getElementById('chatPopup');
-            const chatPopupClose = document.getElementById('chatPopupClose');
-            const whatsappLink = document.getElementById('whatsappLink');
-            
-            if (!chatCapsuleBtn) return;
-            
-            // Open popup on button click
-            chatCapsuleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                chatPopup.classList.toggle('active');
-            });
-            
-            // Close popup on close button click
-            if (chatPopupClose) {
-                chatPopupClose.addEventListener('click', () => {
-                    chatPopup.classList.remove('active');
-                });
-            }
-            
-            // Close popup when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.chat-popup-wrapper')) {
-                    chatPopup.classList.remove('active');
-                }
-            });
-            
-            // Handle WhatsApp link
-            if (whatsappLink) {
-                whatsappLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const rawNumber = whatsappLink.getAttribute('data-number') || '';
-                    const message = whatsappLink.getAttribute('data-message') || '';
-                    const number = rawNumber.replace(/\D/g, '');
-                    
-                    if (!number) {
-                        alert('WhatsApp number is not configured');
-                        return;
-                    }
-                    
-                    const encodedMessage = encodeURIComponent(message);
-                    const messageQuery = message ? `?text=${encodedMessage}` : '';
-                    const whatsappUrl = `https://wa.me/${number}${messageQuery}`;
-                    window.open(whatsappUrl, '_blank', 'noopener');
-                    
-                    // Close popup after opening WhatsApp
-                    chatPopup.classList.remove('active');
-                });
-            }
-        })();
+                                        // Visitor Modal Handler
+                                        (function () {
+                                            const isVisitorModalEnabled = ("<%= visitorModalEnabled ? 'true' : 'false' %>" === "true");
+                                            const visitorModal = document.getElementById('visitorModal');
+                                            const closeModal = document.getElementById('closeModal');
+                                            const visitorForm = document.getElementById('visitorForm');
 
-        // Carousel Image Height Detection - Hide overlay on short images
-        (function() {
-            const carouselSlideWrappers = document.querySelectorAll('.carousel-slide-wrapper');
-            
-            carouselSlideWrappers.forEach(wrapper => {
-                const img = wrapper.querySelector('.carousel-slide-image');
-                if (!img) return; // Skip if no image
-                
-                const checkImageHeight = () => {
-                    const containerHeight = wrapper.offsetHeight;
-                    const imageHeight = img.naturalHeight;
-                    
-                    // If image is shorter than container (with 50px tolerance), hide the overlay
-                    if (imageHeight > 0 && imageHeight < containerHeight - 50) {
-                        wrapper.classList.add('image-short');
-                    } else {
-                        wrapper.classList.remove('image-short');
-                    }
-                };
-                
-                // Check on image load
-                if (img.complete) {
-                    checkImageHeight();
-                } else {
-                    img.addEventListener('load', checkImageHeight);
-                }
-                
-                // Recheck on window resize
-                window.addEventListener('resize', checkImageHeight);
-            });
-        })();
-    </script>
+                                            // Only run if visitor modal is enabled in settings
+                                            if (!isVisitorModalEnabled) {
+                                                return;
+                                            }
+
+                                            // Check if user has already submitted the form
+                                            const hasSubmitted = sessionStorage.getItem('visitorSubmitted');
+
+                                            // Show modal after loader finishes (if not submitted)
+                                            if (!hasSubmitted) {
+                                                setTimeout(function () {
+                                                    visitorModal.style.display = 'flex';
+                                                    setTimeout(() => {
+                                                        visitorModal.classList.add('show');
+                                                    }, 50);
+                                                }, 3200); // Show 700ms after loader ends
+                                            }
+
+                                            // Close modal
+                                            closeModal.addEventListener('click', function () {
+                                                visitorModal.classList.remove('show');
+                                                setTimeout(() => {
+                                                    visitorModal.style.display = 'none';
+                                                    sessionStorage.setItem('visitorSubmitted', 'skipped');
+                                                }, 300);
+                                            });
+
+                                            // Handle form submission
+                                            visitorForm.addEventListener('submit', async function (e) {
+                                                e.preventDefault();
+
+                                                const submitBtn = visitorForm.querySelector('button[type="submit"]');
+                                                const originalText = submitBtn.innerHTML;
+                                                submitBtn.disabled = true;
+                                                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+                                                const formData = {
+                                                    name: document.getElementById('visitorName').value,
+                                                    email: document.getElementById('visitorEmail').value,
+                                                    mobile: document.getElementById('visitorMobile').value,
+                                                    preference: document.querySelector('input[name="preference"]:checked').value
+                                                };
+
+                                                try {
+                                                    const response = await fetch('/api/visitor', {
+                                                        method: 'POST',
+                                                        headers: {
+                                                            'Content-Type': 'application/json'
+                                                        },
+                                                        body: JSON.stringify(formData)
+                                                    });
+
+                                                    const data = await response.json();
+
+                                                    if (data.success) {
+                                                        sessionStorage.setItem('visitorSubmitted', 'true');
+
+                                                        // Close modal with success message
+                                                        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Success!';
+                                                        submitBtn.classList.add('btn-success');
+
+                                                        setTimeout(() => {
+                                                            visitorModal.classList.remove('show');
+                                                            setTimeout(() => {
+                                                                visitorModal.style.display = 'none';
+
+                                                                // Redirect based on preference
+                                                                const redirectUrls = {
+                                                                    'seasonal': '/seasonal-products',
+                                                                    'tech': '/tech-packages',
+                                                                    'organic': '/organic-products'
+                                                                };
+
+                                                                if (redirectUrls[data.preference]) {
+                                                                    window.location.href = redirectUrls[data.preference];
+                                                                }
+                                                            }, 300);
+                                                        }, 1500);
+                                                    } else {
+                                                        throw new Error(data.message || 'Failed to submit');
+                                                    }
+                                                } catch (error) {
+                                                    console.error('Error:', error);
+                                                    submitBtn.disabled = false;
+                                                    submitBtn.innerHTML = originalText;
+                                                    alert('Failed to submit. Please try again.');
+                                                }
+                                            });
+                                        })();
+
+                                        // Scroll Animation Handler with Intersection Observer
+                                        (function () {
+                                            // Configuration for the observer
+                                            const observerOptions = {
+                                                root: null,
+                                                rootMargin: '0px 0px -100px 0px', // Trigger slightly before element is visible
+                                                threshold: 0.15 // Trigger when 15% of element is visible
+                                            };
+
+                                            // Callback function for intersection
+                                            const handleIntersection = (entries, observer) => {
+                                                entries.forEach(entry => {
+                                                    if (entry.isIntersecting) {
+                                                        // Add animated class when element is in viewport
+                                                        entry.target.classList.add('animated');
+
+                                                        // Optional: Stop observing after animation (improves performance)
+                                                        // Comment this out if you want animations to repeat on scroll
+                                                        observer.unobserve(entry.target);
+                                                    }
+                                                });
+                                            };
+
+                                            // Create the observer
+                                            const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+                                            // Select all elements that should be animated
+                                            const animatedElements = document.querySelectorAll(
+                                                '.scroll-animate, .fade-in, .slide-up, .slide-right, .slide-left, .scale-up'
+                                            );
+
+                                            // Observe each element
+                                            animatedElements.forEach(element => {
+                                                observer.observe(element);
+                                            });
+
+                                            // Fallback for older browsers that don't support Intersection Observer
+                                            if (!('IntersectionObserver' in window)) {
+                                                animatedElements.forEach(element => {
+                                                    element.classList.add('animated');
+                                                });
+                                            }
+                                        })();
+
+                                        // Chat Capsule Popup Button
+                                        (function () {
+                                            const chatCapsuleBtn = document.getElementById('chatCapsuleBtn');
+                                            const chatPopup = document.getElementById('chatPopup');
+                                            const chatPopupClose = document.getElementById('chatPopupClose');
+                                            const whatsappLink = document.getElementById('whatsappLink');
+
+                                            if (!chatCapsuleBtn) return;
+
+                                            // Open popup on button click
+                                            chatCapsuleBtn.addEventListener('click', (e) => {
+                                                e.preventDefault();
+                                                chatPopup.classList.toggle('active');
+                                            });
+
+                                            // Close popup on close button click
+                                            if (chatPopupClose) {
+                                                chatPopupClose.addEventListener('click', () => {
+                                                    chatPopup.classList.remove('active');
+                                                });
+                                            }
+
+                                            // Close popup when clicking outside
+                                            document.addEventListener('click', (e) => {
+                                                if (!e.target.closest('.chat-popup-wrapper')) {
+                                                    chatPopup.classList.remove('active');
+                                                }
+                                            });
+
+                                            // Handle WhatsApp link
+                                            if (whatsappLink) {
+                                                whatsappLink.addEventListener('click', (e) => {
+                                                    e.preventDefault();
+                                                    const rawNumber = whatsappLink.getAttribute('data-number') || '';
+                                                    const message = whatsappLink.getAttribute('data-message') || '';
+                                                    const number = rawNumber.replace(/\D/g, '');
+
+                                                    if (!number) {
+                                                        alert('WhatsApp number is not configured');
+                                                        return;
+                                                    }
+
+                                                    const encodedMessage = encodeURIComponent(message);
+                                                    const messageQuery = message ? `?text=${encodedMessage}` : '';
+                                                    const whatsappUrl = `https://wa.me/${number}${messageQuery}`;
+                                                    window.open(whatsappUrl, '_blank', 'noopener');
+
+                                                    // Close popup after opening WhatsApp
+                                                    chatPopup.classList.remove('active');
+                                                });
+                                            }
+                                        })();
+
+                                        // Carousel Image Height Detection - Hide overlay on short images
+                                        (function () {
+                                            const carouselSlideWrappers = document.querySelectorAll('.carousel-slide-wrapper');
+
+                                            carouselSlideWrappers.forEach(wrapper => {
+                                                const img = wrapper.querySelector('.carousel-slide-image');
+                                                if (!img) return; // Skip if no image
+
+                                                const checkImageHeight = () => {
+                                                    const containerHeight = wrapper.offsetHeight;
+                                                    const imageHeight = img.naturalHeight;
+
+                                                    // If image is shorter than container (with 50px tolerance), hide the overlay
+                                                    if (imageHeight > 0 && imageHeight < containerHeight - 50) {
+                                                        wrapper.classList.add('image-short');
+                                                    } else {
+                                                        wrapper.classList.remove('image-short');
+                                                    }
+                                                };
+
+                                                // Check on image load
+                                                if (img.complete) {
+                                                    checkImageHeight();
+                                                } else {
+                                                    img.addEventListener('load', checkImageHeight);
+                                                }
+
+                                                // Recheck on window resize
+                                                window.addEventListener('resize', checkImageHeight);
+                                            });
+                                        })();
+                                        // Video Carousel Sync & Audio Management
+                                        (function() {
+                                            const carouselElement = document.getElementById('websiteCarousel');
+                                            if (!carouselElement) return;
+
+                                            // Handle manual mute toggle
+                                            document.addEventListener('click', function(e) {
+                                                const btn = e.target.closest('.video-mute-btn');
+                                                if (!btn) return;
+                                                
+                                                const wrapper = btn.closest('.position-relative');
+                                                const video = wrapper.querySelector('video');
+                                                const icon = btn.querySelector('i');
+                                                
+                                                if (video) {
+                                                    video.muted = !video.muted;
+                                                    if (video.muted) {
+                                                        icon.classList.remove('bi-volume-up-fill');
+                                                        icon.classList.add('bi-volume-mute-fill');
+                                                    } else {
+                                                        icon.classList.remove('bi-volume-mute-fill');
+                                                        icon.classList.add('bi-volume-up-fill');
+                                                    }
+                                                }
+                                            });
+
+                                            // When slide begins transitioning to another
+                                            carouselElement.addEventListener('slide.bs.carousel', function (e) {
+                                                // Mute and pause all videos to stop audio bleeding
+                                                const allVideos = carouselElement.querySelectorAll('video');
+                                                allVideos.forEach(v => {
+                                                    v.muted = true;
+                                                    v.pause();
+                                                });
+                                                
+                                                // Reset all mute button icons to muted state
+                                                const allMuteIcons = carouselElement.querySelectorAll('.video-mute-btn i');
+                                                allMuteIcons.forEach(icon => {
+                                                    icon.classList.remove('bi-volume-up-fill');
+                                                    icon.classList.add('bi-volume-mute-fill');
+                                                });
+                                            });
+
+                                            // When slide finishes transitioning
+                                            carouselElement.addEventListener('slid.bs.carousel', function (e) {
+                                                const activeItem = e.relatedTarget;
+                                                const video = activeItem.querySelector('video');
+                                                
+                                                // Get the carousel instance
+                                                const carousel = bootstrap.Carousel.getInstance(carouselElement) || new bootstrap.Carousel(carouselElement);
+                                                
+                                                if (video) {
+                                                    // Stop standard carousel timer
+                                                    carousel.pause();
+                                                    
+                                                    // Play video from start
+                                                    video.currentTime = 0;
+                                                    video.play().catch(e => console.log('Autoplay prevented'));
+                                                    
+                                                    // Move to next slide manually when video ends
+                                                    video.onended = function() {
+                                                        carousel.next();
+                                                    };
+                                                } else {
+                                                    // Not a video, resume normal timing
+                                                    carousel.cycle();
+                                                }
+                                            });
+
+                                            // Handle initial page load if first slide is video
+                                            window.addEventListener('load', function() {
+                                                const firstActive = carouselElement.querySelector('.carousel-item.active video');
+                                                if (firstActive) {
+                                                    const carousel = bootstrap.Carousel.getInstance(carouselElement) || new bootstrap.Carousel(carouselElement);
+                                                    carousel.pause();
+                                                    firstActive.play().catch(e => console.log('Autoplay prevented'));
+                                                    firstActive.onended = function() {
+                                                        carousel.next();
+                                                    };
+                                                }
+                                            });
+                                        })();
+                                    </script>
 </body>
+
 </html>
