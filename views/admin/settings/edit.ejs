@@ -147,6 +147,11 @@
                         </button>
                     </li>
                     <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#typography" type="button">
+                            <i class="bi bi-type"></i> Typography & Buttons
+                        </button>
+                    </li>
+                    <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#footer" type="button">
                             <i class="bi bi-footer"></i> Footer
                         </button>
@@ -382,7 +387,7 @@
                                                            maxlength="7"
                                                            onchange="document.getElementById('colors.primary').value = this.value; updateColorPreview();">
                                                 </div>
-                                                <div class="mt-2 p-3 rounded" id="primaryPreview" style="background-color: <%= settings.colors ? settings.colors.primary : '#4C1E4F' %>; color: white; text-align: center;">
+                                                <div class="mt-2 p-3 rounded" id="primaryPreview" <%- `style="background-color: ${settings.colors ? settings.colors.primary : '#4C1E4F'}; color: white; text-align: center;"` %>>
                                                     Preview
                                                 </div>
                                             </div>
@@ -406,7 +411,7 @@
                                                            maxlength="7"
                                                            onchange="document.getElementById('colors.accent').value = this.value; updateColorPreview();">
                                                 </div>
-                                                <div class="mt-2 p-3 rounded" id="accentPreview" style="background-color: <%= settings.colors ? settings.colors.accent : '#B5A886' %>; color: white; text-align: center;">
+                                                <div class="mt-2 p-3 rounded" id="accentPreview" <%- `style="background-color: ${settings.colors ? settings.colors.accent : '#B5A886'}; color: white; text-align: center;"` %>>
                                                     Preview
                                                 </div>
                                             </div>
@@ -430,7 +435,7 @@
                                                            maxlength="7"
                                                            onchange="document.getElementById('colors.secondary').value = this.value; updateColorPreview();">
                                                 </div>
-                                                <div class="mt-2 p-3 rounded" id="secondaryPreview" style="background-color: <%= settings.colors ? settings.colors.secondary : '#6C8E7F' %>; color: white; text-align: center;">
+                                                <div class="mt-2 p-3 rounded" id="secondaryPreview" <%- `style="background-color: ${settings.colors ? settings.colors.secondary : '#6C8E7F'}; color: white; text-align: center;"` %>>
                                                     Preview
                                                 </div>
                                             </div>
@@ -460,7 +465,7 @@
                                                            onchange="document.getElementById('colors.headingText').value = this.value; updateColorPreview();">
                                                 </div>
                                                 <div class="mt-2 p-3 rounded border" id="headingTextPreview" style="background-color: white;">
-                                                    <h5 style="color: <%= settings.colors ? (settings.colors.headingText || '#2c3e50') : '#2c3e50' %>; margin: 0;">Sample Heading</h5>
+                                                    <h5 <%- `style="color: ${settings.colors ? (settings.colors.headingText || '#2c3e50') : '#2c3e50'}; margin: 0;"` %>>Sample Heading</h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -484,7 +489,7 @@
                                                            onchange="document.getElementById('colors.bodyText').value = this.value; updateColorPreview();">
                                                 </div>
                                                 <div class="mt-2 p-3 rounded border" id="bodyTextPreview" style="background-color: white;">
-                                                    <p style="color: <%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>; margin: 0;">Sample body text content goes here to show the preview.</p>
+                                                    <p <%- `style="color: ${settings.colors ? (settings.colors.bodyText || '#495057') : '#495057'}; margin: 0;"` %>>Sample body text content goes here to show the preview.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -513,7 +518,7 @@
                                                            onchange="document.getElementById('colors.linkColor').value = this.value; updateColorPreview();">
                                                 </div>
                                                 <div class="mt-2 p-3 rounded border" id="linkColorPreview" style="background-color: white;">
-                                                    <a style="color: <%= settings.colors ? (settings.colors.linkColor || '#B5A886') : '#B5A886' %>; text-decoration: underline;">This is a sample link</a>
+                                                    <a <%- `style="color: ${settings.colors ? (settings.colors.linkColor || '#B5A886') : '#B5A886'}; text-decoration: underline;"` %>>This is a sample link</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -536,8 +541,8 @@
                                                            maxlength="7"
                                                            onchange="document.getElementById('colors.headerFooterLinkColor').value = this.value; updateColorPreview();">
                                                 </div>
-                                                <div class="mt-2 p-3 rounded border" id="headerFooterLinkColorPreview" style="background-color: <%= settings.colors ? settings.colors.primary : '#4C1E4F' %>;">
-                                                    <a style="color: <%= settings.colors ? (settings.colors.headerFooterLinkColor || '#FFD700') : '#FFD700' %>; text-decoration: underline;">This is a sample link</a>
+                                                <div class="mt-2 p-3 rounded border" id="headerFooterLinkColorPreview" <%- `style="background-color: ${settings.colors ? settings.colors.primary : '#4C1E4F'};"` %>>
+                                                    <a <%- `style="color: ${settings.colors ? (settings.colors.headerFooterLinkColor || '#FFD700') : '#FFD700'}; text-decoration: underline;"` %>>This is a sample link</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -577,10 +582,10 @@
                                                            onchange="document.getElementById('colors.bodyBackgroundColor').value = this.value; updateColorPreview();">
                                                 </div>
 
-                                                <div id="bgGradientControls" style="display: <%= settings.colors && settings.colors.backgroundType === 'gradient' ? 'block' : 'none' %>;">
+                                                <div id="bgGradientControls" <%- `style="display: ${settings.colors && settings.colors.backgroundType === 'gradient' ? 'block' : 'none'};"` %>>
                                                     <div class="mb-2 d-flex gap-2">
-                                                        <input type="color" class="form-control form-control-color" id="gradient.stop1" value="<%= settings.colors && settings.colors.backgroundGradient ? (settings.colors.backgroundGradientStop1 || '#000000') : '#000000' %>">
-                                                        <input type="color" class="form-control form-control-color" id="gradient.stop2" value="<%= settings.colors && settings.colors.backgroundGradient ? (settings.colors.backgroundGradientStop2 || '#444444') : '#444444' %>">
+                                                        <input type="color" class="form-control form-control-color" id="gradient.stop1" name="gradient.stop1" value="<%= settings.colors ? (settings.colors.backgroundGradientStop1 || '#000000') : '#000000' %>">
+                                                        <input type="color" class="form-control form-control-color" id="gradient.stop2" name="gradient.stop2" value="<%= settings.colors ? (settings.colors.backgroundGradientStop2 || '#444444') : '#444444' %>">
                                                     </div>
                                                     <div class="mb-2">
                                                         <label for="colors.backgroundGradient" class="form-label small">Custom gradient CSS (optional)</label>
@@ -589,7 +594,7 @@
                                                     <small class="text-muted">If left empty, gradient will be built from the two color pickers above.</small>
                                                 </div>
 
-                                                <div class="mt-2 p-3 rounded border" id="bodyBackgroundPreview" style="background: <%= settings.colors && settings.colors.backgroundType === 'gradient' ? (settings.colors.backgroundGradient || 'linear-gradient(180deg, #000000, #444444)') : (settings.colors ? (settings.colors.bodyBackgroundColor || '#ffffff') : '#ffffff') %>; color: <%= settings.colors ? (settings.colors.bodyText || '#495057') : '#495057' %>;">
+                                                <div class="mt-2 p-3 rounded border" id="bodyBackgroundPreview" <%- `style="background: ${settings.colors && settings.colors.backgroundType === 'gradient' ? (settings.colors.backgroundGradient || 'linear-gradient(180deg, #000000, #444444)') : (settings.colors ? (settings.colors.bodyBackgroundColor || '#ffffff') : '#ffffff')}; color: ${settings.colors ? (settings.colors.bodyText || '#495057') : '#495057'};"` %>>
                                                     <p style="margin:0;">Website background preview</p>
                                                 </div>
                                             </div>
@@ -632,6 +637,73 @@
                                             </div>
                                         </div>
                                     </div>
+
+                        <!-- Typography & Buttons Tab -->
+                        <div class="tab-pane fade" id="typography">
+                            <div class="settings-section">
+                                <h3 class="section-title">Typography & Buttons</h3>
+                                <p class="text-muted mb-4">Customize the fonts and button styles used across the website.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title fw-bold">Typography</h5>
+                                                <div class="mb-3">
+                                                    <label for="typography.fontFamily" class="form-label">Main Font Family</label>
+                                                    <select class="form-select" id="typography.fontFamily" name="typography.fontFamily">
+                                                        <option value="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" <%= settings.typography && settings.typography.fontFamily.includes('Inter') ? 'selected' : '' %>>Inter (Default Modern)</option>
+                                                        <option value="'Roboto', sans-serif" <%= settings.typography && settings.typography.fontFamily.includes('Roboto') ? 'selected' : '' %>>Roboto</option>
+                                                        <option value="'Outfit', sans-serif" <%= settings.typography && settings.typography.fontFamily.includes('Outfit') ? 'selected' : '' %>>Outfit</option>
+                                                        <option value="'Open Sans', sans-serif" <%= settings.typography && settings.typography.fontFamily.includes('Open Sans') ? 'selected' : '' %>>Open Sans</option>
+                                                        <option value="'Poppins', sans-serif" <%= settings.typography && settings.typography.fontFamily.includes('Poppins') ? 'selected' : '' %>>Poppins</option>
+                                                        <option value="'Playfair Display', serif" <%= settings.typography && settings.typography.fontFamily.includes('Playfair Display') ? 'selected' : '' %>>Playfair Display (Serif)</option>
+                                                        <option value="'Lora', serif" <%= settings.typography && settings.typography.fontFamily.includes('Lora') ? 'selected' : '' %>>Lora (Serif)</option>
+                                                    </select>
+                                                    <p class="text-muted small mt-1">This font will be applied to all text on your website.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title fw-bold">Button Styles</h5>
+                                                <div class="mb-3">
+                                                    <label for="buttons.borderRadius" class="form-label">Border Radius (px)</label>
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <input type="range" class="form-range flex-grow-1" id="buttons.borderRadius" name="buttons.borderRadius" min="0" max="50" step="1" value="<%= settings.buttons ? parseInt(settings.buttons.borderRadius) : 4 %>" oninput="document.getElementById('borderRadiusValue').innerText = this.value + 'px'; document.getElementById('buttonPreview').style.borderRadius = this.value + 'px';">
+                                                        <span id="borderRadiusValue" class="badge bg-swadesi" style="min-width: 50px;"><%= settings.buttons ? settings.buttons.borderRadius : '4px' %></span>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="buttons.paddingY" class="form-label">Button Size (Height)</label>
+                                                    <select class="form-select" id="buttons.paddingY" name="buttons.paddingY" onchange="document.getElementById('buttonPreview').style.padding = this.value + ' ' + document.getElementById('buttons.paddingX').value;">
+                                                        <option value="0.25rem" <%= settings.buttons && settings.buttons.paddingY === '0.25rem' ? 'selected' : '' %>>Small</option>
+                                                        <option value="0.5rem" <%= !settings.buttons || settings.buttons.paddingY === '0.5rem' ? 'selected' : '' %>>Medium (Default)</option>
+                                                        <option value="0.75rem" <%= settings.buttons && settings.buttons.paddingY === '0.75rem' ? 'selected' : '' %>>Large</option>
+                                                        <option value="1rem" <%= settings.buttons && settings.buttons.paddingY === '1rem' ? 'selected' : '' %>>Extra Large</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="buttons.paddingX" class="form-label">Button Size (Width)</label>
+                                                    <select class="form-select" id="buttons.paddingX" name="buttons.paddingX" onchange="document.getElementById('buttonPreview').style.padding = document.getElementById('buttons.paddingY').value + ' ' + this.value;">
+                                                        <option value="0.5rem" <%= settings.buttons && settings.buttons.paddingX === '0.5rem' ? 'selected' : '' %>>Small</option>
+                                                        <option value="1rem" <%= !settings.buttons || settings.buttons.paddingX === '1rem' ? 'selected' : '' %>>Medium (Default)</option>
+                                                        <option value="1.5rem" <%= settings.buttons && settings.buttons.paddingX === '1.5rem' ? 'selected' : '' %>>Large</option>
+                                                        <option value="2rem" <%= settings.buttons && settings.buttons.paddingX === '2rem' ? 'selected' : '' %>>Extra Large</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mt-4 text-center">
+                                                    <button type="button" id="buttonPreview" class="btn" <%- `style="background-color: ${settings.colors ? settings.colors.primary : '#4C1E4F'}; color: white; border-radius: ${settings.buttons && settings.buttons.borderRadius ? (String(settings.buttons.borderRadius).includes('px') || String(settings.buttons.borderRadius).includes('rem') || String(settings.buttons.borderRadius).includes('%') ? settings.buttons.borderRadius : settings.buttons.borderRadius + 'px') : '4px'}; padding: ${settings.buttons && settings.buttons.paddingY ? settings.buttons.paddingY : '0.5rem'} ${settings.buttons && settings.buttons.paddingX ? settings.buttons.paddingX : '1rem'};"` %>>Button Preview</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Footer Tab -->
                         <div class="tab-pane fade" id="footer">

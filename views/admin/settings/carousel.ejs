@@ -173,9 +173,43 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Link URL</label>
-                                    <input type="url" class="form-control" name="linkUrl" value="<%= carouselEditItem ? carouselEditItem.linkUrl : '' %>" placeholder="/seasonal-products or https://...">
+                                    <input type="text" class="form-control" name="linkUrl" value="<%= carouselEditItem ? carouselEditItem.linkUrl : '' %>" placeholder="/seasonal-products or https://...">
                                     <small class="text-muted">Leave blank if you do not want a button on this slide.</small>
                                 </div>
+                                <h6 class="fw-bold mt-4 mb-3">Slide Typography & Colors</h6>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Box Background Color</label>
+                                        <input type="text" class="form-control form-control-color w-100" name="boxBgColor" value="<%= carouselEditItem ? (carouselEditItem.boxBgColor || 'rgba(0, 0, 0, 0.55)') : 'rgba(0, 0, 0, 0.55)' %>">
+                                        <small class="text-muted">Supports hex (#000000) or rgba(). Default is translucent black.</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Text Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="textColor" value="<%= carouselEditItem ? (carouselEditItem.textColor || '#ffffff') : '#ffffff' %>">
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Link Text Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="linkColor" value="<%= carouselEditItem ? (carouselEditItem.linkColor || '#ffffff') : '#ffffff' %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Link Background Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="linkBgColor" value="<%= carouselEditItem ? (carouselEditItem.linkBgColor || '#B5A886') : '#B5A886' %>">
+                                        <small class="text-muted">Or type CSS vars like 'var(--primary)' in text box</small>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Title Font Size</label>
+                                        <input type="text" class="form-control" name="titleFontSize" value="<%= carouselEditItem ? (carouselEditItem.titleFontSize || '2.5rem') : '2.5rem' %>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Desc Font Size</label>
+                                        <input type="text" class="form-control" name="descFontSize" value="<%= carouselEditItem ? (carouselEditItem.descFontSize || '1.25rem') : '1.25rem' %>">
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-3">Slide Layout & Media</h6>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Order</label>
@@ -213,9 +247,9 @@
                                     <div id="carouselDragCanvas" class="position-relative border rounded overflow-hidden bg-dark" style="min-height: 260px; touch-action: none;">
                                         <% if (carouselEditItem && carouselEditItem.media && carouselEditItem.media.url) { %>
                                             <% if (carouselEditItem.media.type === 'video') { %>
-                                                <video id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: contain; background: #0f1115;" muted playsinline></video>
+                                                <video id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; background: transparent;" muted playsinline></video>
                                             <% } else { %>
-                                                <img id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" alt="Current media" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: contain; background: #0f1115;">
+                                                <img id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" alt="Current media" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; background: transparent;">
                                             <% } %>
                                         <% } else { %>
                                             <div id="carouselPreviewMedia" class="w-100 h-100 d-flex align-items-center justify-content-center text-white-50 position-absolute top-0 start-0" style="background: linear-gradient(135deg, #111827, #1f2937); min-height: 260px;">
@@ -225,7 +259,12 @@
                                                 </div>
                                             </div>
                                         <% } %>
-                                        <div id="carouselTextBox" class="position-absolute text-white p-3 rounded shadow" style="left: <%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50 %>%; top: <%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50 %>%; transform: translate(-50%, -50%); cursor: move; user-select: none; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); min-width: 220px; max-width: 80%;">
+                                        <%
+                                            const leftPos = carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50;
+                                            const topPos = carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50;
+                                            const boxStyleAttr = `style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); cursor: move; user-select: none; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); min-width: 220px; max-width: 80%;"`;
+                                        %>
+                                        <div id="carouselTextBox" class="position-absolute text-white p-3 rounded shadow" <%- boxStyleAttr %>>
                                             <div class="fw-bold mb-1"><%= carouselEditItem ? (carouselEditItem.title || 'Slide Title') : 'Slide Title' %></div>
                                             <div class="small opacity-75"><%= carouselEditItem ? (carouselEditItem.description || 'Drag me anywhere on the image') : 'Drag me anywhere on the image' %></div>
                                         </div>
@@ -302,7 +341,8 @@
                                                             <a href="/admin/settings/carousel?edit=<%= item._id %>" class="btn btn-sm btn-primary">
                                                                 <i class="bi bi-pencil"></i> Edit
                                                             </a>
-                                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteCarouselItem('<%= item._id %>', '<%= item.title ? item.title.replace(/'/g, "\\'") : 'this slide' %>')">
+                                                            <% const safeTitle = item.title ? item.title.replace(/'/g, "\\'") : 'this slide'; %>
+                                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteCarouselItem('<%= item._id %>', '<%= safeTitle %>')">
                                                                 <i class="bi bi-trash"></i> Delete
                                                             </button>
                                                         </div>
@@ -372,8 +412,8 @@
             nextElement.id = 'carouselPreviewMedia';
             nextElement.src = objectUrl;
             nextElement.className = 'w-100 h-100 position-absolute top-0 start-0';
-            nextElement.style.objectFit = 'contain';
-            nextElement.style.background = '#0f1115';
+            nextElement.style.objectFit = 'cover';
+            nextElement.style.background = 'transparent';
 
             if (existingMedia && existingMedia.parentNode) {
                 existingMedia.parentNode.replaceChild(nextElement, existingMedia);

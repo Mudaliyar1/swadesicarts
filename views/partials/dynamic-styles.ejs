@@ -1,4 +1,4 @@
-<style>
+<%- '<style>' %>
     /* Dynamic Theme Colors from Admin Settings */
     <% if (siteSettings && siteSettings.colors) { %>
         :root {
@@ -15,7 +15,7 @@
             --secondary: <%= siteSettings.colors.secondary || '#6C8E7F' %>;
             --light: #f8f9fa;
             --dark: <%= siteSettings.colors.bodyText || '#1a1a1a' %>;
-            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-primary: <%- (siteSettings.typography && siteSettings.typography.fontFamily) ? siteSettings.typography.fontFamily : "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" %>;
             --link-color: <%= siteSettings.colors.linkColor || '#B5A886' %>;
         }
 
@@ -31,15 +31,40 @@
 
         body {
             background: var(--site-background) !important;
+            <% if (!siteSettings.colors.backgroundType || siteSettings.colors.backgroundType !== 'gradient') { %>
             background-image: none !important;
+            <% } %>
+            font-family: var(--font-primary) !important;
         }
 
-        h1, h2, h3, h4, h5, h6 {
-            color: <%= siteSettings.colors.headingText || '#2c3e50' %>;
+        /* Override section backgrounds to make the body background visible everywhere */
+        section:not(.hero-carousel-section):not(.bg-primary),
+        .bg-light-custom,
+        .stories-section {
+            background: transparent !important;
         }
 
-        body, p, span {
-            color: <%= siteSettings.colors.bodyText || '#495057' %>;
+
+        .btn, .btn-swadesi, .btn-outline-swadesi {
+            border-radius: <%= siteSettings.buttons && siteSettings.buttons.borderRadius ? (siteSettings.buttons.borderRadius.includes('px') || siteSettings.buttons.borderRadius.includes('rem') || siteSettings.buttons.borderRadius.includes('%') ? siteSettings.buttons.borderRadius : siteSettings.buttons.borderRadius + 'px') : '4px' %> !important;
+            padding: <%= siteSettings.buttons && siteSettings.buttons.paddingY ? siteSettings.buttons.paddingY : '0.5rem' %> <%= siteSettings.buttons && siteSettings.buttons.paddingX ? siteSettings.buttons.paddingX : '1rem' %> !important;
+        }
+
+        h1, h2, h3, h4, h5, h6,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h1,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h2,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h3,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h4,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h5,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) h6 {
+            color: <%= siteSettings.colors.headingText || '#2c3e50' %> !important;
+        }
+
+        body, p, span,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary),
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) p,
+        section:not(.hero-carousel-section):not(.page-header):not(.bg-primary) span {
+            color: <%= siteSettings.colors.bodyText || '#495057' %> !important;
         }
 
         a {
@@ -159,4 +184,4 @@
             <% }); %>
         <% } %>
     <% } %>
-</style>
+<%- '</style>' %>

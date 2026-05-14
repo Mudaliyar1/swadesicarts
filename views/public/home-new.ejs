@@ -323,52 +323,70 @@
 
     <% if (websiteCarouselItems.length > 0) { %>
     <!-- WEBSITE CAROUSEL SECTION -->
-    <section class="py-5 bg-light-custom">
-        <div class="container">
-            <% if (siteSettings && siteSettings.carouselSection && siteSettings.carouselSection.showHeader) { %>
-            <div class="section-header slide-up">
-                <h2><%= siteSettings.carouselSection.heading || 'Featured Carousel' %></h2>
-                <p><%= siteSettings.carouselSection.subheading || 'Updates, offers, and highlights you can control from the admin panel' %></p>
-            </div>
-            <% } %>
+    <section class="mb-5 p-0 m-0">
 
-            <div id="websiteCarousel" class="carousel slide shadow-sm overflow-hidden" data-bs-ride="carousel">
+        <div class="container-fluid px-0">
+            <div id="websiteCarousel" class="carousel slide overflow-hidden" data-bs-ride="carousel" style="padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;">
                 <div class="carousel-indicators">
                     <% websiteCarouselItems.forEach((item, index) => { %>
                         <button type="button" data-bs-target="#websiteCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" aria-label="Slide <%= index + 1 %>"></button>
                     <% }); %>
                 </div>
 
-                <div class="carousel-inner rounded-4 overflow-hidden">
+                <div class="carousel-inner overflow-hidden">
                     <% websiteCarouselItems.forEach((item, index) => { %>
                         <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
-                            <div class="position-relative carousel-slide-wrapper" style="min-height: 460px; background: #0f1115; overflow: hidden;" data-slide-index="<%= index %>">
+                            <div class="position-relative carousel-slide-wrapper" style="background: transparent; overflow: hidden;" data-slide-index="<%= index %>">
                                 <% const mediaSrc = (item.media && item.media.transformedUrl) ? item.media.transformedUrl : (item.media && item.media.url ? item.media.url : ''); %>
-                                <% if (item.media.type === 'video') { %>
-                                    <video class="w-100 h-100 position-absolute top-0 start-0" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: contain; background: #0f1115;"></video>
-                                <% } else { %>
-                                    <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="carousel-slide-image w-100 h-100 position-absolute top-0 start-0" style="object-fit: contain; background: #0f1115;">
-                                <% } %>
-                                <div class="carousel-overlay position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(90deg, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.28) 55%, rgba(0,0,0,0.06) 100%);"></div>
-                                <!-- Animated SVG Accents -->
-                                <svg class="carousel-svg-accent" viewBox="0 0 100 100" style="position: absolute; bottom: 10%; right: 5%; width: 80px; height: 80px; opacity: 0.15; z-index: 1;">
-                                    <circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="2" class="svg-pulse" />
-                                    <path d="M 30 50 Q 50 30 70 50" fill="none" stroke="white" stroke-width="2" class="svg-wave" />
-                                </svg>
-                                <div class="position-absolute" style="left: <%= item.textPosition && typeof item.textPosition.left === 'number' ? item.textPosition.left : 50 %>%; top: <%= item.textPosition && typeof item.textPosition.top === 'number' ? item.textPosition.top : 50 %>%; transform: translate(-50%, -50%); z-index: 2; max-width: min(560px, 85vw);">
-                                    <div class="text-white">
-                                        <% if (item.title) { %>
-                                            <h2 class="display-6 fw-bold mb-3"><%= item.title %></h2>
-                                        <% } %>
-                                        <% if (item.description) { %>
-                                            <p class="lead mb-4"><%= item.description %></p>
-                                        <% } %>
-                                        <% if (item.linkUrl) { %>
-                                            <a href="<%= item.linkUrl %>" class="btn btn-accent btn-lg">
-                                                <%= item.linkText || 'Learn More' %>
-                                            </a>
-                                        <% } %>
+                                
+                                <!-- Decorative Blurred Background (PC Only) -->
+                                <div class="position-absolute top-0 start-0 w-100 h-100 d-none d-md-block" style="z-index: 0; overflow: hidden; pointer-events: none;">
+                                    <% if (item.media.type === 'video') { %>
+                                        <video class="w-100 h-100" src="<%= mediaSrc %>" autoplay muted loop playsinline style="object-fit: cover; filter: blur(35px) brightness(0.4); transform: scale(1.1);"></video>
+                                    <% } else { %>
+                                        <img src="<%= mediaSrc %>" class="w-100 h-100" style="object-fit: cover; filter: blur(35px) brightness(0.4); transform: scale(1.1);">
+                                    <% } %>
+                                </div>
+
+                                <!-- Main Media Layer -->
+                                <div class="position-relative w-100 h-100" style="z-index: 1;">
+                                    <% if (item.media.type === 'video') { %>
+                                        <video class="d-block w-100 mx-auto" src="<%= mediaSrc %>" autoplay muted loop playsinline style="max-height: 85vh; object-fit: contain; background: transparent;"></video>
+                                    <% } else { %>
+                                        <img src="<%= mediaSrc %>" alt="<%= item.title || 'Carousel slide' %>" class="d-block w-100 mx-auto" style="max-height: 85vh; object-fit: contain; background: transparent;">
+                                    <% } %>
+                                <% if (item.title || item.description || (item.linkUrl && item.linkText)) { %>
+                                    <%
+                                        const leftPos = item.textPosition && typeof item.textPosition.left === 'number' ? item.textPosition.left : 50;
+                                        const topPos = item.textPosition && typeof item.textPosition.top === 'number' ? item.textPosition.top : 50;
+                                        const attr = `style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); z-index: 2; max-width: min(560px, 85vw);"`;
+                                        const boxBg = item.boxBgColor || 'rgba(0, 0, 0, 0.55)';
+                                        const txtCol = item.textColor || '#ffffff';
+                                        const linkTxtCol = item.linkColor || '#ffffff';
+                                        const linkBg = item.linkBgColor || 'var(--primary)';
+                                        const titleSz = item.titleFontSize || '2.5rem';
+                                        const descSz = item.descFontSize || '1.25rem';
+                                        const boxAttr = `style="background: ${boxBg}; backdrop-filter: blur(8px); color: ${txtCol};"`;
+                                        const titleAttr = `style="font-size: ${titleSz}; color: ${txtCol};"`;
+                                        const descAttr = `style="font-size: ${descSz}; color: ${txtCol};"`;
+                                        const linkAttr = `style="background: ${linkBg}; color: ${linkTxtCol}; border: none;"`;
+                                    %>
+                                    <div class="position-absolute" <%- attr %>>
+                                        <div class="p-3 p-md-4 rounded shadow" <%- boxAttr %>>
+                                            <% if (item.title) { %>
+                                                <h2 class="fw-bold mb-3" <%- titleAttr %>><%= item.title %></h2>
+                                            <% } %>
+                                            <% if (item.description) { %>
+                                                <p class="mb-4" <%- descAttr %>><%= item.description %></p>
+                                            <% } %>
+                                            <% if (item.linkUrl) { %>
+                                                <a href="<%= item.linkUrl %>" class="btn btn-lg" <%- linkAttr %>>
+                                                    <%= item.linkText || 'Learn More' %>
+                                                </a>
+                                            <% } %>
+                                        </div>
                                     </div>
+                                <% } %>
                                 </div>
                             </div>
                         </div>
@@ -601,13 +619,13 @@
 
         // Visitor Modal Handler
         (function() {
-            const visitorModalEnabled = <%= visitorModalEnabled %>;
+            const isVisitorModalEnabled = ("<%= visitorModalEnabled ? 'true' : 'false' %>" === "true");
             const visitorModal = document.getElementById('visitorModal');
             const closeModal = document.getElementById('closeModal');
             const visitorForm = document.getElementById('visitorForm');
             
             // Only run if visitor modal is enabled in settings
-            if (!visitorModalEnabled) {
+            if (!isVisitorModalEnabled) {
                 return;
             }
             

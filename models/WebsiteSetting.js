@@ -27,7 +27,21 @@ const websiteSettingSchema = new mongoose.Schema({
     headerFooterLinkColor: { type: String, default: '#FFD700' }, // Link color for header/footer
     bodyBackgroundColor: { type: String, default: '#ffffff' }, // Body/Website background color
     backgroundType: { type: String, enum: ['color','gradient'], default: 'color' },
-    backgroundGradient: { type: String, default: '' } // Custom CSS gradient string
+    backgroundGradient: { type: String, default: '' }, // Custom CSS gradient string
+    backgroundGradientStop1: { type: String, default: '#000000' },
+    backgroundGradientStop2: { type: String, default: '#444444' }
+  },
+
+  // Typography Settings
+  typography: {
+    fontFamily: { type: String, default: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }
+  },
+
+  // Button Settings
+  buttons: {
+    borderRadius: { type: String, default: '4px' },
+    paddingX: { type: String, default: '1rem' },
+    paddingY: { type: String, default: '0.5rem' }
   },
 
   // Footer Settings
@@ -72,6 +86,12 @@ const websiteSettingSchema = new mongoose.Schema({
       left: { type: Number, default: 50, min: 0, max: 100 },
       top: { type: Number, default: 50, min: 0, max: 100 }
     },
+    boxBgColor: { type: String, default: 'rgba(0, 0, 0, 0.55)' },
+    textColor: { type: String, default: '#ffffff' },
+    linkColor: { type: String, default: '#ffffff' },
+    linkBgColor: { type: String, default: 'var(--primary)' },
+    titleFontSize: { type: String, default: '2.5rem' },
+    descFontSize: { type: String, default: '1.25rem' },
     media: {
       url: { type: String, default: '' },
       publicId: { type: String, default: '' },

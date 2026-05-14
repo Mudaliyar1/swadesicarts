@@ -306,7 +306,7 @@ exports.addCarouselItem = async (req, res) => {
       return res.redirect('/admin/settings/carousel');
     }
 
-    const { title, description, linkText, linkUrl, order, textLeft, textTop } = req.body;
+    const { title, description, linkText, linkUrl, order, textLeft, textTop, boxBgColor, textColor, linkColor, linkBgColor, titleFontSize, descFontSize } = req.body;
 
     if (!req.files || !req.files.media || !req.files.media[0]) {
       req.flash('error', 'Please upload a media file for the carousel item');
@@ -332,7 +332,13 @@ exports.addCarouselItem = async (req, res) => {
         type: mediaType
       },
       order: parseInt(order) || 0,
-      isActive: normalizeBoolean(req.body.isActive)
+      isActive: normalizeBoolean(req.body.isActive),
+      boxBgColor: boxBgColor || 'rgba(0, 0, 0, 0.55)',
+      textColor: textColor || '#ffffff',
+      linkColor: linkColor || '#ffffff',
+      linkBgColor: linkBgColor || 'var(--primary)',
+      titleFontSize: titleFontSize || '2.5rem',
+      descFontSize: descFontSize || '1.25rem'
     });
 
     await settings.save();
@@ -359,7 +365,7 @@ exports.updateCarouselItem = async (req, res) => {
       return res.redirect('/admin/settings/carousel');
     }
 
-    const { title, description, linkText, linkUrl, order, textLeft, textTop } = req.body;
+    const { title, description, linkText, linkUrl, order, textLeft, textTop, boxBgColor, textColor, linkColor, linkBgColor, titleFontSize, descFontSize } = req.body;
 
     item.title = title || '';
     item.description = description || '';
@@ -371,6 +377,12 @@ exports.updateCarouselItem = async (req, res) => {
       left: Number.parseInt(textLeft, 10) || item.textPosition?.left || 50,
       top: Number.parseInt(textTop, 10) || item.textPosition?.top || 50
     };
+    if (boxBgColor) item.boxBgColor = boxBgColor;
+    if (textColor) item.textColor = textColor;
+    if (linkColor) item.linkColor = linkColor;
+    if (linkBgColor) item.linkBgColor = linkBgColor;
+    if (titleFontSize) item.titleFontSize = titleFontSize;
+    if (descFontSize) item.descFontSize = descFontSize;
 
     if (req.files && req.files.media && req.files.media[0]) {
       if (item.media && item.media.publicId) {
@@ -574,6 +586,36 @@ exports.updateSettings = async (req, res) => {
     }
     if (req.body['colors.bodyBackgroundColor']) {
       settings.colors.bodyBackgroundColor = req.body['colors.bodyBackgroundColor'];
+    }
+    if (req.body['colors.backgroundType']) {
+      settings.colors.backgroundType = req.body['colors.backgroundType'];
+    }
+    if (req.body['colors.backgroundGradient'] !== undefined) {
+      settings.colors.backgroundGradient = req.body['colors.backgroundGradient'];
+    }
+    if (req.body['gradient.stop1']) {
+      settings.colors.backgroundGradientStop1 = req.body['gradient.stop1'];
+    }
+    if (req.body['gradient.stop2']) {
+      settings.colors.backgroundGradientStop2 = req.body['gradient.stop2'];
+    }
+
+    // Update typography settings
+    if (!settings.typography) settings.typography = {};
+    if (req.body['typography.fontFamily']) {
+      settings.typography.fontFamily = req.body['typography.fontFamily'];
+    }
+
+    // Update buttons settings
+    if (!settings.buttons) settings.buttons = {};
+    if (req.body['buttons.borderRadius']) {
+      settings.buttons.borderRadius = req.body['buttons.borderRadius'];
+    }
+    if (req.body['buttons.paddingX']) {
+      settings.buttons.paddingX = req.body['buttons.paddingX'];
+    }
+    if (req.body['buttons.paddingY']) {
+      settings.buttons.paddingY = req.body['buttons.paddingY'];
     }
 
     // Handle about image upload

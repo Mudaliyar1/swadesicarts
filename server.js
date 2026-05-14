@@ -131,9 +131,6 @@ const server = app.listen(PORT, () => {
   console.log(`  🌐 Public Website:  http://localhost:${PORT}`);
   console.log(`  🔐 Admin Dashboard: http://localhost:${PORT}/admin/login`);
   console.log('');
-  console.log(`  📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`  📁 Database: ${process.env.MONGODB_URI}`);
-  console.log('');
   console.log('═══════════════════════════════════════════════════════');
   console.log('');
   console.log('  Press Ctrl+C to stop the server');
