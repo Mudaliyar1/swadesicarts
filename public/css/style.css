@@ -247,16 +247,25 @@ body {
     background-color: #f8f9fa;
 }
 
+.carousel-main-stage {
+    position: relative;
+    width: 100%;
+    height: clamp(320px, 55vw, 600px);
+    background-color: #f8f9fa;
+}
+
 .carousel-main-media {
     width: 100%;
-    max-height: 600px;
-    object-fit: cover;
+    height: 100%;
+    max-height: none;
+    object-fit: contain;
+    object-position: center center;
     display: block;
     background-color: #e9ecef;
 }
 
 .carousel-main-media.video {
-    height: 600px;
+    height: 100%;
 }
 
 .carousel-video-badge {
@@ -353,6 +362,26 @@ body {
     margin-top: 0.5rem;
 }
 
+/* Detail panels for product sections */
+.detail-panel {
+    background: #f1f3f5 !important;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    padding: 1.25rem;
+}
+
+.detail-panel .card-body,
+.detail-panel .list-group,
+.detail-panel .list-group-flush,
+.detail-panel .list-group-item {
+    background: transparent !important;
+}
+
+.detail-panel .list-group-item {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /* Alerts */
 .alert {
     border-radius: 8px;
@@ -376,12 +405,16 @@ body {
         height: 200px !important;
     }
 
+    .carousel-main-stage {
+        height: clamp(260px, 70vw, 420px);
+    }
+
     .carousel-main-media {
-        max-height: 400px;
+        height: 100%;
     }
 
     .carousel-main-media.video {
-        height: 400px;
+        height: 100%;
     }
 
     .carousel-thumbnails {

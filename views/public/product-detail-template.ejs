@@ -64,14 +64,14 @@
                     </div>
 
                     <!-- DESCRIPTION -->
-                    <div class="mb-4">
+                    <div class="detail-panel mb-4">
                         <h5 class="mb-3">Description</h5>
                         <p class="text-muted-custom" style="line-height: 1.8;"><%= product.fullDescription %></p>
                     </div>
 
                     <!-- BENEFITS / FEATURES -->
                     <% if (product.benefits && product.benefits.length > 0) { %>
-                        <div class="mb-4">
+                        <div class="detail-panel mb-4">
                             <h5 class="mb-3">Benefits & Features</h5>
                             <ul class="list-group list-group-flush">
                                 <% product.benefits.forEach(benefit => { %>
@@ -86,7 +86,7 @@
 
                     <!-- FEATURES (for tech packages) -->
                     <% if (product.features && product.features.length > 0) { %>
-                        <div class="mb-4">
+                        <div class="detail-panel mb-4">
                             <h5 class="mb-3">Features</h5>
                             <ul class="list-group list-group-flush">
                                 <% product.features.forEach(feature => { %>

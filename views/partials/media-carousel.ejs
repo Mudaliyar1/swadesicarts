@@ -22,9 +22,9 @@
     %>
 
     <% if (allMedia.length > 0) { %>
-        <div style="position: relative; width: 100%;" id="carouselMainContainer">
+        <div class="carousel-main-stage" style="position: relative; width: 100%; height: clamp(320px, 55vw, 600px); background: #f8f9fa; border-radius: 8px; overflow: hidden;" id="carouselMainContainer">
             <% if (allMedia[0].type === 'video') { %>
-                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                <video id="mainMedia" src="<%= allMedia[0].url %>" class="carousel-main-media video" playsinline muted style="width: 100%; height: 100%; object-fit: contain; object-position: center center; display: block; background: #f8f9fa;"></video>
                 <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                     <i class="bi bi-volume-up-fill"></i>
                 </button>
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             <% } else { %>
-                <img id="mainMedia" src="<%= allMedia[0].url %>" alt="Product" class="carousel-main-media" style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block; border-radius: 8px;">
+                <img id="mainMedia" src="<%= allMedia[0].url %>" alt="Product" class="carousel-main-media" style="width: 100%; height: 100%; object-fit: contain; object-position: center center; display: block; background: #f8f9fa;">
             <% } %>
             
             <!-- Navigation Arrows -->
@@ -127,7 +127,7 @@
             let newHTML = '';
             if (media.type === 'video') {
                 newHTML = `
-                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" playsinline muted style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block;"></video>
+                    <video id="mainMedia" src="${media.url}" class="carousel-main-media video" playsinline muted style="width: 100%; height: 100%; object-fit: contain; object-position: center center; display: block; background: #f8f9fa;"></video>
                     <button class="carousel-mute-btn" id="muteBtn" aria-label="Mute">
                         <i class="bi bi-volume-up-fill"></i>
                     </button>
@@ -144,7 +144,7 @@
                     </div>
                 `;
             } else {
-                newHTML = `<img id="mainMedia" src="${media.url}" alt="Product" class="carousel-main-media" style="width: 100%; height: auto; max-height: 600px; object-fit: cover; display: block; border-radius: 8px;">`;
+                newHTML = `<img id="mainMedia" src="${media.url}" alt="Product" class="carousel-main-media" style="width: 100%; height: 100%; object-fit: contain; object-position: center center; display: block; background: #f8f9fa;">`;
             }
             
             // Add navigation buttons if multiple items

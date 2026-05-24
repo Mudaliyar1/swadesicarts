@@ -131,50 +131,6 @@
 
             <!-- HERO CAROUSEL SECTION -->
             <section class="hero-carousel-section <%= websiteCarouselItems.length > 0 ? 'd-none' : '' %>">
-                <!-- Chat with Us Capsule Button & Popup -->
-                <div class="chat-popup-wrapper">
-                    <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
-                        <i class="bi bi-chat-dots-fill"></i>
-                        <span>Chat with us</span>
-                    </button>
-
-                    <div class="chat-popup" id="chatPopup">
-                        <div class="chat-popup-content">
-                            <button class="chat-popup-close" id="chatPopupClose" aria-label="Close">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-
-                            <div class="chat-options">
-                                <% if (whatsappNumber) { %>
-                                    <a href="#" class="chat-option whatsapp-option" id="whatsappLink"
-                                        data-number="<%= whatsappNumber %>" data-message="<%= whatsappMessage %>"
-                                        aria-label="Chat on WhatsApp">
-                                        <div class="chat-option-icon">
-                                            <i class="bi bi-whatsapp"></i>
-                                        </div>
-                                        <div class="chat-option-text">
-                                            <span class="chat-option-title">WhatsApp</span>
-                                            <span class="chat-option-desc">Chat directly</span>
-                                        </div>
-                                    </a>
-                                    <% } %>
-
-                                        <% if (instagramUrl) { %>
-                                            <a href="<%= instagramUrl %>" target="_blank" rel="noopener"
-                                                class="chat-option instagram-option" aria-label="Follow on Instagram">
-                                                <div class="chat-option-icon">
-                                                    <i class="bi bi-instagram"></i>
-                                                </div>
-                                                <div class="chat-option-text">
-                                                    <span class="chat-option-title">Instagram</span>
-                                                    <span class="chat-option-desc">Follow us</span>
-                                                </div>
-                                            </a>
-                                            <% } %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
                     data-bs-interval="4000">
                     <!-- Carousel Indicators -->
@@ -344,6 +300,51 @@
                     </button>
                 </div>
             </section>
+
+            <!-- Chat with Us Capsule Button & Popup -->
+            <div class="chat-popup-wrapper">
+                <button class="chat-capsule-btn" id="chatCapsuleBtn" aria-label="Chat with us">
+                    <i class="bi bi-chat-dots-fill"></i>
+                    <span>Chat with us</span>
+                </button>
+
+                <div class="chat-popup" id="chatPopup">
+                    <div class="chat-popup-content">
+                        <button class="chat-popup-close" id="chatPopupClose" aria-label="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+
+                        <div class="chat-options">
+                            <% if (whatsappNumber) { %>
+                                <a href="#" class="chat-option whatsapp-option" id="whatsappLink"
+                                    data-number="<%= whatsappNumber %>" data-message="<%= whatsappMessage %>"
+                                    aria-label="Chat on WhatsApp">
+                                    <div class="chat-option-icon">
+                                        <i class="bi bi-whatsapp"></i>
+                                    </div>
+                                    <div class="chat-option-text">
+                                        <span class="chat-option-title">WhatsApp</span>
+                                        <span class="chat-option-desc">Chat directly</span>
+                                    </div>
+                                </a>
+                                <% } %>
+
+                                    <% if (instagramUrl) { %>
+                                        <a href="<%= instagramUrl %>" target="_blank" rel="noopener"
+                                            class="chat-option instagram-option" aria-label="Follow on Instagram">
+                                            <div class="chat-option-icon">
+                                                <i class="bi bi-instagram"></i>
+                                            </div>
+                                            <div class="chat-option-text">
+                                                <span class="chat-option-title">Instagram</span>
+                                                <span class="chat-option-desc">Follow us</span>
+                                            </div>
+                                        </a>
+                                        <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <% if (websiteCarouselItems.length> 0) { %>
                 <!-- WEBSITE CAROUSEL SECTION -->
