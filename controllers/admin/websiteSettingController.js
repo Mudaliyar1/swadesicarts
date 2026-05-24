@@ -117,6 +117,15 @@ exports.getSettings = async (req, res) => {
       await settings.save();
     }
     
+    // Ensure layout exists with defaults
+    if (!settings.layout) {
+      settings.layout = {
+        heroPaddingTop: 100,
+        heroPaddingBottom: 100
+      };
+      await settings.save();
+    }
+    
     // Ensure colors exist with defaults
     if (!settings.colors) {
       settings.colors = {
@@ -482,23 +491,23 @@ exports.updateSettings = async (req, res) => {
     // Update social media links - preserve existing values
     const currentSocialMedia = settings.socialMedia || {};
     settings.socialMedia = {
-      facebook: req.body['socialMedia.facebook'] || currentSocialMedia.facebook || '',
-      twitter: req.body['socialMedia.twitter'] || currentSocialMedia.twitter || '',
-      instagram: req.body['socialMedia.instagram'] || currentSocialMedia.instagram || '',
-      linkedin: req.body['socialMedia.linkedin'] || currentSocialMedia.linkedin || '',
-      youtube: req.body['socialMedia.youtube'] || currentSocialMedia.youtube || ''
+      facebook: req.body['socialMedia.facebook'] || (req.body.socialMedia && req.body.socialMedia.facebook) || currentSocialMedia.facebook || '',
+      twitter: req.body['socialMedia.twitter'] || (req.body.socialMedia && req.body.socialMedia.twitter) || currentSocialMedia.twitter || '',
+      instagram: req.body['socialMedia.instagram'] || (req.body.socialMedia && req.body.socialMedia.instagram) || currentSocialMedia.instagram || '',
+      linkedin: req.body['socialMedia.linkedin'] || (req.body.socialMedia && req.body.socialMedia.linkedin) || currentSocialMedia.linkedin || '',
+      youtube: req.body['socialMedia.youtube'] || (req.body.socialMedia && req.body.socialMedia.youtube) || currentSocialMedia.youtube || ''
     };
 
     // Update about settings
-    settings.about.mainHeading = req.body['about.mainHeading'] || settings.about.mainHeading;
-    settings.about.headerDescription = req.body['about.headerDescription'] || settings.about.headerDescription;
-    settings.about.description = req.body['about.description'] || settings.about.description;
-    settings.about.valuesHeading = req.body['about.valuesHeading'] || settings.about.valuesHeading;
-    settings.about.valuesSubheading = req.body['about.valuesSubheading'] || settings.about.valuesSubheading;
-    settings.about.ctaHeading = req.body['about.ctaHeading'] || settings.about.ctaHeading;
-    settings.about.ctaDescription = req.body['about.ctaDescription'] || settings.about.ctaDescription;
-    settings.about.teamHeading = req.body['about.teamHeading'] || settings.about.teamHeading;
-    settings.about.teamSubheading = req.body['about.teamSubheading'] || settings.about.teamSubheading;
+    settings.about.mainHeading = req.body['about.mainHeading'] || (req.body.about && req.body.about.mainHeading) || settings.about.mainHeading;
+    settings.about.headerDescription = req.body['about.headerDescription'] || (req.body.about && req.body.about.headerDescription) || settings.about.headerDescription;
+    settings.about.description = req.body['about.description'] || (req.body.about && req.body.about.description) || settings.about.description;
+    settings.about.valuesHeading = req.body['about.valuesHeading'] || (req.body.about && req.body.about.valuesHeading) || settings.about.valuesHeading;
+    settings.about.valuesSubheading = req.body['about.valuesSubheading'] || (req.body.about && req.body.about.valuesSubheading) || settings.about.valuesSubheading;
+    settings.about.ctaHeading = req.body['about.ctaHeading'] || (req.body.about && req.body.about.ctaHeading) || settings.about.ctaHeading;
+    settings.about.ctaDescription = req.body['about.ctaDescription'] || (req.body.about && req.body.about.ctaDescription) || settings.about.ctaDescription;
+    settings.about.teamHeading = req.body['about.teamHeading'] || (req.body.about && req.body.about.teamHeading) || settings.about.teamHeading;
+    settings.about.teamSubheading = req.body['about.teamSubheading'] || (req.body.about && req.body.about.teamSubheading) || settings.about.teamSubheading;
 
     // Update values
     if (req.body.values && Array.isArray(req.body.values)) {
@@ -510,15 +519,16 @@ exports.updateSettings = async (req, res) => {
     }
 
     // Update statistics
+    const currentStats = settings.about.stats || {};
     settings.about.stats = {
-      customers: req.body['stats.customers'] || settings.about.stats.customers,
-      customersLabel: req.body['stats.customersLabel'] || settings.about.stats.customersLabel,
-      products: req.body['stats.products'] || settings.about.stats.products,
-      productsLabel: req.body['stats.productsLabel'] || settings.about.stats.productsLabel,
-      experience: req.body['stats.experience'] || settings.about.stats.experience,
-      experienceLabel: req.body['stats.experienceLabel'] || settings.about.stats.experienceLabel,
-      satisfaction: req.body['stats.satisfaction'] || settings.about.stats.satisfaction,
-      satisfactionLabel: req.body['stats.satisfactionLabel'] || settings.about.stats.satisfactionLabel
+      customers: req.body['stats.customers'] || (req.body.stats && req.body.stats.customers) || currentStats.customers || '500+',
+      customersLabel: req.body['stats.customersLabel'] || (req.body.stats && req.body.stats.customersLabel) || currentStats.customersLabel || 'Happy Customers',
+      products: req.body['stats.products'] || (req.body.stats && req.body.stats.products) || currentStats.products || '1000+',
+      productsLabel: req.body['stats.productsLabel'] || (req.body.stats && req.body.stats.productsLabel) || currentStats.productsLabel || 'Products & Services',
+      experience: req.body['stats.experience'] || (req.body.stats && req.body.stats.experience) || currentStats.experience || '10+',
+      experienceLabel: req.body['stats.experienceLabel'] || (req.body.stats && req.body.stats.experienceLabel) || currentStats.experienceLabel || 'Years Experience',
+      satisfaction: req.body['stats.satisfaction'] || (req.body.stats && req.body.stats.satisfaction) || currentStats.satisfaction || '100%',
+      satisfactionLabel: req.body['stats.satisfactionLabel'] || (req.body.stats && req.body.stats.satisfactionLabel) || currentStats.satisfactionLabel || 'Satisfaction Guaranteed'
     };
 
     // Handle logo upload
@@ -616,6 +626,25 @@ exports.updateSettings = async (req, res) => {
     }
     if (req.body['buttons.paddingY']) {
       settings.buttons.paddingY = req.body['buttons.paddingY'];
+    }
+
+    // Update layout settings
+    if (!settings.layout) settings.layout = {};
+    const heroPaddingTopRaw = req.body['layout.heroPaddingTop'] !== undefined 
+      ? req.body['layout.heroPaddingTop'] 
+      : (req.body.layout && req.body.layout.heroPaddingTop);
+      
+    const heroPaddingBottomRaw = req.body['layout.heroPaddingBottom'] !== undefined 
+      ? req.body['layout.heroPaddingBottom'] 
+      : (req.body.layout && req.body.layout.heroPaddingBottom);
+
+    if (heroPaddingTopRaw !== undefined && heroPaddingTopRaw !== null && heroPaddingTopRaw !== '') {
+      const val = parseInt(heroPaddingTopRaw, 10);
+      settings.layout.heroPaddingTop = !isNaN(val) ? val : 100;
+    }
+    if (heroPaddingBottomRaw !== undefined && heroPaddingBottomRaw !== null && heroPaddingBottomRaw !== '') {
+      const val = parseInt(heroPaddingBottomRaw, 10);
+      settings.layout.heroPaddingBottom = !isNaN(val) ? val : 100;
     }
 
     // Handle about image upload

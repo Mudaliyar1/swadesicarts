@@ -143,6 +143,12 @@ const websiteSettingSchema = new mongoose.Schema({
     youtube: { type: String, default: '' }
   },
 
+  // Layout Settings
+  layout: {
+    heroPaddingTop: { type: Number, default: 100 },
+    heroPaddingBottom: { type: Number, default: 100 }
+  },
+
   // About Page Settings
   about: {
     mainHeading: { type: String, default: 'About Swadesi Carts' },

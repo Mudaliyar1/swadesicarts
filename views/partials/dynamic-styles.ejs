@@ -83,6 +83,15 @@
             color: var(--accent) !important;
         }
 
+        .stats-number {
+            color: <%= siteSettings.colors.headingText || 'var(--accent)' %> !important;
+        }
+
+        .stats-label {
+            color: <%= siteSettings.colors.bodyText || '#6b7280' %> !important;
+            opacity: 0.85;
+        }
+
         .border-swadesi {
             border-color: var(--primary) !important;
         }
@@ -148,6 +157,32 @@
             background: var(--site-background) !important;
             background-image: none !important;
         }
+
+        /* Custom Homepage Hero/Carousel Spacing */
+        <% if (siteSettings.layout) { %>
+        .hero-slide,
+        .hero-section {
+            padding-top: <%= siteSettings.layout.heroPaddingTop !== undefined ? siteSettings.layout.heroPaddingTop : 100 %>px !important;
+            padding-bottom: <%= siteSettings.layout.heroPaddingBottom !== undefined ? siteSettings.layout.heroPaddingBottom : 100 %>px !important;
+            height: auto !important;
+            min-height: 500px !important;
+        }
+        
+        #heroCarousel {
+            height: auto !important;
+        }
+        
+        .carousel-slide-wrapper {
+            padding-top: calc(<%= siteSettings.layout.heroPaddingTop !== undefined ? siteSettings.layout.heroPaddingTop : 100 %>px * 0.3) !important;
+            padding-bottom: calc(<%= siteSettings.layout.heroPaddingBottom !== undefined ? siteSettings.layout.heroPaddingBottom : 100 %>px * 0.3) !important;
+            height: auto !important;
+        }
+
+        .website-carousel-section {
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        <% } %>
 
         <% if (siteSettings.designEditor && Array.isArray(siteSettings.designEditor.rules) && siteSettings.designEditor.rules.length > 0) { %>
             <% siteSettings.designEditor.rules.forEach(function(rule) { %>

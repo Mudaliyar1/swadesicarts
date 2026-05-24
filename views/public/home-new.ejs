@@ -371,7 +371,7 @@
                     }
                     .carousel-inner { border-radius: 0 !important; }
                     <%- '</style>' %>
-                        <section class="mb-5 p-0 m-0">
+                        <section class="website-carousel-section mb-5 p-0 m-0">
                             <div class="container-fluid px-0">
                                 <div id="websiteCarousel" class="carousel slide overflow-hidden" data-bs-ride="carousel"
                                     style="padding: 0 !important; border-radius: 0 !important; box-shadow: none !important; background: transparent !important;">
@@ -547,7 +547,7 @@
                                     <% if (featuredSeasonal.length> 0) { %>
                                         <div class="row g-4">
                                             <% featuredSeasonal.forEach(product=> { %>
-                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                <div class="col-md-6 col-lg-4 col-xl-3 scroll-animate">
                                                     <div class="card product-card">
                                                         <div class="product-image-wrapper">
                                                             <% if (product.featuredImage && product.featuredImage.url) {
@@ -602,7 +602,7 @@
                                     <% if (featuredTech.length> 0) { %>
                                         <div class="row g-4">
                                             <% featuredTech.forEach(package=> { %>
-                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                <div class="col-md-6 col-lg-4 col-xl-3 scroll-animate">
                                                     <div class="card product-card">
                                                         <div class="product-image-wrapper">
                                                             <% if (package.featuredImage && package.featuredImage.url) {
@@ -660,7 +660,7 @@
                                     <% if (featuredOrganic.length> 0) { %>
                                         <div class="row g-4">
                                             <% featuredOrganic.forEach(product=> { %>
-                                                <div class="col-md-6 col-lg-4 scroll-animate">
+                                                <div class="col-md-6 col-lg-4 col-xl-3 scroll-animate">
                                                     <div class="card product-card">
                                                         <div class="product-image-wrapper">
                                                             <% if (product.featuredImage && product.featuredImage.url) {

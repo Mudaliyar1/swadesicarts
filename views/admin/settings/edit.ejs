@@ -152,6 +152,11 @@
                         </button>
                     </li>
                     <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#layout" type="button">
+                            <i class="bi bi-arrows-expand"></i> Hero Spacing
+                        </button>
+                    </li>
+                    <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#footer" type="button">
                             <i class="bi bi-footer"></i> Footer
                         </button>
@@ -697,6 +702,92 @@
                                                 </div>
                                                 <div class="mt-4 text-center">
                                                     <button type="button" id="buttonPreview" class="btn" <%- `style="background-color: ${settings.colors ? settings.colors.primary : '#4C1E4F'}; color: white; border-radius: ${settings.buttons && settings.buttons.borderRadius ? (String(settings.buttons.borderRadius).includes('px') || String(settings.buttons.borderRadius).includes('rem') || String(settings.buttons.borderRadius).includes('%') ? settings.buttons.borderRadius : settings.buttons.borderRadius + 'px') : '4px'}; padding: ${settings.buttons && settings.buttons.paddingY ? settings.buttons.paddingY : '0.5rem'} ${settings.buttons && settings.buttons.paddingX ? settings.buttons.paddingX : '1rem'};"` %>>Button Preview</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Layout Tab -->
+                        <div class="tab-pane fade" id="layout">
+                            <div class="settings-section">
+                                <h3 class="section-title">Homepage Hero Spacing</h3>
+                                <p class="text-muted mb-4">Adjust the top and bottom spacing of the homepage hero/carousel. Drag the spacers in the preview below or use the sliders to set the values.</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <h5 class="card-title mb-3">Spacing Controls</h5>
+                                                
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold d-flex justify-content-between">
+                                                        <span>Top Spacing</span>
+                                                        <span id="heroPaddingTopVal" class="badge bg-swadesi"><%= settings.layout && settings.layout.heroPaddingTop !== undefined ? settings.layout.heroPaddingTop : 100 %>px</span>
+                                                    </label>
+                                                    <input type="range" class="form-range" id="inputHeroPaddingTop" 
+                                                           min="0" max="300" step="5"
+                                                           value="<%= settings.layout && settings.layout.heroPaddingTop !== undefined ? settings.layout.heroPaddingTop : 100 %>">
+                                                    <input type="hidden" id="hiddenHeroPaddingTop" name="layout.heroPaddingTop" 
+                                                           value="<%= settings.layout && settings.layout.heroPaddingTop !== undefined ? settings.layout.heroPaddingTop : 100 %>">
+                                                </div>
+
+                                                <div class="mb-4">
+                                                    <label class="form-label fw-bold d-flex justify-content-between">
+                                                        <span>Bottom Spacing</span>
+                                                        <span id="heroPaddingBottomVal" class="badge bg-swadesi"><%= settings.layout && settings.layout.heroPaddingBottom !== undefined ? settings.layout.heroPaddingBottom : 100 %>px</span>
+                                                    </label>
+                                                    <input type="range" class="form-range" id="inputHeroPaddingBottom" 
+                                                           min="0" max="300" step="5"
+                                                           value="<%= settings.layout && settings.layout.heroPaddingBottom !== undefined ? settings.layout.heroPaddingBottom : 100 %>">
+                                                    <input type="hidden" id="hiddenHeroPaddingBottom" name="layout.heroPaddingBottom" 
+                                                           value="<%= settings.layout && settings.layout.heroPaddingBottom !== undefined ? settings.layout.heroPaddingBottom : 100 %>">
+                                                </div>
+
+                                                <div class="alert alert-info">
+                                                    <i class="bi bi-info-circle"></i> Drag the spacing regions in the preview or use the sliders above to adjust the spacing.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-8">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <span class="fw-bold"><i class="bi bi-eye"></i> Draggable Spacing Preview</span>
+                                            </div>
+                                            <div class="card-body p-0" style="background: #e9ecef; min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                                                <!-- Mock Hero Container -->
+                                                <div id="mockHero" class="w-100 position-relative" style="background: linear-gradient(135deg, #4C1E4F 0%, #6B2E6F 100%); overflow: hidden; transition: background 0.3s;">
+                                                    
+                                                    <!-- Top Spacer (Draggable Area) -->
+                                                    <div id="mockTopSpacer" class="position-relative w-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.08); border-bottom: 2px dashed rgba(255,255,255,0.3); cursor: row-resize; user-select: none;">
+                                                        <div class="spacer-label text-white-50 small font-monospace py-2">DRAG TO ADJUST TOP SPACING</div>
+                                                        <!-- Drag handle -->
+                                                        <div class="drag-handle position-absolute bottom-0 start-50 translate-middle-x bg-white rounded-circle shadow d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; margin-bottom: -12px; z-index: 10; border: 2px solid #6c757d; cursor: row-resize;">
+                                                            <i class="bi bi-arrows-collapse text-dark" style="font-size: 12px; transform: rotate(90deg);"></i>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Mock Content Area -->
+                                                    <div class="mock-content p-4 text-center text-white" style="user-select: none; pointer-events: none;">
+                                                        <div class="badge bg-light text-dark mb-2">🌿 ORGANIC VIBES</div>
+                                                        <h2 class="fw-bold mb-3" style="color: white !important;">Nature's Best, Wellness First</h2>
+                                                        <p class="text-white-70 mb-3 small" style="max-width: 450px; margin: 0 auto; color: rgba(255,255,255,0.85) !important;">This is a preview of the homepage hero section. Drag the highlighted spaces above or below, or use the sliders on the left.</p>
+                                                        <button class="btn btn-sm btn-light rounded-pill px-3">Shop Now</button>
+                                                    </div>
+
+                                                    <!-- Bottom Spacer (Draggable Area) -->
+                                                    <div id="mockBottomSpacer" class="position-relative w-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.08); border-top: 2px dashed rgba(255,255,255,0.3); cursor: row-resize; user-select: none;">
+                                                        <div class="spacer-label text-white-50 small font-monospace py-2">DRAG TO ADJUST BOTTOM SPACING</div>
+                                                        <!-- Drag handle -->
+                                                        <div class="drag-handle position-absolute top-0 start-50 translate-middle-x bg-white rounded-circle shadow d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; margin-top: -12px; z-index: 10; border: 2px solid #6c757d; cursor: row-resize;">
+                                                            <i class="bi bi-arrows-collapse text-dark" style="font-size: 12px; transform: rotate(90deg);"></i>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             </div>
                                         </div>
@@ -1398,6 +1489,141 @@
         // Initialize preview on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateLogoPreview();
+
+            // Drag-and-drop hero spacing logic
+            const inputTop = document.getElementById('inputHeroPaddingTop');
+            const inputBottom = document.getElementById('inputHeroPaddingBottom');
+            const hiddenTop = document.getElementById('hiddenHeroPaddingTop');
+            const hiddenBottom = document.getElementById('hiddenHeroPaddingBottom');
+            const valTop = document.getElementById('heroPaddingTopVal');
+            const valBottom = document.getElementById('heroPaddingBottomVal');
+            
+            const mockTopSpacer = document.getElementById('mockTopSpacer');
+            const mockBottomSpacer = document.getElementById('mockBottomSpacer');
+            const mockHero = document.getElementById('mockHero');
+
+            if (inputTop && inputBottom && mockTopSpacer && mockBottomSpacer) {
+                function syncPreview() {
+                    const topVal = parseInt(inputTop.value) || 0;
+                    const bottomVal = parseInt(inputBottom.value) || 0;
+                    
+                    valTop.textContent = `${topVal}px`;
+                    valBottom.textContent = `${bottomVal}px`;
+                    
+                    hiddenTop.value = topVal;
+                    hiddenBottom.value = bottomVal;
+                    
+                    mockTopSpacer.style.height = `${topVal}px`;
+                    mockBottomSpacer.style.height = `${bottomVal}px`;
+                }
+
+                inputTop.addEventListener('input', syncPreview);
+                inputBottom.addEventListener('input', syncPreview);
+
+                let activeDrag = null;
+                let startY = 0;
+                let startVal = 0;
+
+                function onMouseDown(e, type) {
+                    activeDrag = type;
+                    startY = e.clientY;
+                    startVal = type === 'top' ? parseInt(inputTop.value) : parseInt(inputBottom.value);
+                    document.body.style.cursor = 'row-resize';
+                    
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                }
+
+                function onMouseMove(e) {
+                    if (!activeDrag) return;
+                    const deltaY = e.clientY - startY;
+                    let newVal;
+                    if (activeDrag === 'top') {
+                        newVal = startVal + deltaY;
+                    } else {
+                        newVal = startVal - deltaY;
+                    }
+                    
+                    newVal = Math.max(0, Math.min(300, newVal));
+                    
+                    if (activeDrag === 'top') {
+                        inputTop.value = newVal;
+                    } else {
+                        inputBottom.value = newVal;
+                    }
+                    syncPreview();
+                }
+
+                function onMouseUp() {
+                    activeDrag = null;
+                    document.body.style.cursor = '';
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+
+                mockTopSpacer.addEventListener('mousedown', function(e) {
+                    onMouseDown(e, 'top');
+                });
+                
+                mockBottomSpacer.addEventListener('mousedown', function(e) {
+                    onMouseDown(e, 'bottom');
+                });
+
+                // Touch support
+                function onTouchStart(e, type) {
+                    if (e.touches.length !== 1) return;
+                    activeDrag = type;
+                    startY = e.touches[0].clientY;
+                    startVal = type === 'top' ? parseInt(inputTop.value) : parseInt(inputBottom.value);
+                    
+                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchend', onTouchEnd);
+                }
+
+                function onTouchMove(e) {
+                    if (!activeDrag) return;
+                    e.preventDefault();
+                    const deltaY = e.touches[0].clientY - startY;
+                    let newVal;
+                    if (activeDrag === 'top') {
+                        newVal = startVal + deltaY;
+                    } else {
+                        newVal = startVal - deltaY;
+                    }
+                    newVal = Math.max(0, Math.min(300, newVal));
+                    if (activeDrag === 'top') {
+                        inputTop.value = newVal;
+                    } else {
+                        inputBottom.value = newVal;
+                    }
+                    syncPreview();
+                }
+
+                function onTouchEnd() {
+                    activeDrag = null;
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onTouchEnd);
+                }
+
+                mockTopSpacer.addEventListener('touchstart', function(e) {
+                    onTouchStart(e, 'top');
+                });
+
+                mockBottomSpacer.addEventListener('touchstart', function(e) {
+                    onTouchStart(e, 'bottom');
+                });
+
+                syncPreview();
+                
+                const colorsPrimary = document.getElementById('colors.primary');
+                if (colorsPrimary && mockHero) {
+                    function updateMockBg() {
+                        mockHero.style.background = `linear-gradient(135deg, ${colorsPrimary.value} 0%, #1a1a1a 100%)`;
+                    }
+                    colorsPrimary.addEventListener('input', updateMockBg);
+                    updateMockBg();
+                }
+            }
         });
     </script>
 </body>

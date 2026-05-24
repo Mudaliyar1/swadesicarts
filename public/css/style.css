@@ -128,12 +128,14 @@ body {
 
 .product-card {
     height: 100%;
+    max-width: 300px;
+    margin: 0 auto;
 }
 
 .product-card .card-img-wrapper {
     position: relative;
     overflow: hidden;
-    height: 250px;
+    height: 140px;
 }
 
 .product-card .card-img-top {
@@ -152,6 +154,35 @@ body {
     top: 10px;
     right: 10px;
     z-index: 1;
+}
+
+.product-card .card-body {
+    padding: 0.75rem !important;
+}
+
+.product-card .card-title {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.product-card .card-text {
+    font-size: 0.78rem !important;
+    margin-bottom: 0.5rem !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-card .text-swadesi {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.product-card .btn-swadesi {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
 }
 
 .category-card {

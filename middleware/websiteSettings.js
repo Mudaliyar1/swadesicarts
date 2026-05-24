@@ -114,6 +114,15 @@ const loadWebsiteSettings = async (req, res, next) => {
       }
     }
     
+    // Ensure layout exists with defaults
+    if (settings && !settings.layout) {
+      settings.layout = {
+        heroPaddingTop: 100,
+        heroPaddingBottom: 100
+      };
+      await settings.save();
+    }
+    
     // Make settings available to all views
     // Add transformed media URLs for carousel items (do not persist)
     try {
