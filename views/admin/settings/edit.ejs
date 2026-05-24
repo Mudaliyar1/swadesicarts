@@ -74,6 +74,7 @@
             <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
             <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
             <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
+            <li><a href="/admin/companies"><i class="bi bi-building"></i><span class="sidebar-text">Companies</span></a></li>
             <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
             <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
             <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
@@ -99,6 +100,7 @@
                 <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
                 <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
                 <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
+                <li><a href="/admin/companies"><i class="bi bi-building"></i> Companies</a></li>
                 <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
                 <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
                 <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
@@ -144,6 +146,11 @@
                     <li class="nav-item">
                         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#domain" type="button">
                             <i class="bi bi-globe2"></i> Domain & SEO
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#announcement" type="button">
+                            <i class="bi bi-megaphone"></i> Announcement Bar
                         </button>
                     </li>
                     <li class="nav-item">
@@ -386,6 +393,74 @@
                                         <p class="text-muted small mb-2">Example: https://swadesicarts.in</p>
                                         <input type="url" class="form-control" id="siteUrl" name="siteUrl" value="<%= settings.siteUrl || 'https://swadesicarts.in' %>" placeholder="https://swadesicarts.in">
                                         <div class="form-text">Use the full https URL. This will update sitemap and SEO links everywhere.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Announcement Bar Tab -->
+                        <div class="tab-pane fade" id="announcement">
+                            <div class="settings-section">
+                                <h3 class="section-title">Announcement Bar</h3>
+                                <p class="text-muted mb-4">Display a modern scrolling message above the header for offers, delivery updates, or festival announcements.</p>
+
+                                <div class="row g-4">
+                                    <div class="col-lg-6">
+                                        <div class="card border-0 shadow-sm mb-3">
+                                            <div class="card-body">
+                                                <div class="form-check form-switch mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="announcementBar.enabled" name="announcementBar.enabled" <%= settings.announcementBar && settings.announcementBar.enabled ? 'checked' : '' %>>
+                                                    <label class="form-check-label fw-bold" for="announcementBar.enabled">Enable Announcement Bar</label>
+                                                </div>
+
+                                                <label for="announcementBar.text" class="form-label fw-bold">Announcement Text</label>
+                                                <textarea class="form-control mb-3" id="announcementBar.text" name="announcementBar.text" rows="3" placeholder="🔥 50% OFF on Organic Products"><%= settings.announcementBar && settings.announcementBar.text ? settings.announcementBar.text : '🔥 Fresh offers and updates available now' %></textarea>
+
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label for="announcementBar.speed" class="form-label fw-bold">Scroll Speed</label>
+                                                        <input type="number" class="form-control" id="announcementBar.speed" name="announcementBar.speed" min="8" max="40" value="<%= settings.announcementBar && settings.announcementBar.speed ? settings.announcementBar.speed : 18 %>">
+                                                        <div class="form-text">Lower is faster. Recommended: 12 to 20.</div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="announcementBar.loop" class="form-label fw-bold d-block">Loop</label>
+                                                        <div class="form-check form-switch mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="announcementBar.loop" name="announcementBar.loop" <%= !settings.announcementBar || settings.announcementBar.loop !== false ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="announcementBar.loop">Repeat endlessly</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="announcementBar.backgroundColor" class="form-label fw-bold">Background Color</label>
+                                                        <input type="color" class="form-control form-control-color" id="announcementBar.backgroundColor" name="announcementBar.backgroundColor" value="<%= settings.announcementBar && settings.announcementBar.backgroundColor ? settings.announcementBar.backgroundColor : '#2c5f2d' %>">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="announcementBar.textColor" class="form-label fw-bold">Text Color</label>
+                                                        <input type="color" class="form-control form-control-color" id="announcementBar.textColor" name="announcementBar.textColor" value="<%= settings.announcementBar && settings.announcementBar.textColor ? settings.announcementBar.textColor : '#ffffff' %>">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-check form-switch mt-2">
+                                                            <input class="form-check-input" type="checkbox" id="announcementBar.closeButton" name="announcementBar.closeButton" <%= !settings.announcementBar || settings.announcementBar.closeButton !== false ? 'checked' : '' %>>
+                                                            <label class="form-check-label fw-bold" for="announcementBar.closeButton">Show Close Button</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Preview Notes</h5>
+                                                <p class="text-muted mb-3">This bar appears above the navbar and is ideal for time-sensitive messages such as delivery notices, offers, and festival campaigns.</p>
+                                                <ul class="list-unstyled mb-0">
+                                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Works across all public pages</li>
+                                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Uses your saved colors and text</li>
+                                                    <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Can be closed by visitors</li>
+                                                    <li class="mb-0"><i class="bi bi-check2-circle text-success me-2"></i>Updates immediately after saving settings</li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

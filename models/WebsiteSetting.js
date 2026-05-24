@@ -22,6 +22,17 @@ const websiteSettingSchema = new mongoose.Schema({
     default: process.env.SITE_URL || 'https://swadesicarts.in'
   },
 
+  // Announcement Bar
+  announcementBar: {
+    enabled: { type: Boolean, default: false },
+    text: { type: String, default: '🔥 Fresh offers and updates available now' },
+    speed: { type: Number, default: 18 },
+    backgroundColor: { type: String, default: '#2c5f2d' },
+    textColor: { type: String, default: '#ffffff' },
+    loop: { type: Boolean, default: true },
+    closeButton: { type: Boolean, default: true }
+  },
+
   // Color Scheme
   colors: {
     primary: { type: String, default: '#4C1E4F' }, // Header/Footer color

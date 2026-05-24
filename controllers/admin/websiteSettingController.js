@@ -179,6 +179,19 @@ exports.getSettings = async (req, res) => {
       settings.siteUrl = normalizeSiteUrl();
       await settings.save();
     }
+
+    if (!settings.announcementBar) {
+      settings.announcementBar = {
+        enabled: false,
+        text: '🔥 Fresh offers and updates available now',
+        speed: 18,
+        backgroundColor: '#2c5f2d',
+        textColor: '#ffffff',
+        loop: true,
+        closeButton: true
+      };
+      await settings.save();
+    }
     
     // Ensure layout exists with defaults
     if (!settings.layout) {
@@ -639,6 +652,18 @@ exports.updateSettings = async (req, res) => {
         settings.siteUrl = normalizedSiteUrl;
       }
     }
+
+    // Update announcement bar settings
+    const currentAnnouncementBar = settings.announcementBar || {};
+    settings.announcementBar = {
+      enabled: req.body['announcementBar.enabled'] === 'on' || req.body['announcementBar.enabled'] === 'true',
+      text: req.body['announcementBar.text'] || currentAnnouncementBar.text || '🔥 Fresh offers and updates available now',
+      speed: parseInt(req.body['announcementBar.speed'], 10) || currentAnnouncementBar.speed || 18,
+      backgroundColor: req.body['announcementBar.backgroundColor'] || currentAnnouncementBar.backgroundColor || '#2c5f2d',
+      textColor: req.body['announcementBar.textColor'] || currentAnnouncementBar.textColor || '#ffffff',
+      loop: req.body['announcementBar.loop'] === 'on' || req.body['announcementBar.loop'] === 'true',
+      closeButton: req.body['announcementBar.closeButton'] === 'on' || req.body['announcementBar.closeButton'] === 'true'
+    };
 
     // Update color scheme
     if (req.body['colors.primary']) {

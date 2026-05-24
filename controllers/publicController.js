@@ -2,6 +2,7 @@ const SeasonalProduct = require('../models/SeasonalProduct');
 const TechPackage = require('../models/TechPackage');
 const OrganicProduct = require('../models/OrganicProduct');
 const Story = require('../models/Story');
+const Company = require('../models/companyModel');
 const { getSiteUrl } = require('../helpers/siteUrl');
 
 function buildSeo({ title, description, path, keywords = '', ogType = 'website', baseUrl }) {
@@ -47,6 +48,11 @@ exports.getHome = async (req, res) => {
       .sort({ order: 1 })
       .limit(3);
 
+    const companies = await Company.find({ isVisible: true })
+      .select('name logo shortDescription fullDescription websiteUrl isFeatured isVisible createdAt')
+      .sort({ isFeatured: -1, createdAt: -1 })
+      .limit(12);
+
     const stories = await getActiveStories();
 
     res.render('public/home-new', {
@@ -61,6 +67,7 @@ exports.getHome = async (req, res) => {
       featuredSeasonal,
       featuredTech,
       featuredOrganic,
+      companies,
       stories,
       currentPage: 'home'
     });

@@ -8,6 +8,7 @@ const inquiryController = require('../controllers/admin/inquiryController');
 const adminController = require('../controllers/admin/adminController');
 const storyController = require('../controllers/admin/storyController');
 const websiteSettingController = require('../controllers/admin/websiteSettingController');
+const companyRoutes = require('./companyRoutes');
 const visitorController = require('../controllers/admin/visitorController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
@@ -96,6 +97,9 @@ router.post('/stories/edit/:id', isAuthenticated, upload.fields([
 ]), storyController.update);
 router.delete('/stories/delete/:id', isAuthenticated, storyController.delete);
 router.post('/stories/:id/toggle', isAuthenticated, storyController.toggleActive);
+
+// Companies routes
+router.use('/companies', companyRoutes);
 
 // Website Settings routes
 router.get('/settings', isAuthenticated, websiteSettingController.getSettings);

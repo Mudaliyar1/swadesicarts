@@ -64,6 +64,19 @@ const loadWebsiteSettings = async (req, res, next) => {
       await settings.save();
     }
 
+    if (settings && !settings.announcementBar) {
+      settings.announcementBar = {
+        enabled: false,
+        text: '🔥 Fresh offers and updates available now',
+        speed: 18,
+        backgroundColor: '#2c5f2d',
+        textColor: '#ffffff',
+        loop: true,
+        closeButton: true
+      };
+      await settings.save();
+    }
+
     if (settings && !settings.designEditor) {
       settings.designEditor = { rules: [] };
       await settings.save();

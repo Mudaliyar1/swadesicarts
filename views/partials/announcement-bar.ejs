@@ -1,0 +1,106 @@
+<%
+  const announcement = siteSettings && siteSettings.announcementBar ? siteSettings.announcementBar : {};
+  const announcementEnabled = announcement.enabled && announcement.text && announcement.text.trim();
+  const announcementSpeed = Math.max(8, parseInt(announcement.speed, 10) || 18);
+  const announcementLoop = announcement.loop !== false;
+  const announcementBackground = announcement.backgroundColor || '#2c5f2d';
+  const announcementTextColor = announcement.textColor || '#ffffff';
+  const announcementHeight = announcementEnabled ? 44 : 0;
+%>
+<script>
+(function () {
+  const enabled = <%= announcementEnabled ? 'true' : 'false' %>;
+  const closed = localStorage.getItem('swadesiAnnouncementClosed') === '1';
+  document.documentElement.style.setProperty('--announcement-bar-height', enabled && !closed ? '<%= announcementHeight %>px' : '0px');
+})();
+</script>
+<% if (announcementEnabled) { %>
+<style>
+    .announcement-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--announcement-bar-height, 0px);
+        min-height: var(--announcement-bar-height, 0px);
+        z-index: 1045;
+        background: <%= announcementBackground %>;
+        color: <%= announcementTextColor %>;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .announcement-bar__track {
+        display: flex;
+        align-items: center;
+        gap: 2.5rem;
+        width: max-content;
+        min-width: 100%;
+        white-space: nowrap;
+        will-change: transform;
+    }
+
+    .announcement-bar__track.is-looping {
+        animation: swadesiAnnouncementMarquee <%= announcementSpeed %>s linear infinite;
+    }
+
+    .announcement-bar__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+        padding: 0 1rem;
+    }
+
+    .announcement-bar-spacer {
+        height: var(--announcement-bar-height, 0px);
+    }
+
+    body {
+        padding-top: calc(var(--navbar-offset) + var(--announcement-bar-height, 0px)) !important;
+    }
+
+    .navbar {
+        top: var(--announcement-bar-height, 0px) !important;
+    }
+
+    @keyframes swadesiAnnouncementMarquee {
+        from { transform: translateX(0); }
+        to { transform: translateX(-50%); }
+    }
+
+    @media (max-width: 767.98px) {
+        .announcement-bar__item {
+            font-size: 0.82rem;
+            gap: 0.45rem;
+            padding: 0 0.75rem;
+        }
+    }
+</style>
+
+<div class="announcement-bar" data-announcement-bar role="region" aria-label="Announcement bar">
+    <div class="announcement-bar__track <%= announcementLoop ? 'is-looping' : '' %>">
+        <div class="announcement-bar__item">
+            <i class="bi bi-megaphone-fill"></i>
+            <span><%= announcement.text %></span>
+        </div>
+        <% if (announcementLoop) { %>
+            <div class="announcement-bar__item" aria-hidden="true">
+                <i class="bi bi-megaphone-fill"></i>
+                <span><%= announcement.text %></span>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const bar = document.querySelector('[data-announcement-bar]');
+  if (!bar) return;
+});
+</script>
+<% } %>
