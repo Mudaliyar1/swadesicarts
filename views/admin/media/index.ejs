@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<%
+    const formatBytes = (bytes = 0) => {
+        if (!bytes) return '0 B';
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const index = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+        return `${(bytes / (1024 ** index)).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+    };
+%>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .media-stat-card {
+            border: 0;
+            border-radius: 18px;
+            background: linear-gradient(135deg, #ffffff 0%, #f4f7fb 100%);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            height: 100%;
+        }
+
+        .media-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(76, 30, 79, 0.12);
+            color: var(--swadesi-green);
+        }
+
+        @media (min-width: 992px) {
+            .media-toolbar {
+                position: sticky;
+                top: 0;
+                z-index: 5;
+                backdrop-filter: blur(8px);
+            }
+        }
+
+        .media-card {
+            border: 0;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer;
+        }
+
+        .media-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+        }
+
+        .media-thumb {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+
+        .media-thumb.video {
+            aspect-ratio: 16 / 10;
+            background: #111827;
+        }
+
+        .media-thumb.raw {
+            object-fit: contain;
+            background: linear-gradient(135deg, #f8fafc, #e5e7eb);
+        }
+
+        .media-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .media-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+        }
+
+        .media-select-box {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 3;
+            background: rgba(255,255,255,0.92);
+            border-radius: 999px;
+            padding: 0.35rem;
+        }
+
+        .media-grid-wrap .table-responsive {
+            overflow-x: auto;
+        }
+
+        .media-grid-wrap .table {
+            min-width: 950px;
+        }
+
+        .media-preview-large {
+            width: 100%;
+            max-height: 320px;
+            object-fit: contain;
+            border-radius: 18px;
+            background: #0f172a;
+        }
+
+        .usage-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #334155;
+            margin: 0 0.4rem 0.4rem 0;
+        }
+
+        .table-media-thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #e9ecef;
+        }
+
+        .media-section-title {
+            letter-spacing: -0.02em;
+        }
+
+        #floatingBulkDeleteContainer {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+
+        #floatingBulkDeleteContainer.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        #floatingBulkDeleteBtn {
+            border-radius: 50px;
+            padding: 14px 28px;
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.4);
+            border: 0;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #ffffff;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #floatingBulkDeleteBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(220, 53, 69, 0.5);
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            color: #ffffff;
+        }
+
+        #floatingBulkDeleteBtn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 575.98px) {
+            /* Stat cards scaling */
+            .media-stat-card {
+                padding: 0.75rem !important;
+            }
+            .media-stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+                border-radius: 10px;
+            }
+            .media-stat-card .gap-3 {
+                gap: 0.5rem !important;
+            }
+            .media-stat-card .fs-5 {
+                font-size: 1.05rem !important;
+            }
+            .media-stat-card .fw-bold {
+                font-size: 0.95rem !important;
+            }
+            .media-stat-card .small {
+                font-size: 0.75rem !important;
+            }
+            .media-stat-card .progress {
+                margin-top: 0.75rem !important;
+                height: 6px !important;
+            }
+
+            /* Media cards scaling */
+            .media-card .card-body {
+                padding: 0.75rem !important;
+            }
+            .media-card .card-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.25rem !important;
+            }
+            .media-meta {
+                font-size: 0.75rem;
+                line-height: 1.3;
+            }
+            .media-badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+                top: 8px;
+                left: 8px;
+            }
+            .media-select-box {
+                top: 8px;
+                right: 8px;
+                padding: 0.2rem;
+            }
+            .media-card .card-footer {
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+                flex-direction: column;
+                gap: 0.4rem !important;
+            }
+            .media-card .card-footer button {
+                width: 100%;
+                font-size: 0.75rem;
+                padding: 0.35rem 0.5rem;
+            }
+
+            /* Floating button */
+            #floatingBulkDeleteContainer {
+                bottom: 15px;
+                right: 15px;
+            }
+            #floatingBulkDeleteBtn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            /* Table scaling */
+            .table-media-thumb {
+                width: 48px !important;
+                height: 48px !important;
+                border-radius: 8px !important;
+            }
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">Media Management</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/site-editor" title="Website Editor"><i class="bi bi-cursor"></i><span class="sidebar-text">Website Editor</span></a></li>
+            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
+            <li><a href="/admin/companies" title="Companies"><i class="bi bi-building"></i><span class="sidebar-text">Companies</span></a></li>
+            <li><a href="/admin/media" class="active" title="Media Management"><i class="bi bi-images"></i><span class="sidebar-text">Media Management</span></a></li>
+            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+            <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
+            <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
+            <li><a href="/admin/settings" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/site-editor"><i class="bi bi-cursor"></i> Website Editor</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
+                <li><a href="/admin/companies"><i class="bi bi-building"></i> Companies</a></li>
+                <li><a href="/admin/media" class="active"><i class="bi bi-images"></i> Media Management</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
+                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
+                <li><a href="/admin/settings"><i class="bi bi-gear"></i> Website Settings</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-2 p-md-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                <div>
+                    <h2 class="fw-bold mb-1 media-section-title"><i class="bi bi-images"></i> Media Management</h2>
+                    <p class="text-muted mb-0">Mini Cloudinary dashboard for usage, optimization, and safe cleanup</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="/admin/media/refresh" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Sync Cloudinary</a>
+                    <button class="btn btn-swadesi" id="bulkDeleteBtn" type="button" disabled><i class="bi bi-trash"></i> Bulk Delete</button>
+                </div>
+            </div>
+
+            <% if (success && success.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <% if (error && error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="media-stat-icon"><i class="bi bi-hdd"></i></div>
+                            <div>
+                                <div class="text-muted small">Used Storage</div>
+                                <div class="fw-bold"><%= stats.totalStorageBytes ? Math.round((stats.totalStorageBytes / (1024 * 1024)) * 10) / 10 : 0 %> MB</div>
+                            </div>
+                        </div>
+                        <div class="progress mt-3" style="height: 8px;">
+                            <%
+                                const storagePct = stats.totalStorageLimit ? Math.min(100, Math.round((stats.totalStorageBytes / stats.totalStorageLimit) * 100)) : 0;
+                            %>
+                            <div class="progress-bar bg-success" <%= `style="width: ${storagePct}%;"` %>></div>
+                        </div>
+                        <div class="small text-muted mt-2"><%= storagePct %>% of Cloudinary limit</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="media-stat-icon"><i class="bi bi-folder2"></i></div>
+                            <div>
+                                <div class="text-muted small">Total Assets</div>
+                                <div class="fw-bold"><%= stats.totalAssets %></div>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-3">Used: <%= stats.usedCount %> | Unused: <%= stats.unusedCount %></div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="media-stat-icon"><i class="bi bi-image"></i></div>
+                            <div>
+                                <div class="text-muted small">Images</div>
+                                <div class="fw-bold"><%= stats.imageCount %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="media-stat-icon"><i class="bi bi-play-btn"></i></div>
+                            <div>
+                                <div class="text-muted small">Videos / PDFs</div>
+                                <div class="fw-bold"><%= stats.videoCount %> / <%= stats.pdfCount %></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="text-muted small">Remaining Storage</div>
+                        <div class="fw-bold fs-5"><%= stats.totalStorageLimit ? formatBytes(stats.remainingStorageBytes) : 'N/A' %></div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="text-muted small">Used Bandwidth</div>
+                        <div class="fw-bold fs-5"><%= formatBytes(stats.bandwidthBytes) %></div>
+                        <%
+                            const bandwidthPct = stats.totalBandwidthLimit ? Math.round((stats.bandwidthBytes / stats.totalBandwidthLimit) * 100) : 0;
+                        %>
+                        <div class="small text-muted mt-1"><%= bandwidthPct %>% of credit limit</div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="text-muted small">Unused Media</div>
+                        <div class="fw-bold fs-5"><%= stats.unusedCount %></div>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="card media-stat-card p-3">
+                        <div class="text-muted small">Documents</div>
+                        <div class="fw-bold fs-5"><%= stats.documentCount %></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4 media-toolbar">
+                <div class="card-body">
+                    <form method="GET" action="/admin/media" class="row g-3 align-items-end">
+                        <input type="hidden" name="view" value="<%= filters.view %>">
+                        <div class="col-12 col-md-6 col-lg-3">
+                            <label class="form-label">Search</label>
+                            <input type="text" class="form-control" name="search" value="<%= filters.search %>" placeholder="File name, public ID, page">
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" name="type">
+                                <option value="all" <%= filters.type === 'all' ? 'selected' : '' %>>All</option>
+                                <option value="image" <%= filters.type === 'image' ? 'selected' : '' %>>Image</option>
+                                <option value="video" <%= filters.type === 'video' ? 'selected' : '' %>>Video</option>
+                                <option value="pdf" <%= filters.type === 'pdf' ? 'selected' : '' %>>PDF</option>
+                                <option value="document" <%= filters.type === 'document' ? 'selected' : '' %>>Document</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <label class="form-label">Usage</label>
+                            <select class="form-select" name="usage">
+                                <option value="all" <%= filters.usage === 'all' ? 'selected' : '' %>>All</option>
+                                <option value="used" <%= filters.usage === 'used' ? 'selected' : '' %>>Used</option>
+                                <option value="unused" <%= filters.usage === 'unused' ? 'selected' : '' %>>Unused</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4 col-lg-2">
+                            <label class="form-label">Section</label>
+                            <input type="text" class="form-control" name="section" value="<%= filters.section %>" placeholder="Homepage, Company...">
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-1">
+                            <label class="form-label">From</label>
+                            <input type="date" class="form-control" name="dateFrom" value="<%= filters.dateFrom %>">
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-1">
+                            <label class="form-label">To</label>
+                            <input type="date" class="form-control" name="dateTo" value="<%= filters.dateTo %>">
+                        </div>
+                        <div class="col-12 col-md-2 col-lg-1">
+                            <button class="btn btn-swadesi w-100" type="submit"><i class="bi bi-funnel"></i></button>
+                        </div>
+                    </form>
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <a class="btn btn-sm <%= filters.view === 'grid' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=grid&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-grid-3x3-gap"></i> Grid</a>
+                        <a class="btn btn-sm <%= filters.view === 'table' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=table&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-list"></i> Table</a>
+                        <div class="ms-auto small text-muted align-self-center">Page <%= pagination.page %> of <%= pagination.totalPages %></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3">Media Analytics</h5>
+                <div class="row g-3">
+                    <div class="col-lg-4">
+                        <div class="card media-stat-card p-3">
+                            <div class="fw-semibold mb-2">Most Used Media</div>
+                            <% if (analytics.mostUsed.length === 0) { %>
+                                <div class="text-muted small">No used media found.</div>
+                            <% } else { %>
+                                <% analytics.mostUsed.forEach((item) => { %>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                        <div class="text-truncate me-2"><%= item.publicId %></div>
+                                        <span class="badge bg-light text-dark"><%= formatBytes(item.bytes || 0) %></span>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card media-stat-card p-3">
+                            <div class="fw-semibold mb-2">Largest Files</div>
+                            <% if (analytics.largestFiles.length === 0) { %>
+                                <div class="text-muted small">No files available.</div>
+                            <% } else { %>
+                                <% analytics.largestFiles.forEach((item) => { %>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                        <div class="text-truncate me-2"><%= item.publicId %></div>
+                                        <span class="badge bg-light text-dark"><%= formatBytes(item.bytes || 0) %></span>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card media-stat-card p-3">
+                            <div class="fw-semibold mb-2">Recently Uploaded</div>
+                            <% if (analytics.recentUploads.length === 0) { %>
+                                <div class="text-muted small">No recent uploads.</div>
+                            <% } else { %>
+                                <% analytics.recentUploads.forEach((item) => { %>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 small">
+                                        <div class="text-truncate me-2"><%= item.publicId %></div>
+                                        <span class="badge bg-light text-dark"><%= new Date(item.uploadedAt).toLocaleDateString() %></span>
+                                    </div>
+                                <% }) %>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% if (filters.view === 'table') { %>
+                <div class="card border-0 shadow-sm media-grid-wrap">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 48px;"><input type="checkbox" id="selectAllTable"></th>
+                                        <th>Preview</th>
+                                        <th>Public ID</th>
+                                        <th>Type</th>
+                                        <th>Size</th>
+                                        <th>Usage</th>
+                                        <th>Uploaded</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% media.forEach((item) => { %>
+                                        <tr>
+                                            <td><input type="checkbox" class="media-checkbox" value="<%= item.publicId %>"></td>
+                                            <td>
+                                                <% if (item.fileType === 'video') { %>
+                                                    <video class="table-media-thumb" muted playsinline preload="metadata" src="<%= item.secureUrl %>"></video>
+                                                <% } else if (item.fileType === 'pdf' || item.fileType === 'document' || item.resourceType === 'raw') { %>
+                                                    <div class="table-media-thumb d-flex align-items-center justify-content-center bg-light">
+                                                        <i class="bi bi-file-earmark-text fs-3 text-muted"></i>
+                                                    </div>
+                                                <% } else { %>
+                                                    <img class="table-media-thumb" src="<%= item.secureUrl %>" alt="<%= item.publicId %>">
+                                                <% } %>
+                                            </td>
+                                            <td class="text-break"><%= item.publicId %></td>
+                                            <td><span class="badge bg-secondary text-uppercase"><%= item.fileType %></span></td>
+                                            <td><%= formatBytes(item.bytes || 0) %></td>
+                                            <td>
+                                                <span class="badge <%= item.isUsed ? 'bg-success' : 'bg-warning text-dark' %>"><%= item.isUsed ? 'Used' : 'Unused' %></span>
+                                            </td>
+                                            <td><%= new Date(item.uploadedAt).toLocaleDateString() %></td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-primary view-media-btn" data-public-id="<%= item.publicId %>"><i class="bi bi-eye"></i></button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger delete-media-btn" data-public-id="<%= item.publicId %>" data-used="<%= item.isUsed ? 'yes' : 'no' %>"><i class="bi bi-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="row g-4 media-grid-wrap">
+                    <% media.forEach((item) => { %>
+                        <div class="col-6 col-sm-6 col-lg-4 col-xl-3">
+                            <div class="card media-card h-100 position-relative">
+                                <div class="media-select-box">
+                                    <input type="checkbox" class="media-checkbox form-check-input" value="<%= item.publicId %>">
+                                </div>
+                                <span class="badge bg-dark media-badge text-uppercase"><%= item.fileType %></span>
+                                <% if (item.fileType === 'video') { %>
+                                    <video class="media-thumb video" muted playsinline preload="metadata" src="<%= item.secureUrl %>"></video>
+                                <% } else if (item.fileType === 'pdf' || item.fileType === 'document' || item.resourceType === 'raw') { %>
+                                    <div class="media-thumb raw d-flex align-items-center justify-content-center">
+                                        <div class="text-center">
+                                            <i class="bi bi-file-earmark-text fs-1 text-secondary"></i>
+                                            <div class="small text-muted mt-2"><%= item.format || 'Document' %></div>
+                                        </div>
+                                    </div>
+                                <% } else { %>
+                                    <img class="media-thumb" src="<%= item.secureUrl %>" alt="<%= item.publicId %>">
+                                <% } %>
+                                <div class="card-body">
+                                    <h6 class="card-title text-truncate mb-1" title="<%= item.publicId %>"><%= item.publicId %></h6>
+                                    <div class="media-meta">Size: <%= formatBytes(item.bytes || 0) %></div>
+                                    <div class="media-meta">Uploaded: <%= new Date(item.uploadedAt).toLocaleDateString() %></div>
+                                    <div class="media-meta">Usage: <%= item.isUsed ? 'Used' : 'Unused' %></div>
+                                </div>
+                                <div class="card-footer bg-white border-0 pt-0 pb-3 px-3 d-flex gap-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary flex-fill view-media-btn" data-public-id="<%= item.publicId %>">Details</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger flex-fill delete-media-btn" data-public-id="<%= item.publicId %>" data-used="<%= item.isUsed ? 'yes' : 'no' %>">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
+
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
+                            <span class="d-none d-sm-inline">Previous</span>
+                            <span class="d-inline d-sm-none">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item disabled"><span class="page-link">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li>
+                    <li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
+                            <span class="d-none d-sm-inline">Next</span>
+                            <span class="d-inline d-sm-none">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mediaDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Media Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-4">
+                        <div class="col-lg-7">
+                            <div id="detailPreviewWrap" class="mb-3"></div>
+                            <div class="row g-3 small">
+                                <div class="col-md-6"><strong>Public ID:</strong> <div id="detailPublicId" class="text-break"></div></div>
+                                <div class="col-md-6"><strong>Type:</strong> <div id="detailType"></div></div>
+                                <div class="col-md-6"><strong>Size:</strong> <div id="detailSize"></div></div>
+                                <div class="col-md-6"><strong>Uploaded:</strong> <div id="detailUploaded"></div></div>
+                                <div class="col-md-6"><strong>Resolution:</strong> <div id="detailResolution"></div></div>
+                                <div class="col-md-6"><strong>Usage:</strong> <div id="detailUsage"></div></div>
+                                <div class="col-12"><strong>Storage Usage:</strong> <div id="detailStorage"></div></div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="fw-bold">Usage Locations</h6>
+                                    <div id="detailLocations"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 flex-wrap mt-3">
+                                <a id="detailDownloadBtn" href="#" target="_blank" rel="noopener" class="btn btn-swadesi"><i class="bi bi-download"></i> Download</a>
+                                <button type="button" id="detailDeleteBtn" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
+                            </div>
+                            <div class="alert alert-warning mt-3 d-none" id="detailUsageWarning"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Bulk Delete Button (appears when items are checked) -->
+    <div id="floatingBulkDeleteContainer">
+        <button class="btn btn-danger btn-lg shadow-lg" id="floatingBulkDeleteBtn" type="button">
+            <i class="bi bi-trash-fill"></i>
+            <span>Bulk Delete (<span id="selectedCountSpan">0</span>)</span>
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        const mediaDetailModal = new bootstrap.Modal(document.getElementById('mediaDetailModal'));
+        const selectAllTable = document.getElementById('selectAllTable');
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+
+        const getSelectedIds = () => Array.from(document.querySelectorAll('.media-checkbox:checked')).map((input) => input.value);
+
+        const floatingBulkDeleteContainer = document.getElementById('floatingBulkDeleteContainer');
+        const selectedCountSpan = document.getElementById('selectedCountSpan');
+        const floatingBulkDeleteBtn = document.getElementById('floatingBulkDeleteBtn');
+
+        const updateBulkButton = () => {
+            const selectedCount = getSelectedIds().length;
+            if (bulkDeleteBtn) {
+                bulkDeleteBtn.disabled = selectedCount === 0;
+            }
+            if (floatingBulkDeleteContainer) {
+                if (selectedCount > 0) {
+                    if (selectedCountSpan) {
+                        selectedCountSpan.textContent = selectedCount;
+                    }
+                    floatingBulkDeleteContainer.classList.add('show');
+                } else {
+                    floatingBulkDeleteContainer.classList.remove('show');
+                }
+            }
+        };
+
+        document.addEventListener('change', (event) => {
+            if (event.target && event.target.classList.contains('media-checkbox')) {
+                updateBulkButton();
+            }
+            if (event.target === selectAllTable) {
+                document.querySelectorAll('.media-checkbox').forEach((checkbox) => {
+                    checkbox.checked = selectAllTable.checked;
+                });
+                updateBulkButton();
+            }
+        });
+
+        document.addEventListener('click', async (event) => {
+            const button = event.target.closest('.view-media-btn');
+            if (!button) return;
+
+            try {
+                const publicId = button.getAttribute('data-public-id');
+                const response = await fetch(`/admin/media/${encodeURIComponent(publicId)}/detail`);
+                const payload = await response.json();
+
+                if (!payload.success) {
+                    alert(payload.message || 'Unable to load media details');
+                    return;
+                }
+
+                const media = payload.media;
+                const previewWrap = document.getElementById('detailPreviewWrap');
+                const detailDownloadBtn = document.getElementById('detailDownloadBtn');
+                const detailDeleteBtn = document.getElementById('detailDeleteBtn');
+                const detailUsageWarning = document.getElementById('detailUsageWarning');
+
+                if (media.fileType === 'video') {
+                    previewWrap.innerHTML = `<video class="media-preview-large" controls playsinline src="${media.secureUrl}"></video>`;
+                } else if (media.fileType === 'pdf' || media.fileType === 'document' || media.resourceType === 'raw') {
+                    previewWrap.innerHTML = `<div class="media-preview-large d-flex align-items-center justify-content-center"><div class="text-center text-white"><i class="bi bi-file-earmark-text fs-1"></i><div class="mt-2">Document preview</div></div></div>`;
+                } else {
+                    previewWrap.innerHTML = `<img class="media-preview-large" src="${media.secureUrl}" alt="${media.publicId}">`;
+                }
+
+                document.getElementById('detailPublicId').textContent = media.publicId || '';
+                document.getElementById('detailType').textContent = media.fileType || 'unknown';
+                document.getElementById('detailSize').textContent = media.bytes ? `${(media.bytes / (1024 * 1024)).toFixed(2)} MB` : '0 MB';
+                document.getElementById('detailUploaded').textContent = media.uploadedAt ? new Date(media.uploadedAt).toLocaleString() : '';
+                document.getElementById('detailResolution').textContent = media.width && media.height ? `${media.width} x ${media.height}` : (media.duration ? `${media.duration.toFixed(1)} sec` : 'N/A');
+                document.getElementById('detailUsage').textContent = media.isUsed ? 'Used' : 'Unused';
+                document.getElementById('detailStorage').textContent = media.bytes ? `${(media.bytes / (1024 * 1024)).toFixed(2)} MB` : '0 MB';
+
+                const locationsWrap = document.getElementById('detailLocations');
+                const usageLocations = Array.isArray(media.usageLocations) ? media.usageLocations : [];
+                locationsWrap.innerHTML = usageLocations.length
+                    ? usageLocations.map((location) => `<span class="usage-pill"><i class="bi bi-pin-angle"></i> ${location.relatedModel || 'Media'} → ${location.relatedTitle || location.relatedId || location.usageSection || 'Usage'}</span>`).join('')
+                    : '<div class="text-muted small">No usage locations found. This media appears unused.</div>';
+
+                if (detailDownloadBtn) {
+                    detailDownloadBtn.href = `/admin/media/${encodeURIComponent(media.publicId)}/download`;
+                }
+
+                if (detailDeleteBtn) {
+                    detailDeleteBtn.onclick = async () => {
+                        if (!confirm('Delete this media permanently?')) return;
+
+                        let response = await fetch(`/admin/media/${encodeURIComponent(media.publicId)}`, {
+                            method: 'DELETE'
+                        });
+                        let result = await response.json();
+
+                        if (!result.success && result.used) {
+                            const locationsText = result.usageLocations
+                                ? result.usageLocations.map((loc) => `${loc.relatedModel || 'Media'} → ${loc.relatedTitle || loc.usageSection || loc.relatedId}`).join(', ')
+                                : '';
+                            const msg = locationsText 
+                                ? `This media is currently used in:\n${locationsText}\n\nForce delete anyway?`
+                                : 'This media is currently used. Force delete anyway?';
+                            
+                            if (confirm(msg)) {
+                                response = await fetch(`/admin/media/${encodeURIComponent(media.publicId)}?force=true`, {
+                                    method: 'DELETE'
+                                });
+                                result = await response.json();
+                            } else {
+                                return;
+                            }
+                        }
+
+                        if (!result.success) {
+                            detailUsageWarning.classList.remove('d-none');
+                            detailUsageWarning.textContent = result.message || 'Unable to delete media';
+                            return;
+                        }
+
+                        window.location.reload();
+                    };
+                }
+
+                detailUsageWarning.classList.add('d-none');
+                mediaDetailModal.show();
+            } catch (err) {
+                console.error("Error opening details modal:", err);
+            }
+        });
+
+        document.querySelectorAll('.delete-media-btn').forEach((button) => {
+            button.addEventListener('click', async () => {
+                const publicId = button.getAttribute('data-public-id');
+                if (!confirm('Delete this media permanently?')) return;
+
+                let response = await fetch(`/admin/media/${encodeURIComponent(publicId)}`, {
+                    method: 'DELETE'
+                });
+                let result = await response.json();
+
+                if (!result.success && result.used) {
+                    const locationsText = result.usageLocations
+                        ? result.usageLocations.map((loc) => `${loc.relatedModel || 'Media'} → ${loc.relatedTitle || loc.usageSection || loc.relatedId}`).join(', ')
+                        : '';
+                    const msg = locationsText 
+                        ? `This media is currently used in:\n${locationsText}\n\nForce delete anyway?`
+                        : 'This media is currently used. Force delete anyway?';
+                    
+                    if (confirm(msg)) {
+                        response = await fetch(`/admin/media/${encodeURIComponent(publicId)}?force=true`, {
+                            method: 'DELETE'
+                        });
+                        result = await response.json();
+                    } else {
+                        return;
+                    }
+                }
+
+                if (!result.success) {
+                    alert(result.message || 'Unable to delete media');
+                    return;
+                }
+
+                window.location.reload();
+            });
+        });
+
+        const handleBulkDelete = async () => {
+            const publicIds = getSelectedIds();
+            if (!publicIds.length) return;
+
+            if (!confirm(`Delete ${publicIds.length} selected media item(s)?`)) return;
+
+            let response = await fetch('/admin/media/bulk', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ publicIds, force: false })
+            });
+            let result = await response.json();
+
+            if (!result.success && result.used) {
+                const locationsText = result.usageLocations
+                    ? result.usageLocations.map((loc) => `${loc.relatedModel || 'Media'} → ${loc.usageSection || loc.relatedId}`).join(', ')
+                    : '';
+                const msg = locationsText 
+                    ? `Some selected media are still used by site content:\n${locationsText}\n\nForce delete them anyway?`
+                    : 'Some selected media are still used by site content. Force delete them anyway?';
+
+                if (confirm(msg)) {
+                    response = await fetch('/admin/media/bulk', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ publicIds, force: true })
+                    });
+                    result = await response.json();
+                } else {
+                    return;
+                }
+            }
+
+            if (!result.success) {
+                alert(result.message || 'Unable to bulk delete media');
+                return;
+            }
+
+            window.location.reload();
+        };
+
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.addEventListener('click', handleBulkDelete);
+        }
+
+        if (floatingBulkDeleteBtn) {
+            floatingBulkDeleteBtn.addEventListener('click', handleBulkDelete);
+        }
+
+        updateBulkButton();
+    </script>
+</body>
+</html>

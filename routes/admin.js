@@ -9,6 +9,7 @@ const adminController = require('../controllers/admin/adminController');
 const storyController = require('../controllers/admin/storyController');
 const websiteSettingController = require('../controllers/admin/websiteSettingController');
 const companyRoutes = require('./companyRoutes');
+const mediaRoutes = require('./mediaRoutes');
 const visitorController = require('../controllers/admin/visitorController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
@@ -100,6 +101,9 @@ router.post('/stories/:id/toggle', isAuthenticated, storyController.toggleActive
 
 // Companies routes
 router.use('/companies', companyRoutes);
+
+// Media Management routes
+router.use('/media', mediaRoutes);
 
 // Website Settings routes
 router.get('/settings', isAuthenticated, websiteSettingController.getSettings);
