@@ -2,6 +2,21 @@ const SeasonalProduct = require('../models/SeasonalProduct');
 const TechPackage = require('../models/TechPackage');
 const OrganicProduct = require('../models/OrganicProduct');
 const Story = require('../models/Story');
+const { getSiteUrl } = require('../helpers/siteUrl');
+
+function buildSeo({ title, description, path, keywords = '', ogType = 'website', baseUrl }) {
+  const canonical = `${baseUrl || getSiteUrl()}${path}`;
+  return {
+    title,
+    description,
+    keywords,
+    canonical,
+    ogType,
+    ogSiteName: 'Swadesi Carts',
+    twitterCard: 'summary_large_image',
+    robots: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+  };
+}
 
 // Helper function to get active stories
 async function getActiveStories() {
@@ -16,6 +31,7 @@ async function getActiveStories() {
 // Home page
 exports.getHome = async (req, res) => {
   try {
+    const baseUrl = getSiteUrl(res.locals.siteSettings);
     const featuredSeasonal = await SeasonalProduct.find({ isVisible: true })
       .select('title slug category shortDescription featuredImage order')
       .sort({ order: 1 })
@@ -35,6 +51,13 @@ exports.getHome = async (req, res) => {
 
     res.render('public/home-new', {
       title: 'Swadesi Carts - Home',
+      seo: buildSeo({
+        title: 'Swadesi Carts - Organic, Seasonal & Tech Products',
+        description: 'Premium organic products, fresh seasonal produce, and professional tech packages from Swadesi Carts.',
+        path: '/',
+        keywords: 'Swadesi Carts, organic products India, seasonal produce India, tech packages India',
+        baseUrl
+      }),
       featuredSeasonal,
       featuredTech,
       featuredOrganic,
@@ -51,8 +74,17 @@ exports.getHome = async (req, res) => {
 exports.getAbout = async (req, res) => {
   try {
     const stories = await getActiveStories();
+    const baseUrl = getSiteUrl(res.locals.siteSettings);
     res.render('public/about-new', {
       title: 'About Us - Swadesi Carts',
+      seo: buildSeo({
+        title: 'About Us - Swadesi Carts',
+        description: 'Learn about Swadesi Carts, our mission, values, and the people behind our organic, seasonal, and tech services.',
+        path: '/about',
+        keywords: 'about Swadesi Carts, mission, values, team',
+        baseUrl,
+        ogType: 'article'
+      }),
       stories,
       currentPage: 'about'
     });
@@ -66,8 +98,17 @@ exports.getAbout = async (req, res) => {
 exports.getContact = async (req, res) => {
   try {
     const stories = await getActiveStories();
+    const baseUrl = getSiteUrl(res.locals.siteSettings);
     res.render('public/contact-new', {
       title: 'Contact Us - Swadesi Carts',
+      seo: buildSeo({
+        title: 'Contact Us - Swadesi Carts',
+        description: 'Contact Swadesi Carts for organic products, seasonal produce, tech packages, and business inquiries.',
+        path: '/contact',
+        keywords: 'contact Swadesi Carts, inquiry, support, business contact',
+        baseUrl,
+        ogType: 'article'
+      }),
       stories,
       currentPage: 'contact',
       success: req.flash('success'),

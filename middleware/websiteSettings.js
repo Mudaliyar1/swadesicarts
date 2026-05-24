@@ -1,5 +1,6 @@
 const WebsiteSetting = require('../models/WebsiteSetting');
 const cloudinary = require('../config/cloudinary');
+const { normalizeSiteUrl } = require('../helpers/siteUrl');
 
 // Middleware to load website settings for all views
 const loadWebsiteSettings = async (req, res, next) => {
@@ -55,6 +56,11 @@ const loadWebsiteSettings = async (req, res, next) => {
         heading: 'Featured Carousel',
         subheading: 'Updates, offers, and highlights you can control from the admin panel'
       };
+      await settings.save();
+    }
+
+    if (settings && !settings.siteUrl) {
+      settings.siteUrl = normalizeSiteUrl();
       await settings.save();
     }
 

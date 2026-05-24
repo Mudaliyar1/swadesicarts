@@ -16,6 +16,12 @@ const websiteSettingSchema = new mongoose.Schema({
     height: { type: Number, default: 72 } // Header height in pixels
   },
 
+  // Site URL / Domain
+  siteUrl: {
+    type: String,
+    default: process.env.SITE_URL || 'https://swadesicarts.in'
+  },
+
   // Color Scheme
   colors: {
     primary: { type: String, default: '#4C1E4F' }, // Header/Footer color

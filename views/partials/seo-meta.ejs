@@ -1,0 +1,37 @@
+<%
+  const seoData = seo || {};
+  const pageTitle = seoData.title || title || 'Swadesi Carts';
+  const pageDescription = seoData.description || seoData.metaDescription || '';
+  const pageKeywords = seoData.keywords || '';
+  const pageCanonical = seoData.canonical || '';
+  const pageRobots = seoData.robots || 'index, follow';
+  const pageOgType = seoData.ogType || 'website';
+  const pageOgSiteName = seoData.ogSiteName || 'Swadesi Carts';
+  const pageOgImage = seoData.ogImage || '';
+  const pageGeoKeywords = seoData.geoKeywords || '';
+  const pageAiPhrases = seoData.aiSearchPhrases || '';
+%>
+<title><%= pageTitle %></title>
+<meta name="description" content="<%= pageDescription %>">
+<% if (pageKeywords) { %><meta name="keywords" content="<%= pageKeywords %>"><% } %>
+<meta name="robots" content="<%= pageRobots %>">
+<% if (pageCanonical) { %><link rel="canonical" href="<%= pageCanonical %>"><% } %>
+<meta property="og:title" content="<%= pageTitle %>">
+<meta property="og:description" content="<%= pageDescription %>">
+<meta property="og:type" content="<%= pageOgType %>">
+<meta property="og:site_name" content="<%= pageOgSiteName %>">
+<% if (pageCanonical) { %><meta property="og:url" content="<%= pageCanonical %>"><% } %>
+<% if (pageOgImage) { %><meta property="og:image" content="<%= pageOgImage %>"><% } %>
+<meta name="twitter:card" content="<%= seoData.twitterCard || 'summary_large_image' %>">
+<meta name="twitter:title" content="<%= pageTitle %>">
+<meta name="twitter:description" content="<%= pageDescription %>">
+<% if (pageOgImage) { %><meta name="twitter:image" content="<%= pageOgImage %>"><% } %>
+<% if (pageGeoKeywords) { %><meta name="geo.keywords" content="<%= pageGeoKeywords %>"><% } %>
+<% if (pageAiPhrases) { %><meta name="ai.search.phrases" content="<%= pageAiPhrases %>"><% } %>
+<% if (Array.isArray(schemaJsonLd)) { %>
+  <% schemaJsonLd.forEach(function(schema) { %>
+    <script type="application/ld+json"><%- schema %></script>
+  <% }); %>
+<% } else if (schemaJsonLd) { %>
+  <script type="application/ld+json"><%- schemaJsonLd %></script>
+<% } %>

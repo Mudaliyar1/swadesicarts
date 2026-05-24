@@ -161,6 +161,49 @@
                                     <label class="form-check-label">Available for purchase</label>
                                 </div>
                             </div>
+                            <!-- SEO & GEO Section -->
+                            <div class="col-12 mb-3 mt-2" id="seo-section">
+                                <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e8f5e9 100%); border: 1px solid #b3d9ff; border-radius: 10px; padding: 1.25rem;">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                        <h6 style="color: #1565c0; margin-bottom: 0; font-weight: 700;"><i class="bi bi-search me-2"></i>SEO & GEO Keyword Optimization</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="seoAutoFillBtn" onclick="seoAutoFill()">
+                                            <i class="bi bi-magic me-1"></i> Auto-Generate SEO & GEO
+                                        </button>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">URL Slug</label>
+                                            <input type="text" class="form-control" name="slug" value="<%= product.slug || '' %>">
+                                            <small class="text-muted">Lowercase letters, numbers, and hyphens only.</small>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">SEO Title <span class="text-muted fw-normal">(max 60 chars)</span></label>
+                                            <input type="text" class="form-control" name="seoTitle" maxlength="70" value="<%= product.seoTitle || '' %>" placeholder="Keyword-rich title for search engines">
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">SEO Meta Description <span class="text-muted fw-normal">(max 160 chars)</span></label>
+                                            <textarea class="form-control" name="seoMetaDescription" rows="2" maxlength="160" placeholder="Compelling description for search result snippets"><%= product.seoMetaDescription || '' %></textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">SEO Keywords</label>
+                                            <input type="text" class="form-control" name="seoKeywords" value="<%= product.seoKeywords || '' %>" placeholder="web development, website design, affordable tech services">
+                                            <small class="text-muted">Comma-separated.</small>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">GEO / Local Keywords</label>
+                                            <input type="text" class="form-control" name="geoKeywords" value="<%= product.geoKeywords || '' %>" placeholder="web development Hyderabad, IT services India">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">Long-tail Keywords</label>
+                                            <input type="text" class="form-control" name="longTailKeywords" value="<%= product.longTailKeywords || '' %>" placeholder="cheap website development for small business India">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">AI Search Phrases</label>
+                                            <input type="text" class="form-control" name="aiSearchPhrases" value="<%= product.aiSearchPhrases || '' %>" placeholder="best affordable web development company India">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-swadesi"><i class="bi bi-check-circle"></i> Update Package</button>
                                 <a href="/admin/tech-packages" class="btn btn-outline-secondary">Cancel</a>
@@ -173,6 +216,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/seo-autofill.js"></script>
     <script src="/js/admin.js"></script>
     <script>
         function addFeature() {

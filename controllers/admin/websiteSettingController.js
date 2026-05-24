@@ -1,6 +1,9 @@
 const WebsiteSetting = require('../../models/WebsiteSetting');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
+const fs = require('fs');
+const path = require('path');
+const { normalizeSiteUrl } = require('../../helpers/siteUrl');
 
 const buildDefaultDesignEditor = () => ({ rules: [] });
 
@@ -69,6 +72,61 @@ const uploadToCloudinary = (buffer, folder) => {
 
 const normalizeBoolean = (value) => value === 'true' || value === 'on' || value === true;
 
+const buildRobotsTxt = (siteUrl) => `User-agent: *
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+Disallow: /admin/
+Disallow: /admin/login
+Disallow: /admin/dashboard
+Disallow: /dashboard
+Disallow: /api/visitor
+
+# Sitemap location
+Sitemap: ${siteUrl}/sitemap.xml
+`;
+
+const persistRobotsTxt = (siteUrl) => {
+  try {
+    const robotsPath = path.join(__dirname, '../../public/robots.txt');
+    fs.writeFileSync(robotsPath, buildRobotsTxt(siteUrl), 'utf8');
+  } catch (error) {
+    console.error('Error updating robots.txt:', error);
+  }
+};
+
 // Get or create website settings
 exports.getSettings = async (req, res) => {
   try {
@@ -114,6 +172,11 @@ exports.getSettings = async (req, res) => {
 
     if (!settings.carousel) {
       settings.carousel = [];
+      await settings.save();
+    }
+
+    if (!settings.siteUrl) {
+      settings.siteUrl = normalizeSiteUrl();
       await settings.save();
     }
     
@@ -510,12 +573,18 @@ exports.updateSettings = async (req, res) => {
     settings.about.teamSubheading = req.body['about.teamSubheading'] || (req.body.about && req.body.about.teamSubheading) || settings.about.teamSubheading;
 
     // Update values
-    if (req.body.values && Array.isArray(req.body.values)) {
-      settings.about.values = req.body.values.map(value => ({
+    if (req.body.values) {
+      const valuesArray = Array.isArray(req.body.values)
+        ? req.body.values
+        : Object.values(req.body.values);
+
+      settings.about.values = valuesArray.map(value => ({
         icon: value.icon || '🌟',
         title: value.title || '',
         description: value.description || ''
       }));
+    } else {
+      settings.about.values = [];
     }
 
     // Update statistics
@@ -561,6 +630,14 @@ exports.updateSettings = async (req, res) => {
     // Update header settings
     if (req.body['header.height']) {
       settings.header.height = parseInt(req.body['header.height']) || 72;
+    }
+
+    // Update site URL / domain
+    if (typeof req.body.siteUrl !== 'undefined') {
+      const normalizedSiteUrl = normalizeSiteUrl(req.body.siteUrl);
+      if (normalizedSiteUrl) {
+        settings.siteUrl = normalizedSiteUrl;
+      }
     }
 
     // Update color scheme
@@ -663,6 +740,7 @@ exports.updateSettings = async (req, res) => {
     }
 
     await settings.save();
+    persistRobotsTxt(settings.siteUrl || normalizeSiteUrl());
     
     req.flash('success', 'Website settings updated successfully');
     res.redirect('/admin/settings');

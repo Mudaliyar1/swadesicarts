@@ -48,10 +48,11 @@ exports.showCreate = (req, res) => {
 // Create product
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
 
     const productData = {
       title,
+      slug: slug ? slug.trim() : undefined,
       category,
       shortDescription,
       fullDescription,
@@ -59,8 +60,16 @@ exports.create = async (req, res) => {
       priceUnit: priceUnit || '',
       minOrderQuantity: parseInt(minOrderQuantity) || 1,
       minOrderUnit: minOrderUnit || '',
+      inStock: inStock === 'on',
+      stockQuantity: stockQuantity ? parseInt(stockQuantity) : null,
       isVisible: isVisible === 'on',
-      order: parseInt(order) || 0
+      order: parseInt(order) || 0,
+      seoTitle: seoTitle || '',
+      seoMetaDescription: seoMetaDescription || '',
+      seoKeywords: seoKeywords || '',
+      geoKeywords: geoKeywords || '',
+      longTailKeywords: longTailKeywords || '',
+      aiSearchPhrases: aiSearchPhrases || ''
     };
 
     // Upload featured image
@@ -124,7 +133,7 @@ exports.showEdit = async (req, res) => {
 // Update product
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
     
     const product = await SeasonalProduct.findById(req.params.id);
     
@@ -134,6 +143,7 @@ exports.update = async (req, res) => {
     }
 
     product.title = title;
+    if (slug && slug.trim()) product.slug = slug.trim();
     product.category = category;
     product.shortDescription = shortDescription;
     product.fullDescription = fullDescription;
@@ -141,8 +151,16 @@ exports.update = async (req, res) => {
     product.priceUnit = priceUnit || '';
     product.minOrderQuantity = parseInt(minOrderQuantity) || 1;
     product.minOrderUnit = minOrderUnit || '';
+    product.inStock = inStock === 'on';
+    product.stockQuantity = stockQuantity ? parseInt(stockQuantity) : null;
     product.isVisible = isVisible === 'on';
     product.order = parseInt(order) || 0;
+    product.seoTitle = seoTitle || '';
+    product.seoMetaDescription = seoMetaDescription || '';
+    product.seoKeywords = seoKeywords || '';
+    product.geoKeywords = geoKeywords || '';
+    product.longTailKeywords = longTailKeywords || '';
+    product.aiSearchPhrases = aiSearchPhrases || '';
 
     // Update featured image if new one uploaded
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {

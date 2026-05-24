@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
+    <%- include('../partials/seo-meta') %>
 </head>
 <body>
     <%- include('../partials/navbar-new') %>
@@ -52,20 +53,20 @@
                                 </div>
                             <% } %>
 
-                            <form action="/tech-packages/inquiry-submit" method="POST" novalidate>
+                            <form action="/tech-packages/inquiry-submit" method="POST" novalidate data-inquiry-autofill="true">
                                 <div class="mb-3">
                                     <label for="name" class="form-label">Full Name *</label>
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" autocomplete="name" required>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label">Email *</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="mobile" class="form-label">Mobile Number *</label>
-                                        <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+                                        <input type="tel" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" autocomplete="tel" required>
                                     </div>
                                 </div>
 
@@ -75,15 +76,21 @@
                                         <option value="">-- Select a tech package --</option>
                                         <% if (products && products.length > 0) { %>
                                             <% products.forEach(product => { %>
-                                                <option value="<%= product._id %>" <%= selectedProductId === product._id.toString() ? 'selected' : '' %>><%= product.title %> - <%= product.price.displayText || ('₹' + product.price) %></option>
+                                                <option value="<%= product._id %>" data-title="<%= product.title %>" data-category="<%= product.category %>" data-price="<%= product.price && product.price.displayText ? product.price.displayText : '' %>" data-description="<%= product.shortDescription || '' %>" data-type="tech" <%= selectedProductId === product._id.toString() ? 'selected' : '' %>><%= product.title %> - <%= product.price.displayText || ('₹' + product.price) %></option>
                                             <% }); %>
                                         <% } %>
                                     </select>
                                 </div>
 
+                                <input type="hidden" name="productTitle" value="">
+                                <input type="hidden" name="productCategory" value="">
+                                <input type="hidden" name="productPrice" value="">
+                                <input type="hidden" name="productType" value="tech">
+                                <input type="hidden" name="packageName" value="">
+
                                 <div class="mb-3">
                                     <label for="requirement" class="form-label">Your Requirement / Message *</label>
-                                    <textarea class="form-control" id="requirement" name="requirement" rows="5" placeholder="Please describe your requirement in detail..." required></textarea>
+                                    <textarea class="form-control" id="requirement" name="requirement" rows="5" placeholder="Please describe your requirement in detail..." autocomplete="off" required></textarea>
                                 </div>
 
                                 <div class="d-grid gap-2 d-sm-flex justify-content-between">
@@ -102,7 +109,12 @@
         </div>
     </section>
 
-    <%- include('../partials/footer-new') %>
+        <%- include('../partials/footer-new') %>
+
+        <script>
+            window.__INQUIRY_PREFILL__ = <%- JSON.stringify(inquiryPrefill || {}) %>;
+        </script>
+        <script src="/js/inquiry-autofill.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

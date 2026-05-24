@@ -62,18 +62,35 @@ const techPackageSchema = new mongoose.Schema({
   order: {
     type: Number,
     default: 0
-  }
+  },
+  // SEO & GEO Keyword Optimization
+  seoTitle: { type: String, default: '' },
+  seoMetaDescription: { type: String, default: '' },
+  seoKeywords: { type: String, default: '' },
+  geoKeywords: { type: String, default: '' },
+  longTailKeywords: { type: String, default: '' },
+  aiSearchPhrases: { type: String, default: '' }
 }, {
   timestamps: true
 });
 
-// Generate slug before validation
+// Helper: sanitize a slug string
+function sanitizeSlug(str) {
+  return str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+// Generate or sanitize slug before validation
 techPackageSchema.pre('validate', function() {
-  if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+  if (this.slug) {
+    this.slug = sanitizeSlug(this.slug);
+  } else if (this.isModified('title') || !this.slug) {
+    this.slug = sanitizeSlug(this.title || '');
   }
 });
 

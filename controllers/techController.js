@@ -1,6 +1,8 @@
 const TechPackage = require('../models/TechPackage');
 const Inquiry = require('../models/Inquiry');
 const Story = require('../models/Story');
+const { productSchema, faqSchema, breadcrumbSchema, toJsonLd } = require('../helpers/schemaHelper');
+const { getSiteUrl } = require('../helpers/siteUrl');
 
 // Helper function to get active stories
 async function getActiveStories() {
@@ -62,6 +64,23 @@ exports.getPackageDetail = async (req, res) => {
     }
 
     const stories = await getActiveStories();
+    const baseUrl = getSiteUrl(res.locals.siteSettings);
+    const pageUrl = `${baseUrl}/tech-packages/${package.slug}`;
+    const productDescription = package.shortDescription || package.fullDescription || package.title;
+    const faqQuestions = [
+      {
+        question: `What is ${package.title}?`,
+        answer: productDescription
+      },
+      {
+        question: `Who should choose ${package.title}?`,
+        answer: `Businesses and individuals looking for ${package.title.toLowerCase()} services.`
+      },
+      {
+        question: 'How do I get a quote?',
+        answer: 'Use the inquiry form or WhatsApp button to request pricing, delivery, and scope details.'
+      }
+    ];
 
     res.render('public/product-detail-template', {
       title: `${package.title} - Swadesi Carts`,
@@ -69,6 +88,37 @@ exports.getPackageDetail = async (req, res) => {
       type: 'tech',
       stories,
       currentPage: 'tech',
+      seo: {
+        title: package.seoTitle || `${package.title} - Swadesi Carts`,
+        description: package.seoMetaDescription || package.shortDescription || package.fullDescription || package.title,
+        keywords: [package.seoKeywords, package.geoKeywords, package.longTailKeywords].filter(Boolean).join(', '),
+        canonical: pageUrl,
+        ogType: 'product',
+        ogImage: package.featuredImage && package.featuredImage.url ? package.featuredImage.url : '',
+        geoKeywords: package.geoKeywords || '',
+        aiSearchPhrases: package.aiSearchPhrases || ''
+      },
+      schemaJsonLd: [
+        toJsonLd(productSchema({
+          name: package.title,
+          description: productDescription,
+          url: pageUrl,
+          image: package.featuredImage && package.featuredImage.url ? package.featuredImage.url : '',
+          category: package.category,
+          sku: package.slug,
+          offers: package.price && package.price.amount ? {
+            '@type': 'Offer',
+            priceCurrency: package.price.currency || 'INR',
+            price: package.price.amount
+          } : undefined
+        })),
+        toJsonLd(breadcrumbSchema([
+          { name: 'Home', url: baseUrl + '/' },
+          { name: 'Tech Packages', url: baseUrl + '/tech-packages' },
+          { name: package.title, url: pageUrl }
+        ])),
+        toJsonLd(faqSchema(faqQuestions))
+      ],
       success: req.flash('success'),
       error: req.flash('error')
     });
@@ -118,15 +168,37 @@ exports.submitInquiry = async (req, res) => {
 exports.getInquiryPage = async (req, res) => {
   try {
     const packages = await TechPackage.find()
-      .select('_id title price')
+      .select('_id title price shortDescription category slug featuredImage')
       .sort({ title: 1 });
 
     const selectedProductId = req.query.productId || '';
+    const selectedProduct = selectedProductId
+      ? packages.find(product => product._id.toString() === selectedProductId.toString()) || null
+      : null;
+    const baseUrl = getSiteUrl(res.locals.siteSettings);
 
     res.render('public/tech-inquiry', {
       title: 'Tech Package Inquiry - Swadesi Carts',
       products: packages,
       selectedProductId,
+      selectedProduct,
+      seo: {
+        title: 'Tech Package Inquiry - Swadesi Carts',
+        description: selectedProduct ? `Inquiry form for ${selectedProduct.title} on Swadesi Carts.` : 'Send an inquiry for tech packages on Swadesi Carts.',
+        canonical: `${baseUrl}/tech-packages/inquiry`,
+        keywords: 'tech inquiry, tech packages, Swadesi Carts',
+        ogType: 'article'
+      },
+      inquiryPrefill: selectedProduct ? {
+        productId: selectedProduct._id.toString(),
+        productTitle: selectedProduct.title,
+        productCategory: selectedProduct.category,
+        productPrice: selectedProduct.price && selectedProduct.price.displayText ? selectedProduct.price.displayText : '',
+        productDescription: selectedProduct.shortDescription || '',
+        productType: 'tech',
+        packageName: selectedProduct.title,
+        autoRequirement: true
+      } : {},
       currentPage: 'tech'
     });
   } catch (error) {

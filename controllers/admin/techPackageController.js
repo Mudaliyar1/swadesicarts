@@ -44,10 +44,11 @@ exports.showCreate = (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
 
     const packageData = {
       title,
+      slug: slug ? slug.trim() : undefined,
       category,
       shortDescription,
       fullDescription,
@@ -58,7 +59,13 @@ exports.create = async (req, res) => {
       },
       isAvailable: isAvailable === 'on',
       isVisible: typeof isVisible === 'undefined' ? true : isVisible === 'on',
-      order: parseInt(order) || 0
+      order: parseInt(order) || 0,
+      seoTitle: seoTitle || '',
+      seoMetaDescription: seoMetaDescription || '',
+      seoKeywords: seoKeywords || '',
+      geoKeywords: geoKeywords || '',
+      longTailKeywords: longTailKeywords || '',
+      aiSearchPhrases: aiSearchPhrases || ''
     };
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
@@ -118,37 +125,44 @@ exports.showEdit = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
     
-    const package = await TechPackage.findById(req.params.id);
+    const pkg = await TechPackage.findById(req.params.id);
     
-    if (!package) {
+    if (!pkg) {
       req.flash('error', 'Package not found');
       return res.redirect('/admin/tech-packages');
     }
 
-    package.title = title;
-    package.category = category;
-    package.shortDescription = shortDescription;
-    package.fullDescription = fullDescription;
-    package.features = features ? (Array.isArray(features) ? features : [features]) : [];
-    package.price = {
+    pkg.title = title;
+    if (slug && slug.trim()) pkg.slug = slug.trim();
+    pkg.category = category;
+    pkg.shortDescription = shortDescription;
+    pkg.fullDescription = fullDescription;
+    pkg.features = features ? (Array.isArray(features) ? features : [features]) : [];
+    pkg.price = {
       amount: parseFloat(priceAmount) || 0,
       displayText: priceAmount ? `₹${parseFloat(priceAmount).toLocaleString('en-IN')}` : ''
     };
-    package.isAvailable = isAvailable === 'on';
+    pkg.isAvailable = isAvailable === 'on';
     if (typeof isVisible !== 'undefined') {
-      package.isVisible = isVisible === 'on';
+      pkg.isVisible = isVisible === 'on';
     }
-    package.order = parseInt(order) || 0;
+    pkg.order = parseInt(order) || 0;
+    pkg.seoTitle = seoTitle || '';
+    pkg.seoMetaDescription = seoMetaDescription || '';
+    pkg.seoKeywords = seoKeywords || '';
+    pkg.geoKeywords = geoKeywords || '';
+    pkg.longTailKeywords = longTailKeywords || '';
+    pkg.aiSearchPhrases = aiSearchPhrases || '';
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
-      if (package.featuredImage && package.featuredImage.publicId) {
-        await cloudinary.uploader.destroy(package.featuredImage.publicId);
+      if (pkg.featuredImage && pkg.featuredImage.publicId) {
+        await cloudinary.uploader.destroy(pkg.featuredImage.publicId);
       }
       
       const result = await uploadToCloudinary(req.files.featuredImage[0].buffer, 'tech');
-      package.featuredImage = {
+      pkg.featuredImage = {
         url: result.secure_url,
         publicId: result.public_id
       };
@@ -158,7 +172,7 @@ exports.update = async (req, res) => {
       for (const file of req.files.gallery) {
         const result = await uploadToCloudinary(file.buffer, 'tech/gallery');
         const fileType = file.mimetype.startsWith('video/') ? 'video' : 'image';
-        package.gallery.push({
+        pkg.gallery.push({
           url: result.secure_url,
           publicId: result.public_id,
           type: fileType
@@ -166,7 +180,7 @@ exports.update = async (req, res) => {
       }
     }
 
-    await package.save();
+    await pkg.save();
 
     req.flash('success', 'Package updated successfully');
     res.redirect('/admin/tech-packages');
@@ -179,23 +193,23 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    const package = await TechPackage.findById(req.params.id);
+    const pkg = await TechPackage.findById(req.params.id);
     
-    if (!package) {
+    if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
-    if (package.featuredImage && package.featuredImage.publicId) {
+    if (pkg.featuredImage && pkg.featuredImage.publicId) {
       try {
-        const resourceType = package.featuredImage.type === 'video' ? 'video' : 'image';
-        await cloudinary.uploader.destroy(package.featuredImage.publicId, { resource_type: resourceType });
+        const resourceType = pkg.featuredImage.type === 'video' ? 'video' : 'image';
+        await cloudinary.uploader.destroy(pkg.featuredImage.publicId, { resource_type: resourceType });
       } catch (err) {
         console.error('Error deleting featured image from Cloudinary:', err);
       }
     }
 
-    if (package.gallery && package.gallery.length > 0) {
-      for (const media of package.gallery) {
+    if (pkg.gallery && pkg.gallery.length > 0) {
+      for (const media of pkg.gallery) {
         if (media.publicId) {
           try {
             const resourceType = media.type === 'video' ? 'video' : 'image';
@@ -220,13 +234,13 @@ exports.deleteGalleryItem = async (req, res) => {
   try {
     const { productId, itemId } = req.params;
     
-    const package = await TechPackage.findById(productId);
+    const pkg = await TechPackage.findById(productId);
     
-    if (!package) {
+    if (!pkg) {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
-    const galleryItem = package.gallery.id(itemId);
+    const galleryItem = pkg.gallery.id(itemId);
     
     if (!galleryItem) {
       return res.status(404).json({ success: false, message: 'Gallery item not found' });
@@ -241,8 +255,8 @@ exports.deleteGalleryItem = async (req, res) => {
       }
     }
 
-    package.gallery.pull(itemId);
-    await package.save();
+    pkg.gallery.pull(itemId);
+    await pkg.save();
 
     res.json({ success: true, message: 'Gallery item deleted successfully' });
   } catch (error) {
