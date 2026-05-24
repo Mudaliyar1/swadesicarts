@@ -17,6 +17,19 @@
                 <%= product.price.displayText || `₹${product.price.amount.toLocaleString('en-IN')}` %>
             </p>
         <% } %>
+        <% if ((type === 'organic' || type === 'seasonal') && product.price) { %>
+            <p class="text-swadesi fw-bold mb-1">
+                ₹<%= product.price %>
+                <% if (product.priceUnit) { %>
+                    <span class="text-muted small">/ <%= product.priceUnit %></span>
+                <% } %>
+            </p>
+            <% if (product.minOrderQuantity) { %>
+                <p class="text-muted small mb-2">
+                    Min. Order: <%= product.minOrderQuantity %> <%= product.minOrderUnit %>
+                </p>
+            <% } %>
+        <% } %>
         <% if (type === 'tech' && product.isAvailable === false) { %>
             <span class="badge bg-secondary mb-2">Not Available</span>
         <% } %>

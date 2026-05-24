@@ -43,7 +43,7 @@
                     
                     <!-- PRICE & AVAILABILITY -->
                     <div class="d-flex align-items-center gap-3 mb-4">
-                        <% if (product.price) { %>
+                        <% if (product.price && type === 'tech') { %>
                             <div>
                                 <span class="text-muted-custom small">Price</span>
                                 <div class="product-price"><%= product.price.displayText || product.price %></div>
@@ -62,6 +62,39 @@
                             </div>
                         <% } %>
                     </div>
+
+                    <% if (type === 'organic' || type === 'seasonal') { %>
+                        <% if (product.price !== undefined || product.minOrderQuantity !== undefined) { %>
+                            <div class="detail-panel mb-4 p-3 bg-light-custom rounded-3 border">
+                                <div class="row text-center g-2">
+                                    <% if (product.price) { %>
+                                        <div class="col-6 border-end">
+                                            <span class="text-muted-custom small d-block">Price</span>
+                                            <strong class="fs-4 text-primary">₹<%= product.price %></strong>
+                                            <% if (product.priceUnit) { %>
+                                                <span class="text-muted-custom small">/ <%= product.priceUnit %></span>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                    <% if (product.minOrderQuantity) { %>
+                                        <div class="col-6">
+                                            <span class="text-muted-custom small d-block">Minimum Order</span>
+                                            <strong class="fs-4 text-accent"><%= product.minOrderQuantity %></strong>
+                                            <% if (product.minOrderUnit) { %>
+                                                <span class="text-muted-custom small"> <%= product.minOrderUnit %></span>
+                                            <% } %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                                <% if (product.minOrderQuantity) { %>
+                                    <div class="mt-3 pt-3 border-top text-muted-custom small text-center">
+                                        <i class="bi bi-info-circle text-accent"></i> 
+                                        For orders less than the minimum order quantity of <strong><%= product.minOrderQuantity %><%= product.minOrderUnit ? ' ' + product.minOrderUnit : '' %></strong>, pricing may vary. Please contact us for custom inquiries.
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    <% } %>
 
                     <!-- DESCRIPTION -->
                     <div class="detail-panel mb-4">
@@ -112,11 +145,26 @@
                     <% } %>
 
                     <!-- CTA BUTTONS -->
-                    <div class="d-flex gap-3 mt-5">
+                    <div class="d-flex gap-3 mt-5 flex-wrap flex-md-nowrap">
                         <% let inquiryPath = type === 'tech' ? '/tech-packages/inquiry' : '/' + type + '-products/inquiry'; %>
                         <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-accent btn-lg flex-grow-1">
                             <i class="bi bi-chat-dots"></i> Inquire Now
                         </a>
+                        <% 
+                          let wsNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings && siteSettings.footer && siteSettings.footer.phone) || '';
+                          let wsFormattedNumber = wsNumber.replace(/\D/g, '');
+                          let wsMsg = `Hello! I would like to inquire about the product: ${product.title}. Please provide more details.`;
+                          let wsUrl = wsFormattedNumber ? `https://wa.me/${wsFormattedNumber}?text=${encodeURIComponent(wsMsg)}` : '#';
+                        %>
+                        <% if (wsFormattedNumber) { %>
+                            <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
+                                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        <% } else { %>
+                            <a href="#" onclick="alert('WhatsApp number is not configured.'); return false;" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
+                                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        <% } %>
                         <% let backPath = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
                         <a href="<%= backPath %>" class="btn btn-outline-primary btn-lg">
                             <i class="bi bi-arrow-left"></i> Back

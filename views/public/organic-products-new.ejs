@@ -61,6 +61,19 @@
                                         <% }); %>
                                     </div>
                                 <% } %>
+                                <% if (product.price) { %>
+                                    <div class="product-price">
+                                        ₹<%= product.price %>
+                                        <% if (product.priceUnit) { %>
+                                            <span class="text-muted-custom small" style="font-size: 0.75rem; font-weight: normal;">/ <%= product.priceUnit %></span>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                                <% if (product.minOrderQuantity) { %>
+                                    <div class="product-moq small text-muted-custom mb-2" style="font-size: 0.75rem;">
+                                        <i class="bi bi-box-seam"></i> Min. Order: <%= product.minOrderQuantity %> <%= product.minOrderUnit %>
+                                    </div>
+                                <% } %>
                                 <div class="product-card-footer">
                                     <a href="/organic-products/<%= product.slug %>" class="btn btn-primary flex-grow-1">View Details</a>
                                 </div>

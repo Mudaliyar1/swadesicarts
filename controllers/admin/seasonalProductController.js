@@ -48,13 +48,17 @@ exports.showCreate = (req, res) => {
 // Create product
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order } = req.body;
 
     const productData = {
       title,
       category,
       shortDescription,
       fullDescription,
+      price: parseFloat(price) || undefined,
+      priceUnit: priceUnit || '',
+      minOrderQuantity: parseInt(minOrderQuantity) || 1,
+      minOrderUnit: minOrderUnit || '',
       isVisible: isVisible === 'on',
       order: parseInt(order) || 0
     };
@@ -120,7 +124,7 @@ exports.showEdit = async (req, res) => {
 // Update product
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order } = req.body;
     
     const product = await SeasonalProduct.findById(req.params.id);
     
@@ -133,6 +137,10 @@ exports.update = async (req, res) => {
     product.category = category;
     product.shortDescription = shortDescription;
     product.fullDescription = fullDescription;
+    product.price = parseFloat(price) || undefined;
+    product.priceUnit = priceUnit || '';
+    product.minOrderQuantity = parseInt(minOrderQuantity) || 1;
+    product.minOrderUnit = minOrderUnit || '';
     product.isVisible = isVisible === 'on';
     product.order = parseInt(order) || 0;
 

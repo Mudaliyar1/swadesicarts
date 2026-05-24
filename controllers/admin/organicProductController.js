@@ -44,7 +44,7 @@ exports.showCreate = (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, benefits, certifications, inStock, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order } = req.body;
 
     const productData = {
       title,
@@ -53,6 +53,10 @@ exports.create = async (req, res) => {
       fullDescription,
       benefits: benefits ? (Array.isArray(benefits) ? benefits : [benefits]) : [],
       certifications: certifications ? certifications.split(',').map(c => ({ name: c.trim() })) : [],
+      price: parseFloat(price) || undefined,
+      priceUnit: priceUnit || '',
+      minOrderQuantity: parseInt(minOrderQuantity) || 1,
+      minOrderUnit: minOrderUnit || '',
       inStock: inStock === 'on',
       isVisible: isVisible === 'on',
       order: parseInt(order) || 0
@@ -115,7 +119,7 @@ exports.showEdit = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, benefits, certifications, inStock, isVisible, order } = req.body;
+    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order } = req.body;
     
     const product = await OrganicProduct.findById(req.params.id);
     
@@ -130,6 +134,10 @@ exports.update = async (req, res) => {
     product.fullDescription = fullDescription;
     product.benefits = benefits ? (Array.isArray(benefits) ? benefits : [benefits]) : [];
     product.certifications = certifications ? certifications.split(',').map(c => ({ name: c.trim() })) : [];
+    product.price = parseFloat(price) || undefined;
+    product.priceUnit = priceUnit || '';
+    product.minOrderQuantity = parseInt(minOrderQuantity) || 1;
+    product.minOrderUnit = minOrderUnit || '';
     product.inStock = inStock === 'on';
     product.isVisible = isVisible === 'on';
     product.order = parseInt(order) || 0;

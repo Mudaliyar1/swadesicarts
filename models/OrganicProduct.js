@@ -46,6 +46,21 @@ const organicProductSchema = new mongoose.Schema({
       default: 'image'
     }
   }],
+  price: {
+    type: Number
+  },
+  priceUnit: {
+    type: String,
+    default: ''
+  },
+  minOrderQuantity: {
+    type: Number,
+    default: 1
+  },
+  minOrderUnit: {
+    type: String,
+    default: ''
+  },
   isVisible: {
     type: Boolean,
     default: true
