@@ -63,10 +63,15 @@ npm start
 
 ### Default Admin Credentials
 
-- **Email:** admin@swadesicarts.com
-- **Password:** Admin@123
+- For security, this repository does NOT include hard-coded admin credentials.
+- To create or configure an admin for local testing, either create an admin user via the admin UI or set the following in your `.env` file:
 
-**⚠️ Important:** Change the default admin password after first login!
+```env
+ADMIN_EMAIL=you@example.com
+ADMIN_PASSWORD=your_password
+```
+
+- Never commit real credentials to version control. Use environment variables or a secrets manager for production.
 
 ## Project Structure
 
