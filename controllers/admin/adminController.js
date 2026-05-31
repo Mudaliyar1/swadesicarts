@@ -143,3 +143,102 @@ exports.delete = async (req, res) => {
     res.status(500).json({ success: false, message: 'An error occurred while deleting the admin' });
   }
 };
+
+// GET /admin/geo
+exports.getGeoDashboard = async (req, res) => {
+  try {
+    const SeasonalProduct = require('../../models/SeasonalProduct');
+    const TechPackage = require('../../models/TechPackage');
+    const OrganicProduct = require('../../models/OrganicProduct');
+
+    const [organic, seasonal, tech] = await Promise.all([
+      OrganicProduct.find().lean(),
+      SeasonalProduct.find().lean(),
+      TechPackage.find().lean()
+    ]);
+
+    const countMissing = (list) => list.filter(p => !p.geoSummary || !p.aiDescription || !p.aiKeywords).length;
+
+    const stats = {
+      organicTotal: organic.length,
+      organicMissing: countMissing(organic),
+      seasonalTotal: seasonal.length,
+      seasonalMissing: countMissing(seasonal),
+      techTotal: tech.length,
+      techMissing: countMissing(tech),
+    };
+
+    stats.totalProducts = stats.organicTotal + stats.seasonalTotal + stats.techTotal;
+    stats.totalMissing = stats.organicMissing + stats.seasonalMissing + stats.techMissing;
+
+    // Combine all products for details table
+    const allProducts = [
+      ...organic.map(p => ({ ...p, type: 'organic', editUrl: `/admin/organic-products/edit/${p._id}` })),
+      ...seasonal.map(p => ({ ...p, type: 'seasonal', editUrl: `/admin/seasonal-products/edit/${p._id}` })),
+      ...tech.map(p => ({ ...p, type: 'tech', editUrl: `/admin/tech-packages/edit/${p._id}` }))
+    ];
+
+    res.render('admin/geo/dashboard', {
+      title: 'GEO Management',
+      stats,
+      products: allProducts,
+      adminName: req.session.adminName,
+      currentPage: 'geo',
+      success: req.flash('success'),
+      error: req.flash('error')
+    });
+  } catch (error) {
+    console.error('GEO Dashboard error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
+// POST /admin/geo/bulk-generate
+exports.bulkGenerateGeo = async (req, res) => {
+  try {
+    const SeasonalProduct = require('../../models/SeasonalProduct');
+    const TechPackage = require('../../models/TechPackage');
+    const OrganicProduct = require('../../models/OrganicProduct');
+    const geoHelper = require('../../helpers/geoHelper');
+
+    const [organic, seasonal, tech] = await Promise.all([
+      OrganicProduct.find(),
+      SeasonalProduct.find(),
+      TechPackage.find()
+    ]);
+
+    let updatedCount = 0;
+
+    for (const p of organic) {
+      if (!p.geoSummary || !p.aiDescription || !p.aiKeywords || !p.aiCategoryDescription || !p.entityDescription) {
+        geoHelper.autoFillGeoFields(p, 'organic');
+        await p.save();
+        updatedCount++;
+      }
+    }
+
+    for (const p of seasonal) {
+      if (!p.geoSummary || !p.aiDescription || !p.aiKeywords || !p.aiCategoryDescription || !p.entityDescription) {
+        geoHelper.autoFillGeoFields(p, 'seasonal');
+        await p.save();
+        updatedCount++;
+      }
+    }
+
+    for (const p of tech) {
+      if (!p.geoSummary || !p.aiDescription || !p.aiKeywords || !p.aiCategoryDescription || !p.entityDescription) {
+        geoHelper.autoFillGeoFields(p, 'tech');
+        await p.save();
+        updatedCount++;
+      }
+    }
+
+    req.flash('success', `Successfully auto-populated GEO fields for ${updatedCount} products/packages!`);
+    res.redirect('/admin/geo');
+  } catch (error) {
+    console.error('Bulk generate GEO error:', error);
+    req.flash('error', 'An error occurred during bulk generation.');
+    res.redirect('/admin/geo');
+  }
+};
+

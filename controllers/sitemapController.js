@@ -107,3 +107,26 @@ exports.getSitemap = async (req, res) => {
     res.status(500).send('Error generating sitemap');
   }
 };
+
+// GET /geositemap.xml
+exports.getGeoSitemap = async (req, res) => {
+  try {
+    const siteUrl = getSiteUrl(res.locals.siteSettings);
+    
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:geo="http://www.google.com/schemas/sitemap-geo/1.0">
+  <url>
+    <loc>${siteUrl}/geo.kml</loc>
+  </url>
+</urlset>`;
+
+    res.header('Content-Type', 'application/xml; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=3600'); // Cache 1 hour
+    res.send(xml);
+  } catch (error) {
+    console.error('Geo sitemap generation error:', error);
+    res.status(500).send('Error generating geo sitemap');
+  }
+};
+

@@ -83,7 +83,12 @@ const organicProductSchema = new mongoose.Schema({
   seoKeywords: { type: String, default: '' },
   geoKeywords: { type: String, default: '' },
   longTailKeywords: { type: String, default: '' },
-  aiSearchPhrases: { type: String, default: '' }
+  aiSearchPhrases: { type: String, default: '' },
+  geoSummary: { type: String, default: '' },
+  aiDescription: { type: String, default: '' },
+  aiKeywords: { type: String, default: '' },
+  aiCategoryDescription: { type: String, default: '' },
+  entityDescription: { type: String, default: '' }
 }, {
   timestamps: true
 });

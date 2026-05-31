@@ -1,0 +1,366 @@
+                    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .asset-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        .asset-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-active {
+            background-color: #2e7d32;
+            box-shadow: 0 0 8px #4caf50;
+        }
+        .status-warning {
+            background-color: #f57c00;
+            box-shadow: 0 0 8px #ffb74d;
+        }
+        .status-danger {
+            background-color: #c62828;
+            box-shadow: 0 0 8px #ef5350;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <span class="navbar-brand mb-0">GEO Dashboard</span>
+            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
+        <div class="sidebar-header">
+            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
+        </div>
+        <ul class="sidebar-nav flex-grow-1">
+            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
+            <li><a href="/admin/site-editor" title="Website Editor"><i class="bi bi-cursor"></i><span class="sidebar-text">Website Editor</span></a></li>
+            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
+            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
+            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
+            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
+            <li><a href="/admin/companies"><i class="bi bi-building"></i><span class="sidebar-text">Companies</span></a></li>
+            <li><a href="/admin/media" title="Media Management"><i class="bi bi-images"></i><span class="sidebar-text">Media Management</span></a></li>
+            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
+            <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
+            <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
+            <li><a href="/admin/geo" class="active" title="GEO Optimization"><i class="bi bi-robot"></i><span class="sidebar-text">GEO Optimization</span></a></li>
+            <li><a href="/admin/settings" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
+            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
+        </div>
+        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+    </div>
+
+    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Admin Panel</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="sidebar-nav-mobile">
+                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/admin/site-editor"><i class="bi bi-cursor"></i> Website Editor</a></li>
+                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
+                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
+                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
+                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
+                <li><a href="/admin/companies"><i class="bi bi-building"></i> Companies</a></li>
+                <li><a href="/admin/media"><i class="bi bi-images"></i> Media Management</a></li>
+                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
+                <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
+                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
+                <li><a href="/admin/geo"><i class="bi bi-robot"></i> GEO Optimization</a></li>
+                <li><a href="/admin/settings"><i class="bi bi-gear"></i> Website Settings</a></li>
+                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
+                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <!-- Flash Messages -->
+            <% if (success && success.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <%= success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+            <% if (error && error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <% } %>
+
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="fw-bold mb-1">Generative Engine Optimization (GEO)</h2>
+                    <p class="text-muted mb-0">Manage discoverability metrics, machine-readable catalogs, and agent optimization.</p>
+                </div>
+                <% if (stats.totalMissing > 0) { %>
+                    <form action="/admin/geo/bulk-generate" method="POST" onsubmit="return confirm('This will dynamically build GEO / AI fields for all products and packages where they are currently blank. Proceed?');">
+                        <button type="submit" class="btn btn-success fw-semibold shadow-sm">
+                            <i class="bi bi-magic me-1"></i> Auto-Fill <%= stats.totalMissing %> Missing Products
+                        </button>
+                    </form>
+                <% } else { %>
+                    <button class="btn btn-outline-success fw-semibold" disabled>
+                        <i class="bi bi-check-circle-fill me-1"></i> All GEO Content Complete
+                    </button>
+                <% } %>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white;">
+                        <div class="card-body">
+                            <h6 class="text-white-50 mb-2">Total GEO Catalog</h6>
+                            <h2 class="fw-bold mb-1 text-white"><%= stats.totalProducts %></h2>
+                            <p class="mb-0 text-white-50 small">Active products/services tracked</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #e53935 0%, #e35d5b 100%); color: white;">
+                        <div class="card-body">
+                            <h6 class="text-white-50 mb-2">Missing GEO Content</h6>
+                            <h2 class="fw-bold mb-1 text-white"><%= stats.totalMissing %></h2>
+                            <p class="mb-0 text-white-50 small">Requires optimization review</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%); color: white;">
+                        <div class="card-body">
+                            <h6 class="text-white-50 mb-2">Organic Products</h6>
+                            <h2 class="fw-bold mb-1 text-white"><%= stats.organicTotal %></h2>
+                            <p class="mb-0 text-white-50 small"><%= stats.organicMissing %> missing fields</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #ff8f00 0%, #ffb300 100%); color: white;">
+                        <div class="card-body">
+                            <h6 class="text-white-50 mb-2">Seasonal / Tech Products</h6>
+                            <h2 class="fw-bold mb-1 text-white"><%= stats.seasonalTotal + stats.techTotal %></h2>
+                            <p class="mb-0 text-white-50 small"><%= stats.seasonalMissing + stats.techMissing %> missing fields</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GEO File Index Status -->
+            <h5 class="fw-bold mb-3"><i class="bi bi-file-earmark-text me-2"></i>GEO & Discoverability Files</h5>
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">llms.txt</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Plain-text Markdown configuration defining index parameters, categories, and dynamic product summaries for LLMs.</p>
+                        <a href="/llms.txt" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View llms.txt</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">llms-full.txt</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Comprehensive full-content index with complete product descriptions, FAQs, and site structure for AI retrieval and training.</p>
+                        <a href="/llms-full.txt" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View llms-full.txt</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">ai-manifest.json</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Machine-readable manifest describing site capabilities, organization metadata, and full discovery endpoint directory for AI agents.</p>
+                        <a href="/ai-manifest.json" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View Manifest</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">entities.json</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Structured entity catalog with Schema.org-compliant product and organization entities for knowledge graph integration.</p>
+                        <a href="/entities.json" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View Entities</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">knowledge-base.json</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Rich QA-style knowledge base with general FAQs and per-product question-answer pairs for AI chatbot training and retrieval.</p>
+                        <a href="/knowledge-base.json" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View Knowledge Base</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">ai-catalog.json</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Structured, JSON-LD formatted indexing file mapping endpoint configurations, capabilities, and target boundaries.</p>
+                        <a href="/ai-catalog.json" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View Catalog</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">AI Discovery Endpoint</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Dynamic real-time search discovery payload endpoint containing complete schema mappings of active items.</p>
+                        <a href="/api/ai-discovery" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> Open Endpoint</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">geositemap.xml</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Dynamic XML sitemap declaring geographic elements and pointer reference files for physical coordinates.</p>
+                        <a href="/geositemap.xml" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View Sitemaps</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">geo.kml</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Keyhole Markup Language declaring office, warehouse geometries, and location targets for local search mapping.</p>
+                        <a href="/geo.kml" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> Open KML</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card asset-card bg-white p-3">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h6 class="fw-bold mb-0">robots.txt</h6>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-muted small mb-3">Standard robots declaration indicating to LLM crawlers (GPTBot, Claude-Web, etc.) where they can read details.</p>
+                        <a href="/robots.txt" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View robots.txt</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product GEO Status List -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Detailed GEO Content Status</h5>
+                    <div class="d-flex gap-2">
+                        <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search product..." style="width: 200px;">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="geoTable">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>GEO Summary</th>
+                                    <th>AI Description</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% products.forEach(p => { 
+                                    const isMissing = !p.geoSummary || !p.aiDescription || !p.aiKeywords;
+                                %>
+                                <tr>
+                                    <td class="fw-semibold"><%= p.title %></td>
+                                    <td><span class="badge bg-light text-dark"><%= p.category %></span></td>
+                                    <td><span class="badge bg-secondary"><%= p.type.toUpperCase() %></span></td>
+                                    <td>
+                                        <% if (p.geoSummary) { %>
+                                            <i class="bi bi-check-circle-fill text-success" title="<%= p.geoSummary %>"></i> Populated
+                                        <% } else { %>
+                                            <i class="bi bi-dash-circle-fill text-danger"></i> Missing
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (p.aiDescription) { %>
+                                            <i class="bi bi-check-circle-fill text-success" title="<%= p.aiDescription %>"></i> Populated
+                                        <% } else { %>
+                                            <i class="bi bi-dash-circle-fill text-danger"></i> Missing
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (isMissing) { %>
+                                            <span class="badge bg-danger-subtle text-danger px-2.5 py-1">Optimizations Needed</span>
+                                        <% } else { %>
+                                            <span class="badge bg-success-subtle text-success px-2.5 py-1">GEO Optimized</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="<%= p.editUrl %>" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+    <script>
+        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const val = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#geoTable tbody tr');
+            rows.forEach(row => {
+                const text = row.querySelector('td').textContent.toLowerCase();
+                if (text.includes(val)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -82,6 +82,10 @@ router.get('/admins/edit/:id', isAuthenticated, adminController.showEdit);
 router.post('/admins/edit/:id', isAuthenticated, adminController.update);
 router.delete('/admins/delete/:id', isAuthenticated, adminController.delete);
 
+// GEO / Generative AI Discoverability routes
+router.get('/geo', isAuthenticated, adminController.getGeoDashboard);
+router.post('/geo/bulk-generate', isAuthenticated, adminController.bulkGenerateGeo);
+
 // Visitors routes
 router.get('/visitors', isAuthenticated, visitorController.getAllVisitors);
 router.delete('/visitors/:id', isAuthenticated, visitorController.deleteVisitor);

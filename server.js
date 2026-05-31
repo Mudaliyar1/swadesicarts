@@ -8,6 +8,7 @@ const path = require('path');
 const connectDB = require('./config/database');
 const { loadWebsiteSettings } = require('./middleware/websiteSettings');
 const seoMiddleware = require('./middleware/seoMiddleware');
+const geoMiddleware = require('./middleware/geoMiddleware');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -57,6 +58,9 @@ app.use(loadWebsiteSettings);
 // Load SEO defaults for all public/admin pages
 app.use(seoMiddleware);
 
+// Load GEO defaults for all pages
+app.use(geoMiddleware);
+
 // Global variables middleware
 app.use((req, res, next) => {
   res.locals.currentPage = '';
@@ -74,9 +78,11 @@ const seasonalRoutes = require('./routes/seasonal');
 const techRoutes = require('./routes/tech');
 const organicRoutes = require('./routes/organic');
 const adminRoutes = require('./routes/admin');
+const llmsRoutes = require('./routes/llms');
 
 app.use('/', publicRoutes);
 app.use('/', sitemapRoutes);
+app.use('/', llmsRoutes);
 app.use('/seasonal-products', seasonalRoutes);
 app.use('/tech-packages', techRoutes);
 app.use('/organic-products', organicRoutes);

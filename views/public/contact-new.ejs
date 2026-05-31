@@ -11,6 +11,14 @@
     <%- include('../partials/seo-meta') %>
 </head>
 <body>
+    <!-- GEO Generative AI Optimization Summary -->
+    <div style="display: none !important;" aria-hidden="true" id="geo-ai-summary">
+        <p>Topic: <%= geo.conversationalTopic %></p>
+        <p>Location: <%= geo.geoTarget %></p>
+        <p>Entities: <%= geo.entities.join(', ') %></p>
+        <p>Summary: <%= geo.pageSummary %></p>
+    </div>
+
     <%- include('../partials/navbar-new') %>
     
     <!-- PAGE HEADER -->
@@ -39,7 +47,7 @@
 
             <div class="row g-5">
                 <!-- CONTACT INFO -->
-                <div class="col-lg-4">
+                <div class="col-lg-4 contact-info-column">
                     <h2 class="mb-4"><%= siteSettings && siteSettings.contact ? siteSettings.contact.subheading : 'Get In Touch' %></h2>
                     
                     <div class="mb-4">
@@ -59,7 +67,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Email</h5>
-                                <a href="mailto:<%= siteSettings && siteSettings.contact ? siteSettings.contact.email : 'info@swadesicarts.com' %>" class="text-accent text-decoration-none">
+                                <a href="mailto:<%= siteSettings && siteSettings.contact ? siteSettings.contact.email : 'info@swadesicarts.com' %>" class="text-decoration-none" style="color: #ffd700 !important;">
                                     <%= siteSettings && siteSettings.contact ? siteSettings.contact.email : 'info@swadesicarts.com' %>
                                 </a>
                             </div>
@@ -71,7 +79,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-2">Phone</h5>
-                                <a href="tel:<%= siteSettings && siteSettings.contact ? siteSettings.contact.phone : '+91-000-0000000' %>" class="text-accent text-decoration-none">
+                                <a href="tel:<%= siteSettings && siteSettings.contact ? siteSettings.contact.phone : '+91-000-0000000' %>" class="text-decoration-none" style="color: #ffd700 !important;">
                                     <%= siteSettings && siteSettings.contact ? siteSettings.contact.phone : '+91-000-0000000' %>
                                 </a>
                             </div>

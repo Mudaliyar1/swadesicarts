@@ -207,6 +207,41 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- GEO & AI Discoverability Section -->
+                            <div class="col-12 mb-3 mt-2" id="geo-section">
+                                <div style="background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%); border: 1px solid #c5e1a5; border-radius: 10px; padding: 1.25rem;">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                                        <h6 style="color: #2e7d32; margin-bottom: 0; font-weight: 700;"><i class="bi bi-robot me-2"></i>GEO & Generative AI Discoverability (llms.txt)</h6>
+                                        <button type="button" class="btn btn-sm btn-outline-success" id="geoAutoFillBtn" onclick="geoAutoFill()">
+                                            <i class="bi bi-magic me-1"></i> Auto-Generate GEO / AI Fields
+                                        </button>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">GEO Summary <span class="text-muted fw-normal">(geographic sourcing/availability for LLMs)</span></label>
+                                            <textarea class="form-control" name="geoSummary" rows="2" placeholder="Summary of location, availability, and target audience"><%= product.geoSummary || '' %></textarea>
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">AI Description <span class="text-muted fw-normal">(optimized overview for LLM retrieval)</span></label>
+                                            <textarea class="form-control" name="aiDescription" rows="3" placeholder="Descriptive overview structured for LLM retrieval and search indexing"><%= product.aiDescription || '' %></textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">AI Keywords <span class="text-muted fw-normal">(comma-separated query terms)</span></label>
+                                            <input type="text" class="form-control" name="aiKeywords" value="<%= product.aiKeywords || '' %>" placeholder="swadesi carts, custom software, business IT package">
+                                        </div>
+                                        <div class="col-md-6 mb-2">
+                                            <label class="form-label fw-semibold">AI Category Description</label>
+                                            <input type="text" class="form-control" name="aiCategoryDescription" value="<%= product.aiCategoryDescription || '' %>" placeholder="e.g. IT services, software development packages and consulting">
+                                        </div>
+                                        <div class="col-12 mb-2">
+                                            <label class="form-label fw-semibold">Entity Description <span class="text-muted fw-normal">(machine-readable structured entity mapping)</span></label>
+                                            <textarea class="form-control" name="entityDescription" rows="4" placeholder="Entity extraction representation (Entity, Type, Provider, etc.)"><%= product.entityDescription || '' %></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-12">
                                 <button type="submit" class="btn btn-swadesi"><i class="bi bi-check-circle"></i> Update Package</button>
                                 <a href="/admin/tech-packages" class="btn btn-outline-secondary">Cancel</a>
@@ -220,6 +255,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/seo-autofill.js"></script>
+    <script src="/js/geo-autofill.js"></script>
     <script src="/js/admin.js"></script>
     <script>
         function addFeature() {

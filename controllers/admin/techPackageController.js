@@ -1,6 +1,7 @@
 const TechPackage = require('../../models/TechPackage');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
+const geoHelper = require('../../helpers/geoHelper');
 
 const uploadToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
@@ -44,9 +45,9 @@ exports.showCreate = (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
 
-    const packageData = {
+    let packageData = {
       title,
       slug: slug ? slug.trim() : undefined,
       category,
@@ -65,8 +66,15 @@ exports.create = async (req, res) => {
       seoKeywords: seoKeywords || '',
       geoKeywords: geoKeywords || '',
       longTailKeywords: longTailKeywords || '',
-      aiSearchPhrases: aiSearchPhrases || ''
+      aiSearchPhrases: aiSearchPhrases || '',
+      geoSummary: geoSummary || '',
+      aiDescription: aiDescription || '',
+      aiKeywords: aiKeywords || '',
+      aiCategoryDescription: aiCategoryDescription || '',
+      entityDescription: entityDescription || ''
     };
+
+    packageData = geoHelper.autoFillGeoFields(packageData, 'tech');
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
       const result = await uploadToCloudinary(req.files.featuredImage[0].buffer, 'tech');
@@ -125,7 +133,7 @@ exports.showEdit = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, features, priceAmount, isAvailable, isVisible, order, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
     
     const pkg = await TechPackage.findById(req.params.id);
     
@@ -155,6 +163,13 @@ exports.update = async (req, res) => {
     pkg.geoKeywords = geoKeywords || '';
     pkg.longTailKeywords = longTailKeywords || '';
     pkg.aiSearchPhrases = aiSearchPhrases || '';
+    pkg.geoSummary = geoSummary || '';
+    pkg.aiDescription = aiDescription || '';
+    pkg.aiKeywords = aiKeywords || '';
+    pkg.aiCategoryDescription = aiCategoryDescription || '';
+    pkg.entityDescription = entityDescription || '';
+
+    geoHelper.autoFillGeoFields(pkg, 'tech');
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
       if (pkg.featuredImage && pkg.featuredImage.publicId) {

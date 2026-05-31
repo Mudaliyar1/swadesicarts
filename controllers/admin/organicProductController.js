@@ -1,6 +1,7 @@
 const OrganicProduct = require('../../models/OrganicProduct');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
+const geoHelper = require('../../helpers/geoHelper');
 
 const uploadToCloudinary = (buffer, folder) => {
   return new Promise((resolve, reject) => {
@@ -44,9 +45,9 @@ exports.showCreate = (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
 
-    const productData = {
+    let productData = {
       title,
       slug: slug ? slug.trim() : undefined,
       category,
@@ -67,8 +68,15 @@ exports.create = async (req, res) => {
       seoKeywords: seoKeywords || '',
       geoKeywords: geoKeywords || '',
       longTailKeywords: longTailKeywords || '',
-      aiSearchPhrases: aiSearchPhrases || ''
+      aiSearchPhrases: aiSearchPhrases || '',
+      geoSummary: geoSummary || '',
+      aiDescription: aiDescription || '',
+      aiKeywords: aiKeywords || '',
+      aiCategoryDescription: aiCategoryDescription || '',
+      entityDescription: entityDescription || ''
     };
+
+    productData = geoHelper.autoFillGeoFields(productData, 'organic');
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
       const result = await uploadToCloudinary(req.files.featuredImage[0].buffer, 'organic');
@@ -127,7 +135,7 @@ exports.showEdit = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, benefits, certifications, price, priceUnit, minOrderQuantity, minOrderUnit, inStock, isVisible, order, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
     
     const product = await OrganicProduct.findById(req.params.id);
     
@@ -157,6 +165,13 @@ exports.update = async (req, res) => {
     product.geoKeywords = geoKeywords || '';
     product.longTailKeywords = longTailKeywords || '';
     product.aiSearchPhrases = aiSearchPhrases || '';
+    product.geoSummary = geoSummary || '';
+    product.aiDescription = aiDescription || '';
+    product.aiKeywords = aiKeywords || '';
+    product.aiCategoryDescription = aiCategoryDescription || '';
+    product.entityDescription = entityDescription || '';
+
+    geoHelper.autoFillGeoFields(product, 'organic');
 
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
       if (product.featuredImage && product.featuredImage.publicId) {

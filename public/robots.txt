@@ -42,3 +42,12 @@ Disallow: /api/visitor
 
 # Sitemap location
 Sitemap: https://swadesicarts.in/sitemap.xml
+Sitemap: https://swadesicarts.in/geositemap.xml
+
+# LLM Discoverability
+llms: https://swadesicarts.in/llms.txt
+llms-full: https://swadesicarts.in/llms-full.txt
+ai-manifest: https://swadesicarts.in/ai-manifest.json
+ai-catalog: https://swadesicarts.in/ai-catalog.json
+entities: https://swadesicarts.in/entities.json
+knowledge-base: https://swadesicarts.in/knowledge-base.json

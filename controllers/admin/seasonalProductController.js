@@ -1,6 +1,7 @@
 const SeasonalProduct = require('../../models/SeasonalProduct');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
+const geoHelper = require('../../helpers/geoHelper');
 
 // Helper function to upload to Cloudinary
 const uploadToCloudinary = (buffer, folder) => {
@@ -48,9 +49,9 @@ exports.showCreate = (req, res) => {
 // Create product
 exports.create = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
 
-    const productData = {
+    let productData = {
       title,
       slug: slug ? slug.trim() : undefined,
       category,
@@ -69,8 +70,15 @@ exports.create = async (req, res) => {
       seoKeywords: seoKeywords || '',
       geoKeywords: geoKeywords || '',
       longTailKeywords: longTailKeywords || '',
-      aiSearchPhrases: aiSearchPhrases || ''
+      aiSearchPhrases: aiSearchPhrases || '',
+      geoSummary: geoSummary || '',
+      aiDescription: aiDescription || '',
+      aiKeywords: aiKeywords || '',
+      aiCategoryDescription: aiCategoryDescription || '',
+      entityDescription: entityDescription || ''
     };
+
+    productData = geoHelper.autoFillGeoFields(productData, 'seasonal');
 
     // Upload featured image
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {
@@ -133,7 +141,7 @@ exports.showEdit = async (req, res) => {
 // Update product
 exports.update = async (req, res) => {
   try {
-    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases } = req.body;
+    const { title, category, shortDescription, fullDescription, price, priceUnit, minOrderQuantity, minOrderUnit, isVisible, order, inStock, stockQuantity, slug, seoTitle, seoMetaDescription, seoKeywords, geoKeywords, longTailKeywords, aiSearchPhrases, geoSummary, aiDescription, aiKeywords, aiCategoryDescription, entityDescription } = req.body;
     
     const product = await SeasonalProduct.findById(req.params.id);
     
@@ -161,6 +169,13 @@ exports.update = async (req, res) => {
     product.geoKeywords = geoKeywords || '';
     product.longTailKeywords = longTailKeywords || '';
     product.aiSearchPhrases = aiSearchPhrases || '';
+    product.geoSummary = geoSummary || '';
+    product.aiDescription = aiDescription || '';
+    product.aiKeywords = aiKeywords || '';
+    product.aiCategoryDescription = aiCategoryDescription || '';
+    product.entityDescription = entityDescription || '';
+
+    geoHelper.autoFillGeoFields(product, 'seasonal');
 
     // Update featured image if new one uploaded
     if (req.files && req.files.featuredImage && req.files.featuredImage[0]) {

@@ -10,7 +10,19 @@
     <link rel="stylesheet" href="/css/style-new.css">
 </head>
 <body>
-        <% const pageBase = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
+    <!-- GEO Generative AI Optimization Summary -->
+    <div style="display: none !important;" aria-hidden="true" id="geo-ai-summary">
+        <p>Entity: <%= product.title %></p>
+        <p>Category: <%= product.category %></p>
+        <p>Type: <%= type === 'tech' ? 'Service/Package' : 'Product' %></p>
+        <p>Summary: <%= product.geoSummary || '' %></p>
+        <p>AI Description: <%= product.aiDescription || '' %></p>
+        <p>AI Keywords: <%= product.aiKeywords || '' %></p>
+        <p>Category Description: <%= product.aiCategoryDescription || '' %></p>
+        <p>Entity Description: <%= product.entityDescription || '' %></p>
+    </div>
+
+    <% const pageBase = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
     <% const siteBaseUrl = (siteSettings && siteSettings.siteUrl) || 'https://swadesicarts.in'; %>
     <% const pageUrl = (seo && seo.canonical) ? seo.canonical : siteBaseUrl + pageBase + '/' + (product.slug || product._id); %>
         <% const productFaqs = [
@@ -113,10 +125,10 @@
                         <% const descParagraphs = (product.fullDescription || '').split(/\r?\n/).filter(l => l.trim()); %>
                         <% if (descParagraphs.length > 1) { %>
                             <% descParagraphs.forEach(para => { %>
-                                <p class="text-muted-custom" style="line-height: 1.8;"><%= para %></p>
+                                <p class="text-muted-custom" style="line-height: 1.8; color: var(--primary) !important;"><%= para %></p>
                             <% }); %>
                         <% } else { %>
-                            <p class="text-muted-custom" style="line-height: 1.8;"><%= product.fullDescription %></p>
+                            <p class="text-muted-custom" style="line-height: 1.8; color: var(--primary) !important;"><%= product.fullDescription %></p>
                         <% } %>
                     </div>
 
@@ -126,7 +138,7 @@
                             <h5 class="mb-3">Benefits & Features</h5>
                             <ul class="list-group list-group-flush">
                                 <% product.benefits.forEach(benefit => { %>
-                                    <li class="list-group-item border-0 ps-0 pb-2">
+                                    <li class="list-group-item border-0 ps-0 pb-2" style="color: var(--primary) !important;">
                                         <i class="bi bi-check-circle-fill text-success"></i>
                                         <%= benefit %>
                                     </li>
@@ -141,7 +153,7 @@
                             <h5 class="mb-3">Features</h5>
                             <ul class="list-group list-group-flush">
                                 <% product.features.forEach(feature => { %>
-                                    <li class="list-group-item border-0 ps-0 pb-2">
+                                    <li class="list-group-item border-0 ps-0 pb-2" style="color: var(--primary) !important;">
                                         <i class="bi bi-check-circle-fill text-success"></i>
                                         <%= feature %>
                                     </li>

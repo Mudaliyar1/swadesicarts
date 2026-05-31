@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Swadesi Carts Location</name>
+    <description>Swadesi Carts - Nature's Finest Collection &amp; Swadeshi supply network.</description>
+    <Placemark>
+      <name>Swadesi Carts</name>
+      <description>India's Swadeshi supply network — organic products, seasonal festival supplies, and eco solutions delivered directly from Indian farms and artisans.</description>
+      <address>Ahmedabad, Gujarat, India</address>
+      <phoneNumber>+91 7043535143</phoneNumber>
+      <Point>
+        <coordinates>72.5714,23.0225,0</coordinates>
+      </Point>
+    </Placemark>
+  </Document>
+</kml>
