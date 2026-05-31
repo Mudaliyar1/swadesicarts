@@ -42,16 +42,39 @@ exports.list = async (req, res) => {
 
 exports.view = async (req, res) => {
   try {
-    const inquiry = await Inquiry.findById(req.params.id);
+    const inquiry = await Inquiry.findById(req.params.id).populate('productId').lean();
     
     if (!inquiry) {
       req.flash('error', 'Inquiry not found');
       return res.redirect('/admin/inquiries');
     }
 
+    // Build public product URL from populated product data
+    let productUrl = null;
+    let product = inquiry.productId || null;
+    if (product && inquiry.productType && inquiry.productType !== 'general') {
+      const basePath = inquiry.productType === 'tech'
+        ? '/tech-packages'
+        : `/${inquiry.productType}-products`;
+      const slug = product.slug || product._id;
+      productUrl = `${basePath}/${slug}`;
+    }
+
+    // Build admin edit URL
+    let adminEditUrl = null;
+    if (product && inquiry.productType !== 'general') {
+      const adminBase = inquiry.productType === 'tech'
+        ? '/admin/tech-packages'
+        : `/admin/${inquiry.productType}-products`;
+      adminEditUrl = `${adminBase}/edit/${product._id}`;
+    }
+
     res.render('admin/inquiries/view', {
       title: 'Inquiry Details',
       inquiry,
+      product,
+      productUrl,
+      adminEditUrl,
       adminName: req.session.adminName,
       currentPage: 'inquiries',
       success: req.flash('success'),
@@ -62,6 +85,7 @@ exports.view = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
 
 exports.updateStatus = async (req, res) => {
   try {
