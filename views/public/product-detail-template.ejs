@@ -175,24 +175,37 @@
                     <% } %>
 
                     <!-- CTA BUTTONS -->
+                    <%
+                      let wsNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings && siteSettings.footer && siteSettings.footer.phone) || '';
+                      let wsFormattedNumber = wsNumber.replace(/\D/g, '');
+                      let productPageUrl = (seo && seo.canonical) ? seo.canonical : (((siteSettings && siteSettings.siteUrl) || 'https://swadesicarts.in') + (type === 'tech' ? '/tech-packages' : '/' + type + '-products') + '/' + (product.slug || product._id));
+                      let priceInfo = '';
+                      if (type === 'tech' && product.price) {
+                        priceInfo = ` | Price: ${product.price.displayText || '₹' + product.price}`;
+                      } else if (product.price) {
+                        priceInfo = ` | Price: ₹${product.price}${product.priceUnit ? ' / ' + product.priceUnit : ''}`;
+                      }
+                      let wsMsg = `Hello! I am interested in *${product.title}* (${product.category})${priceInfo}.\n\n${product.shortDescription || ''}\n\n🔗 Product Link: ${productPageUrl}\n\nPlease share pricing, delivery, and availability. Thank you!`;
+                      let wsInquireUrl = wsFormattedNumber ? `https://wa.me/${wsFormattedNumber}?text=${encodeURIComponent(wsMsg)}` : null;
+                      let inquiryPath = type === 'tech' ? '/tech-packages/inquiry' : '/' + type + '-products/inquiry';
+                    %>
                     <div class="d-flex gap-3 mt-5 flex-wrap flex-md-nowrap">
-                        <% let inquiryPath = type === 'tech' ? '/tech-packages/inquiry' : '/' + type + '-products/inquiry'; %>
-                        <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-accent btn-lg flex-grow-1">
-                            <i class="bi bi-chat-dots"></i> Inquire Now
-                        </a>
-                                                <% 
-                          let wsNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings && siteSettings.footer && siteSettings.footer.phone) || '';
-                          let wsFormattedNumber = wsNumber.replace(/\D/g, '');
-                                                    let wsMsg = `Hello! I am interested in ${product.title} (${product.category}). ${product.shortDescription || ''} Please share pricing, delivery, and availability.`;
-                          let wsUrl = wsFormattedNumber ? `https://wa.me/${wsFormattedNumber}?text=${encodeURIComponent(wsMsg)}` : '#';
-                        %>
+                        <% if (wsInquireUrl) { %>
+                            <a href="<%= wsInquireUrl %>" target="_blank" rel="noopener" class="btn btn-accent btn-lg flex-grow-1">
+                                <i class="bi bi-chat-dots"></i> Inquire Now
+                            </a>
+                        <% } else { %>
+                            <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-accent btn-lg flex-grow-1">
+                                <i class="bi bi-chat-dots"></i> Inquire Now
+                            </a>
+                        <% } %>
                         <% if (wsFormattedNumber) { %>
-                            <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
+                            <a href="<%= wsInquireUrl %>" target="_blank" rel="noopener" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
                                 <i class="bi bi-whatsapp"></i> Chat on WhatsApp
                             </a>
                         <% } else { %>
-                            <a href="#" onclick="alert('WhatsApp number is not configured.'); return false;" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
-                                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
+                            <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
+                                <i class="bi bi-whatsapp"></i> Inquire Now
                             </a>
                         <% } %>
                         <% let backPath = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
