@@ -8,17 +8,55 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/style.css">
     <%- include('../partials/dynamic-styles') %>
+    <style>
+        /* ── Mobile-first product detail layout ── */
+        .product-detail-header .badge {
+            font-size: 0.75rem;
+            margin-right: 0.35rem;
+        }
+        .product-detail-header h1 {
+            font-size: 1.25rem;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 992px) {
+            .product-detail-header h1 { font-size: 1.75rem; }
+            .mobile-only { display: none !important; }
+            .carousel-sticky-wrap { position: static; }
+        }
+        @media (max-width: 991.98px) {
+            .desktop-only { display: none !important; }
+            .carousel-sticky-wrap {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: #fff;
+                padding-bottom: 0.25rem;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .breadcrumb { font-size: 0.78rem; }
+        }
+
+        /* Force panel headings to black regardless of admin theme color */
+        .detail-panel h5,
+        .detail-panel h5.fw-bold,
+        .inquiry-section h5,
+        .inquiry-section h5.fw-bold {
+            color: #1a1a1a !important;
+        }
+    </style>
 </head>
 <body>
     <%- include('../partials/navbar') %>
-    
+
     <% if (success && success.length > 0) { %>
         <div class="alert alert-success alert-dismissible fade show m-3" role="alert">
             <%= success %>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <% } %>
-    
+
     <% if (error && error.length > 0) { %>
         <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
             <%= error %>
@@ -26,74 +64,96 @@
         </div>
     <% } %>
 
-    <section class="py-5">
+    <section class="py-3 py-lg-5">
         <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
+
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-2">
+                <ol class="breadcrumb mb-1">
                     <li class="breadcrumb-item"><a href="/">Home</a></li>
                     <li class="breadcrumb-item"><a href="/seasonal-products">Seasonal Products</a></li>
-                    <li class="breadcrumb-item active"><%= product.title %></li>
+                    <li class="breadcrumb-item active text-truncate" style="max-width:160px;"><%= product.title %></li>
                 </ol>
             </nav>
 
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <%- include('../partials/media-carousel', { gallery: product.gallery, featuredImage: product.featuredImage }) %>
+            <!-- MOBILE: Title & badges shown ABOVE the image -->
+            <div class="product-detail-header mobile-only mb-3">
+                <span class="badge bg-swadesi"><%= product.category %></span>
+                <h1 class="fw-bold mt-2 mb-1"><%= product.title %></h1>
+                <p class="text-muted small mb-0"><%= product.shortDescription %></p>
+            </div>
+
+            <div class="row g-4">
+
+                <!-- LEFT: Image / Carousel -->
+                <div class="col-12 col-lg-6">
+                    <div class="carousel-sticky-wrap">
+                        <%- include('../partials/media-carousel', { gallery: product.gallery, featuredImage: product.featuredImage }) %>
+                    </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <span class="badge bg-swadesi mb-2"><%= product.category %></span>
-                    <h1 class="fw-bold mb-3"><%= product.title %></h1>
-                    <p class="text-muted mb-4"><%= product.shortDescription %></p>
-                    
-                    <div class="detail-panel mb-4">
+                <!-- RIGHT: Info panel -->
+                <div class="col-12 col-lg-6">
+
+                    <!-- DESKTOP ONLY: Header inside right column -->
+                    <div class="desktop-only mb-3">
+                        <span class="badge bg-swadesi mb-2"><%= product.category %></span>
+                        <h1 class="fw-bold mb-2"><%= product.title %></h1>
+                        <p class="text-muted mb-4"><%= product.shortDescription %></p>
+                    </div>
+
+                    <!-- Product Description -->
+                    <div class="detail-panel mb-3">
                         <div class="card-body">
-                            <h5 class="fw-bold mb-3">Product Description</h5>
+                            <h5 class="fw-bold mb-3" style="color:#000000 !important">Product Description</h5>
                             <p class="mb-0" style="white-space: pre-wrap;"><%= product.fullDescription %></p>
                         </div>
                     </div>
 
+                    <!-- Inquiry Form -->
                     <div class="inquiry-section card border-swadesi shadow-sm">
                         <div class="card-body">
-                            <h5 class="fw-bold mb-3">
+                            <h5 class="fw-bold mb-3" style="color:#000000 !important">
                                 <i class="bi bi-chat-dots text-swadesi"></i> Submit Inquiry
                             </h5>
                             <form action="/seasonal-products/inquiry" method="POST" id="inquiryForm">
                                 <input type="hidden" name="productId" value="<%= product._id %>">
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">Name *</label>
                                     <input type="text" class="form-control" name="name" required>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">Mobile Number *</label>
                                     <input type="tel" class="form-control" name="mobile" pattern="[0-9]{10}" required>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">Email *</label>
                                     <input type="email" class="form-control" name="email" required>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <label class="form-label">Your Requirement *</label>
                                     <textarea class="form-control" name="requirement" rows="4" required></textarea>
                                 </div>
-                                
+
                                 <button type="submit" class="btn btn-swadesi w-100" id="submitBtn">
                                     <i class="bi bi-send"></i> Submit Inquiry
                                 </button>
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
+
+                </div><!-- /right col -->
+            </div><!-- /row -->
+
         </div>
     </section>
 
     <%- include('../partials/footer') %>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
     <script>

@@ -3,259 +3,693 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <%- include('../partials/seo-meta') %>
+    <%- include('../partials/seo-meta') %>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
+
+    <style>
+    /* =========================================================
+       SWADESI CARTS — PRODUCT DETAIL PAGE  v3  (2026 Premium)
+       ========================================================= */
+
+    /* 1. HARD RESET: Kill the admin heading colour override on this page */
+    .sc-pd h1,
+    .sc-pd h2,
+    .sc-pd h3,
+    .sc-pd h4,
+    .sc-pd h5,
+    .sc-pd h6,
+    .sc-pd .sc-title,
+    .sc-pd .sc-section-label {
+        color: #111 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .sc-pd p,
+    .sc-pd li,
+    .sc-pd span:not(.badge):not(.sc-tag):not(.sc-price-val):not(.sc-cert):not(.sc-stock) {
+        color: #444 !important;
+    }
+
+    /* 2. PAGE SHELL */
+    .sc-pd {
+        background: #f6f4f0;
+        min-height: 100vh;
+        padding-bottom: 4rem;
+        padding-top: 18px; /* buffer for announcement bar above fixed navbar */
+    }
+
+    /* 3. BREADCRUMB BAR */
+    .sc-breadbar {
+        background: transparent;
+        padding: 0.7rem 0 0.4rem;
+        font-size: 0.78rem;
+        position: relative;
+        z-index: 10;
+        font-weight: 500;
+    }
+    .sc-breadbar .breadcrumb { margin: 0; flex-wrap: nowrap; overflow: hidden; background: none; }
+    .sc-breadbar .breadcrumb-item + .breadcrumb-item::before { content: '›'; color: #bbb !important; }
+    /* Nuclear override — must beat navbar-new.ejs specificity */
+    div.sc-breadbar a,
+    div.sc-breadbar a:not(.btn),
+    div.sc-breadbar .breadcrumb-item a {
+        color: #4C1E4F !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+    }
+    div.sc-breadbar a:hover,
+    div.sc-breadbar .breadcrumb-item a:hover { text-decoration: underline !important; }
+    div.sc-breadbar .breadcrumb-item,
+    div.sc-breadbar .breadcrumb-item.active,
+    div.sc-breadbar li {
+        color: #888 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+    }
+
+    /* 4. MOBILE-ONLY HERO HEADER (above image on phones) */
+    .sc-mob-header {
+        padding: 1.2rem 0 0.75rem;
+    }
+    .sc-mob-header .sc-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        background: var(--primary, #4C1E4F);
+        color: #fff !important;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 0.25rem 0.7rem;
+        border-radius: 999px;
+        margin-bottom: 0.6rem;
+    }
+    .sc-mob-header h1 {
+        font-size: clamp(1.25rem, 5vw, 1.55rem);
+        font-weight: 800;
+        line-height: 1.25;
+        letter-spacing: -0.3px;
+        margin-bottom: 0.4rem;
+    }
+    .sc-mob-header .sc-tagline {
+        font-size: 0.85rem;
+        line-height: 1.55;
+        color: #666 !important;
+        margin: 0;
+    }
+    @media (min-width: 992px) { .sc-mob-header { display: none; } }
+
+    /* 5. MEDIA BLOCK */
+    .sc-media-card {
+        background: #fff;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 4px 30px rgba(0,0,0,0.07);
+    }
+    @media (min-width: 992px) {
+        .sc-media-sticky { position: sticky; top: 82px; }
+    }
+
+    /* 6. INFO COLUMN — DESKTOP HEADER */
+    .sc-desk-header { display: none; }
+    @media (min-width: 992px) {
+        .sc-desk-header { display: block; padding-bottom: 1rem; }
+        .sc-desk-header .sc-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: var(--primary, #4C1E4F);
+            color: #fff !important;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            margin-bottom: 0.75rem;
+        }
+        .sc-desk-header h1 {
+            font-size: 2.1rem;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+        .sc-desk-header .sc-tagline {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #666 !important;
+            max-width: 42ch;
+        }
+    }
+
+    /* 7. PRICE + STOCK CARD */
+    .sc-price-card {
+        background: #fff;
+        border: 1.5px solid rgba(76,30,79,0.12);
+        border-radius: 18px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 12px rgba(76,30,79,0.06);
+    }
+    .sc-price-block {}
+    .sc-price-label {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #999 !important;
+        margin-bottom: 0.15rem;
+    }
+    .sc-price-val {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--primary, #4C1E4F) !important;
+        line-height: 1;
+        letter-spacing: -1px;
+    }
+    .sc-price-unit-text {
+        font-size: 0.75rem;
+        color: #aaa !important;
+        font-weight: 500;
+        margin-top: 0.15rem;
+    }
+    .sc-divider-v {
+        width: 1px;
+        height: 40px;
+        background: #e5e7eb;
+        flex-shrink: 0;
+    }
+    .sc-stock {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+    }
+    .sc-stock.in  { background: #f0fdf4; color: #15803d !important; border: 1px solid #bbf7d0; }
+    .sc-stock.out { background: #fff7ed; color: #c2410c !important; border: 1px solid #fed7aa; }
+    .sc-moq-note {
+        font-size: 0.73rem;
+        color: #aaa !important;
+        width: 100%;
+        margin: 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.35rem;
+    }
+
+    /* 8. CTA ROW — the fixed button layout */
+    .sc-cta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem;
+        margin-bottom: 1rem;
+    }
+    .sc-cta-grid .sc-btn-back {
+        grid-column: 1 / -1; /* full width */
+    }
+    @media (min-width: 576px) {
+        .sc-cta-grid {
+            grid-template-columns: 1fr 1fr auto;
+        }
+        .sc-cta-grid .sc-btn-back {
+            grid-column: auto;
+        }
+    }
+
+    .sc-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        padding: 0.8rem 1rem;
+        border-radius: 14px;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        white-space: nowrap;
+    }
+    .sc-btn:hover { transform: translateY(-2px); }
+
+    .sc-btn-inquire {
+        background: var(--primary, #4C1E4F);
+        color: #fff !important;
+        box-shadow: 0 4px 18px rgba(76,30,79,0.22);
+    }
+    .sc-btn-inquire:hover {
+        background: #3a1640;
+        box-shadow: 0 8px 24px rgba(76,30,79,0.32);
+        color: #fff !important;
+    }
+    .sc-btn-wa {
+        background: #25D366;
+        color: #fff !important;
+        box-shadow: 0 4px 18px rgba(37,211,102,0.22);
+    }
+    .sc-btn-wa:hover {
+        background: #1cb857;
+        box-shadow: 0 8px 24px rgba(37,211,102,0.32);
+        color: #fff !important;
+    }
+    .sc-btn-back {
+        background: #fff;
+        color: #555 !important;
+        border: 1.5px solid #e0e0e0;
+        box-shadow: none;
+        padding: 0.75rem 1.1rem;
+    }
+    .sc-btn-back:hover {
+        border-color: var(--primary, #4C1E4F);
+        color: var(--primary, #4C1E4F) !important;
+        box-shadow: none;
+    }
+
+    /* 9. CONTENT PANELS */
+    .sc-panel {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid rgba(0,0,0,0.06);
+        margin-bottom: 0.85rem;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        transition: box-shadow 0.2s ease;
+    }
+    .sc-panel:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .sc-panel-head {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.9rem 1.25rem;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        background: #fafafa;
+    }
+    .sc-panel-head-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--primary, #4C1E4F);
+        color: #fff;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    .sc-panel-title {
+        font-size: 0.8rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.8px !important;
+        text-transform: uppercase !important;
+        color: #111 !important;
+        margin: 0 !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+    .sc-panel-body { padding: 1.1rem 1.25rem; }
+    .sc-panel-body p {
+        font-size: 0.88rem;
+        line-height: 1.8;
+        color: #444 !important;
+        margin-bottom: 0.75rem;
+    }
+    .sc-panel-body p:last-child { margin-bottom: 0; }
+
+    /* 10. FEATURE / BENEFIT LIST */
+    .sc-feat-list { list-style: none; margin: 0; padding: 0; }
+    .sc-feat-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.6rem;
+        padding: 0.55rem 0;
+        border-bottom: 1px solid #f3f3f3;
+        font-size: 0.87rem;
+        color: #333 !important;
+        line-height: 1.5;
+    }
+    .sc-feat-list li:last-child { border-bottom: none; }
+    .sc-feat-icon {
+        color: #22c55e !important;
+        font-size: 1.05rem;
+        margin-top: 0.06rem;
+        flex-shrink: 0;
+    }
+
+    /* 11. CERTIFICATIONS */
+    .sc-certs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .sc-cert {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        border: 1px solid #86efac;
+        color: #15803d !important;
+        font-size: 0.74rem;
+        font-weight: 600;
+        padding: 0.32rem 0.75rem;
+        border-radius: 999px;
+    }
+
+    /* 12. FAQ */
+    .sc-faq .accordion-item {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .sc-faq .accordion-item:last-child { border-bottom: none; }
+    .sc-faq .accordion-button {
+        background: transparent;
+        font-size: 0.86rem;
+        font-weight: 600;
+        color: #111 !important;
+        padding: 0.9rem 0;
+        box-shadow: none;
+    }
+    .sc-faq .accordion-button:not(.collapsed) { color: var(--primary, #4C1E4F) !important; }
+    .sc-faq .accordion-body {
+        font-size: 0.84rem;
+        color: #666 !important;
+        padding: 0 0 1rem;
+        line-height: 1.75;
+    }
+
+    /* 13. SHARE ROW */
+    .sc-share {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .sc-share-label { font-size: 0.75rem; color: #bbb !important; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    .sc-share-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        border: 1.5px solid #e5e7eb;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: #666 !important;
+        text-decoration: none;
+        transition: all 0.18s ease;
+    }
+    .sc-share-btn:hover {
+        border-color: var(--primary, #4C1E4F);
+        color: var(--primary, #4C1E4F) !important;
+        transform: translateY(-2px);
+    }
+
+    /* ---- small screen tweaks ---- */
+    @media (max-width: 575.98px) {
+        .sc-price-val { font-size: 1.5rem; }
+        .sc-panel-body { padding: 0.9rem 1rem; }
+        .sc-panel-head { padding: 0.75rem 1rem; }
+        .sc-btn { font-size: 0.82rem; padding: 0.72rem 0.8rem; border-radius: 12px; }
+    }
+    </style>
 </head>
 <body>
-    <!-- GEO Generative AI Optimization Summary -->
-    <div style="display: none !important;" aria-hidden="true" id="geo-ai-summary">
-        <p>Entity: <%= product.title %></p>
-        <p>Category: <%= product.category %></p>
-        <p>Type: <%= type === 'tech' ? 'Service/Package' : 'Product' %></p>
-        <p>Summary: <%= product.geoSummary || '' %></p>
-        <p>AI Description: <%= product.aiDescription || '' %></p>
-        <p>AI Keywords: <%= product.aiKeywords || '' %></p>
-        <p>Category Description: <%= product.aiCategoryDescription || '' %></p>
-        <p>Entity Description: <%= product.entityDescription || '' %></p>
+
+<%- include('../partials/navbar-new') %>
+
+<div class="sc-pd">
+
+<%
+  const pageBase = type === 'tech' ? '/tech-packages' : '/' + type + '-products';
+  const siteBaseUrl = (siteSettings && siteSettings.siteUrl) || 'https://swadesicarts.in';
+  const pageUrl = (seo && seo.canonical) ? seo.canonical : siteBaseUrl + pageBase + '/' + (product.slug || product._id);
+  const productFaqs = [
+    { question: `What is ${product.title}?`, answer: product.shortDescription || product.fullDescription || product.title },
+    { question: `Who should use ${product.title}?`, answer: type === 'tech' ? 'Businesses and individuals looking for practical, reliable tech services.' : 'Customers looking for authentic, high-quality products.' },
+    { question: 'How do I place an inquiry?', answer: 'Tap the Inquire Now or WhatsApp button on this page to request pricing, delivery info, and availability.' }
+  ];
+  let wsNum = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings && siteSettings.footer && siteSettings.footer.phone) || '';
+  let wsNumClean = wsNum.replace(/\D/g, '');
+  let priceInfo = '';
+  if (type === 'tech' && product.price) { priceInfo = ` | Price: ${product.price.displayText || '₹' + product.price}`; }
+  else if (product.price) { priceInfo = ` | Price: ₹${product.price}${product.priceUnit ? ' / ' + product.priceUnit : ''}`; }
+  let wsMsg = `Hello! I am interested in *${product.title}* (${product.category})${priceInfo}.\n\n${product.shortDescription || ''}\n\n🔗 ${pageUrl}\n\nKindly share pricing, delivery, and availability. Thank you!`;
+  let wsUrl = wsNumClean ? `https://wa.me/${wsNumClean}?text=${encodeURIComponent(wsMsg)}` : null;
+  let inquiryPath = type === 'tech' ? '/tech-packages/inquiry' : '/' + type + '-products/inquiry';
+  let backPath   = type === 'tech' ? '/tech-packages' : '/' + type + '-products';
+  let typeLabel  = type === 'tech' ? 'Tech Packages' : type.charAt(0).toUpperCase() + type.slice(1) + ' Products';
+
+  /* price display helpers */
+  const showTechPrice  = type === 'tech' && product.price && product.price.displayText;
+  const showOtherPrice = type !== 'tech' && product.price;
+  const showMoq        = product.minOrderQuantity;
+  const showStock      = product.inStock !== undefined;
+  const hasPriceCard   = showTechPrice || showOtherPrice || showMoq || showStock;
+%>
+
+<!-- GEO AI (hidden) -->
+<div style="display:none" aria-hidden="true" id="geo-ai-summary">
+    <p>Entity: <%= product.title %></p><p>Category: <%= product.category %></p>
+    <p>Type: <%= type === 'tech' ? 'Service/Package' : 'Product' %></p>
+    <p>Summary: <%= product.geoSummary || '' %></p>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="sc-breadbar">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                <li class="breadcrumb-item"><a href="<%= pageBase %>"><%= typeLabel %></a></li>
+                <li class="breadcrumb-item active"><%= product.title %></li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- ═══ MOBILE HEADER (phones only) ═══ -->
+    <div class="sc-mob-header">
+        <div class="sc-tag"><i class="bi bi-tag-fill"></i>&nbsp;<%= product.category %></div>
+        <h1><%= product.title %></h1>
+        <% if (product.shortDescription) { %>
+            <p class="sc-tagline"><%= product.shortDescription %></p>
+        <% } %>
     </div>
 
-    <% const pageBase = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
-    <% const siteBaseUrl = (siteSettings && siteSettings.siteUrl) || 'https://swadesicarts.in'; %>
-    <% const pageUrl = (seo && seo.canonical) ? seo.canonical : siteBaseUrl + pageBase + '/' + (product.slug || product._id); %>
-        <% const productFaqs = [
-            { question: `What is ${product.title}?`, answer: product.shortDescription || product.fullDescription || product.title },
-            { question: `Who should use ${product.title}?`, answer: type === 'tech' ? 'Businesses and individuals looking for practical, reliable tech services.' : 'Customers looking for authentic, high-quality products.' },
-            { question: 'How do I inquire about this item?', answer: 'Use the inquiry button or WhatsApp option on this page to request pricing, delivery, and availability.' }
-        ]; %>
-    <%- include('../partials/navbar-new') %>
-    
-    <!-- PAGE HEADER -->
-    <section class="page-header" style="padding: 40px 0;">
-        <div class="container">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb breadcrumb-light">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item"><a href="<%= pageBase %>"><%= type === 'tech' ? 'Tech Packages' : type.charAt(0).toUpperCase() + type.slice(1) + ' Products' %></a></li>
-                    <li class="breadcrumb-item active"><%= product.title %></li>
-                </ol>
-            </nav>
-        </div>
-    </section>
+    <!-- ═══ MAIN GRID ═══ -->
+    <div class="row g-4">
 
-    <!-- PRODUCT DETAIL SECTION -->
-    <section>
-        <div class="container">
-            <div class="row g-5">
-                <!-- PRODUCT IMAGE -->
-                <div class="col-lg-6">
-                    <div class="product-media-container">
-                        <%- include('../partials/media-carousel', { gallery: product.gallery, featuredImage: product.featuredImage }) %>
-                    </div>
-                </div>
-
-                <!-- PRODUCT INFO -->
-                <div class="col-lg-6">
-                    <span class="product-category"><%= product.category %></span>
-                    <h1 class="mt-2 mb-3"><%= product.title %></h1>
-                    
-                    <!-- PRICE & AVAILABILITY -->
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        <% if (product.price && type === 'tech') { %>
-                            <div>
-                                <span class="text-muted-custom small">Price</span>
-                                <div class="product-price"><%= product.price.displayText || product.price %></div>
-                            </div>
-                        <% } %>
-                        <% if (product.inStock !== undefined) { %>
-                            <div>
-                                <span class="text-muted-custom small">Availability</span>
-                                <div class="mt-1 d-flex align-items-center gap-2">
-                                    <% if (product.inStock) { %>
-                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> In Stock</span>
-                                        <% if (product.stockQuantity !== undefined && product.stockQuantity !== null) { %>
-                                            <span class="text-muted-custom small" style="font-size: 0.85rem;">(<%= product.stockQuantity %> available)</span>
-                                        <% } %>
-                                    <% } else { %>
-                                        <span class="badge bg-warning"><i class="bi bi-exclamation-circle"></i> Out of Stock</span>
-                                    <% } %>
-                                </div>
-                            </div>
-                        <% } %>
-                    </div>
-
-                    <% if (type === 'organic' || type === 'seasonal') { %>
-                        <% if (product.price !== undefined || product.minOrderQuantity !== undefined) { %>
-                            <div class="detail-panel mb-4 p-3 bg-light-custom rounded-3 border">
-                                <div class="row text-center g-2">
-                                    <% if (product.price) { %>
-                                        <div class="col-6 border-end">
-                                            <span class="text-muted-custom small d-block">Price</span>
-                                            <strong class="fs-4 text-primary">₹<%= product.price %></strong>
-                                            <% if (product.priceUnit) { %>
-                                                <span class="text-muted-custom small">/ <%= product.priceUnit %></span>
-                                            <% } %>
-                                        </div>
-                                    <% } %>
-                                    <% if (product.minOrderQuantity) { %>
-                                        <div class="col-6">
-                                            <span class="text-muted-custom small d-block">Minimum Order</span>
-                                            <strong class="fs-4 text-accent"><%= product.minOrderQuantity %></strong>
-                                            <% if (product.minOrderUnit) { %>
-                                                <span class="text-muted-custom small"> <%= product.minOrderUnit %></span>
-                                            <% } %>
-                                        </div>
-                                    <% } %>
-                                </div>
-                                <% if (product.minOrderQuantity) { %>
-                                    <div class="mt-3 pt-3 border-top text-muted-custom small text-center">
-                                        <i class="bi bi-info-circle text-accent"></i> 
-                                        For orders less than the minimum order quantity of <strong><%= product.minOrderQuantity %><%= product.minOrderUnit ? ' ' + product.minOrderUnit : '' %></strong>, pricing may vary. Please contact us for custom inquiries.
-                                    </div>
-                                <% } %>
-                            </div>
-                        <% } %>
-                    <% } %>
-
-                    <!-- DESCRIPTION -->
-                    <div class="detail-panel mb-4">
-                        <h5 class="mb-3">Description</h5>
-                        <% const descParagraphs = (product.fullDescription || '').split(/\r?\n/).filter(l => l.trim()); %>
-                        <% if (descParagraphs.length > 1) { %>
-                            <% descParagraphs.forEach(para => { %>
-                                <p class="text-muted-custom" style="line-height: 1.8; color: var(--primary) !important;"><%= para %></p>
-                            <% }); %>
-                        <% } else { %>
-                            <p class="text-muted-custom" style="line-height: 1.8; color: var(--primary) !important;"><%= product.fullDescription %></p>
-                        <% } %>
-                    </div>
-
-                    <!-- BENEFITS / FEATURES -->
-                    <% if (product.benefits && product.benefits.length > 0) { %>
-                        <div class="detail-panel mb-4">
-                            <h5 class="mb-3">Benefits & Features</h5>
-                            <ul class="list-group list-group-flush">
-                                <% product.benefits.forEach(benefit => { %>
-                                    <li class="list-group-item border-0 ps-0 pb-2" style="color: var(--primary) !important;">
-                                        <i class="bi bi-check-circle-fill text-success"></i>
-                                        <%= benefit %>
-                                    </li>
-                                <% }); %>
-                            </ul>
-                        </div>
-                    <% } %>
-
-                    <!-- FEATURES (for tech packages) -->
-                    <% if (product.features && product.features.length > 0) { %>
-                        <div class="detail-panel mb-4">
-                            <h5 class="mb-3">Features</h5>
-                            <ul class="list-group list-group-flush">
-                                <% product.features.forEach(feature => { %>
-                                    <li class="list-group-item border-0 ps-0 pb-2" style="color: var(--primary) !important;">
-                                        <i class="bi bi-check-circle-fill text-success"></i>
-                                        <%= feature %>
-                                    </li>
-                                <% }); %>
-                            </ul>
-                        </div>
-                    <% } %>
-
-                    <!-- CERTIFICATIONS (for organic products) -->
-                    <% if (product.certifications && product.certifications.length > 0) { %>
-                        <div class="mb-4">
-                            <h5 class="mb-3">Certifications</h5>
-                            <div class="d-flex flex-wrap gap-2">
-                                <% product.certifications.forEach(cert => { %>
-                                    <span class="badge-custom"><%= cert.name %></span>
-                                <% }); %>
-                            </div>
-                        </div>
-                    <% } %>
-
-                    <!-- CTA BUTTONS -->
-                    <%
-                      let wsNumber = (siteSettings && siteSettings.whatsapp && siteSettings.whatsapp.number) || (siteSettings && siteSettings.footer && siteSettings.footer.phone) || '';
-                      let wsFormattedNumber = wsNumber.replace(/\D/g, '');
-                      let productPageUrl = (seo && seo.canonical) ? seo.canonical : (((siteSettings && siteSettings.siteUrl) || 'https://swadesicarts.in') + (type === 'tech' ? '/tech-packages' : '/' + type + '-products') + '/' + (product.slug || product._id));
-                      let priceInfo = '';
-                      if (type === 'tech' && product.price) {
-                        priceInfo = ` | Price: ${product.price.displayText || '₹' + product.price}`;
-                      } else if (product.price) {
-                        priceInfo = ` | Price: ₹${product.price}${product.priceUnit ? ' / ' + product.priceUnit : ''}`;
-                      }
-                      let wsMsg = `Hello! I am interested in *${product.title}* (${product.category})${priceInfo}.\n\n${product.shortDescription || ''}\n\n🔗 Product Link: ${productPageUrl}\n\nPlease share pricing, delivery, and availability. Thank you!`;
-                      let wsInquireUrl = wsFormattedNumber ? `https://wa.me/${wsFormattedNumber}?text=${encodeURIComponent(wsMsg)}` : null;
-                      let inquiryPath = type === 'tech' ? '/tech-packages/inquiry' : '/' + type + '-products/inquiry';
-                    %>
-                    <div class="d-flex gap-3 mt-5 flex-wrap flex-md-nowrap">
-                        <% if (wsInquireUrl) { %>
-                            <a href="<%= wsInquireUrl %>" target="_blank" rel="noopener" class="btn btn-accent btn-lg flex-grow-1">
-                                <i class="bi bi-chat-dots"></i> Inquire Now
-                            </a>
-                        <% } else { %>
-                            <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-accent btn-lg flex-grow-1">
-                                <i class="bi bi-chat-dots"></i> Inquire Now
-                            </a>
-                        <% } %>
-                        <% if (wsFormattedNumber) { %>
-                            <a href="<%= wsInquireUrl %>" target="_blank" rel="noopener" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
-                                <i class="bi bi-whatsapp"></i> Chat on WhatsApp
-                            </a>
-                        <% } else { %>
-                            <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="btn btn-success btn-lg flex-grow-1" style="background-color: #25D366; border-color: #25D366; color: white;">
-                                <i class="bi bi-whatsapp"></i> Inquire Now
-                            </a>
-                        <% } %>
-                        <% let backPath = type === 'tech' ? '/tech-packages' : '/' + type + '-products'; %>
-                        <a href="<%= backPath %>" class="btn btn-outline-primary btn-lg">
-                            <i class="bi bi-arrow-left"></i> Back
-                        </a>
-                    </div>
-
-                    <!-- SHARE -->
-                    <div class="mt-4 pt-4 border-top">
-                        <p class="text-muted-custom small mb-3">Share this product:</p>
-                        <div class="d-flex gap-2">
-                            <a href="https://www.facebook.com/sharer/sharer.php" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-facebook"></i>
-                            </a>
-                            <a href="https://twitter.com/intent/tweet" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                            <a href="https://www.linkedin.com/sharing/share-offsite/" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="detail-panel mb-4 mt-4">
-                        <h5 class="mb-3">Frequently Asked Questions</h5>
-                        <div class="accordion accordion-flush" id="productFaqAccordion">
-                            <% productFaqs.forEach(function(item, index) { %>
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="faq-heading-<%= index %>">
-                                        <button class="accordion-button <%= index === 0 ? '' : 'collapsed' %>" type="button" data-bs-toggle="collapse" data-bs-target="#faq-collapse-<%= index %>">
-                                            <%= item.question %>
-                                        </button>
-                                    </h2>
-                                    <div id="faq-collapse-<%= index %>" class="accordion-collapse collapse <%= index === 0 ? 'show' : '' %>" data-bs-parent="#productFaqAccordion">
-                                        <div class="accordion-body text-muted-custom">
-                                            <%= item.answer %>
-                                        </div>
-                                    </div>
-                                </div>
-                            <% }); %>
-                        </div>
-                    </div>
+        <!-- LEFT COL — image -->
+        <div class="col-12 col-lg-6">
+            <div class="sc-media-sticky">
+                <div class="sc-media-card">
+                    <%- include('../partials/media-carousel', { gallery: product.gallery, featuredImage: product.featuredImage }) %>
                 </div>
             </div>
         </div>
-    </section>
 
-    <%- include('../partials/footer-new') %>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- RIGHT COL — info -->
+        <div class="col-12 col-lg-6">
+
+            <!-- Desktop header -->
+            <div class="sc-desk-header">
+                <div class="sc-tag"><i class="bi bi-tag-fill"></i>&nbsp;<%= product.category %></div>
+                <h1><%= product.title %></h1>
+                <% if (product.shortDescription) { %>
+                    <p class="sc-tagline"><%= product.shortDescription %></p>
+                <% } %>
+            </div>
+
+            <!-- ─── Price card ─── -->
+            <% if (hasPriceCard) { %>
+            <div class="sc-price-card">
+                <% if (showTechPrice) { %>
+                    <div class="sc-price-block">
+                        <div class="sc-price-label">Starting Price</div>
+                        <div class="sc-price-val"><%= product.price.displayText %></div>
+                    </div>
+                <% } else if (showOtherPrice) { %>
+                    <div class="sc-price-block">
+                        <div class="sc-price-label">Price</div>
+                        <div class="sc-price-val">₹<%= product.price %></div>
+                        <% if (product.priceUnit) { %>
+                            <div class="sc-price-unit-text">per <%= product.priceUnit %></div>
+                        <% } %>
+                    </div>
+                <% } %>
+
+                <% if ((showTechPrice || showOtherPrice) && (showStock || showMoq)) { %>
+                    <div class="sc-divider-v"></div>
+                <% } %>
+
+                <% if (showMoq) { %>
+                    <div class="sc-price-block">
+                        <div class="sc-price-label">Min. Order</div>
+                        <div class="sc-price-val" style="font-size:1.3rem;color:#B5A886 !important;"><%= product.minOrderQuantity %><% if(product.minOrderUnit){ %>&nbsp;<small style="font-size:0.9rem"><%= product.minOrderUnit %></small><% } %></div>
+                    </div>
+                <% } %>
+
+                <% if (showStock) { %>
+                    <span class="sc-stock <%= product.inStock ? 'in' : 'out' %>">
+                        <i class="bi <%= product.inStock ? 'bi-check-circle-fill' : 'bi-x-circle-fill' %>"></i>
+                        <%= product.inStock ? 'In Stock' : 'Out of Stock' %>
+                        <% if (product.inStock && product.stockQuantity != null) { %>
+                            &middot; <%= product.stockQuantity %> left
+                        <% } %>
+                    </span>
+                <% } %>
+
+                <% if (showMoq) { %>
+                    <p class="sc-moq-note"><i class="bi bi-info-circle"></i> For quantities below the minimum order, pricing may vary — contact us for a custom quote.</p>
+                <% } %>
+            </div>
+            <% } %>
+
+            <!-- ─── CTA Buttons ─── -->
+            <div class="sc-cta-grid">
+                <% if (wsUrl) { %>
+                    <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="sc-btn sc-btn-inquire">
+                        <i class="bi bi-chat-dots-fill"></i> Inquire Now
+                    </a>
+                <% } else { %>
+                    <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="sc-btn sc-btn-inquire">
+                        <i class="bi bi-chat-dots-fill"></i> Inquire Now
+                    </a>
+                <% } %>
+
+                <% if (wsNumClean) { %>
+                    <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="sc-btn sc-btn-wa">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </a>
+                <% } else { %>
+                    <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="sc-btn sc-btn-wa">
+                        <i class="bi bi-envelope-fill"></i> Inquire
+                    </a>
+                <% } %>
+
+                <a href="<%= backPath %>" class="sc-btn sc-btn-back">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <!-- ─── Description ─── -->
+            <div class="sc-panel">
+                <div class="sc-panel-head">
+                    <div class="sc-panel-head-icon"><i class="bi bi-file-text"></i></div>
+                    <span class="sc-panel-title">Description</span>
+                </div>
+                <div class="sc-panel-body">
+                    <% const paras = (product.fullDescription || '').split(/\r?\n/).filter(l => l.trim()); %>
+                    <% if (paras.length > 1) { paras.forEach(p => { %><p><%= p %></p><% }); } else { %>
+                        <p><%= product.fullDescription %></p>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- ─── Benefits & Features ─── -->
+            <% if (product.benefits && product.benefits.length > 0) { %>
+            <div class="sc-panel">
+                <div class="sc-panel-head">
+                    <div class="sc-panel-head-icon"><i class="bi bi-stars"></i></div>
+                    <span class="sc-panel-title">Benefits &amp; Features</span>
+                </div>
+                <div class="sc-panel-body" style="padding-top:0.4rem;padding-bottom:0.4rem;">
+                    <ul class="sc-feat-list">
+                        <% product.benefits.forEach(b => { %>
+                            <li><i class="bi bi-check-circle-fill sc-feat-icon"></i><span><%= b %></span></li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- ─── Features (tech) ─── -->
+            <% if (product.features && product.features.length > 0) { %>
+            <div class="sc-panel">
+                <div class="sc-panel-head">
+                    <div class="sc-panel-head-icon"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <span class="sc-panel-title">Features</span>
+                </div>
+                <div class="sc-panel-body" style="padding-top:0.4rem;padding-bottom:0.4rem;">
+                    <ul class="sc-feat-list">
+                        <% product.features.forEach(f => { %>
+                            <li><i class="bi bi-check-circle-fill sc-feat-icon"></i><span><%= f %></span></li>
+                        <% }); %>
+                    </ul>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- ─── Certifications ─── -->
+            <% if (product.certifications && product.certifications.length > 0) { %>
+            <div class="sc-panel">
+                <div class="sc-panel-head">
+                    <div class="sc-panel-head-icon"><i class="bi bi-patch-check-fill"></i></div>
+                    <span class="sc-panel-title">Certifications</span>
+                </div>
+                <div class="sc-panel-body">
+                    <div class="sc-certs">
+                        <% product.certifications.forEach(c => { %>
+                            <span class="sc-cert"><i class="bi bi-shield-check"></i><%= c.name %></span>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+
+            <!-- ─── FAQ ─── -->
+            <div class="sc-panel sc-faq">
+                <div class="sc-panel-head">
+                    <div class="sc-panel-head-icon"><i class="bi bi-question-circle-fill"></i></div>
+                    <span class="sc-panel-title">FAQs</span>
+                </div>
+                <div class="sc-panel-body" style="padding-top:0;padding-bottom:0;">
+                    <div class="accordion accordion-flush" id="scFaq">
+                        <% productFaqs.forEach((faq, i) => { %>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button <%= i === 0 ? '' : 'collapsed' %>" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#scFaq-<%= i %>">
+                                    <%= faq.question %>
+                                </button>
+                            </h2>
+                            <div id="scFaq-<%= i %>" class="accordion-collapse collapse <%= i === 0 ? 'show' : '' %>" data-bs-parent="#scFaq">
+                                <div class="accordion-body"><%= faq.answer %></div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── Share ─── -->
+            <div class="sc-share">
+                <span class="sc-share-label">Share</span>
+                <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(pageUrl) %>" target="_blank" rel="noopener" class="sc-share-btn" title="Facebook"><i class="bi bi-facebook"></i></a>
+                <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(pageUrl) %>&text=<%= encodeURIComponent(product.title) %>" target="_blank" rel="noopener" class="sc-share-btn" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent(pageUrl) %>" target="_blank" rel="noopener" class="sc-share-btn" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                <a href="https://wa.me/?text=<%= encodeURIComponent(product.title + ' — ' + pageUrl) %>" target="_blank" rel="noopener" class="sc-share-btn" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            </div>
+
+        </div><!-- /right col -->
+    </div><!-- /row -->
+</div><!-- /container -->
+</div><!-- /sc-pd -->
+
+<%- include('../partials/footer-new') %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

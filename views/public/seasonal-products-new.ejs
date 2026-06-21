@@ -9,6 +9,146 @@
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
     <%- include('../partials/seo-meta') %>
+    <style>
+        /* PREMIUM LIGHT YELLOW / SKIN TONE CARDS - EXTREMELY COMPACT */
+        #product-cards-container div.product-card {
+            background: #fef3c7 !important; /* Light Buttery Yellow / Warm Skin */
+            border: 1px solid #fde68a !important;
+            border-radius: 8px !important;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        #product-cards-container div.product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2) !important;
+            border-color: #fcd34d !important;
+        }
+        #product-cards-container div.product-card .product-image-wrapper {
+            position: relative;
+            height: 140px; /* Restored extremely small image */
+            overflow: hidden;
+            background: #ffffff !important;
+            border-bottom: 1px solid #fde68a !important;
+        }
+        #product-cards-container div.product-card .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        #product-cards-container div.product-card:hover .product-image-wrapper img {
+            transform: scale(1.05);
+        }
+        #product-cards-container div.product-card span.product-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #78350f !important;
+            color: #fef3c7 !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            font-size: 0.6rem !important;
+            font-weight: 700 !important;
+            border: none !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        }
+        #product-cards-container div.product-card .product-card-body {
+            padding: 0.75rem !important; /* Restored extremely tight padding */
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            background: transparent !important;
+        }
+        #product-cards-container div.product-card span.product-category {
+            font-size: 0.6rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            color: #b45309 !important;
+            margin-bottom: 0.2rem !important;
+            font-weight: 700 !important;
+            display: block !important;
+        }
+        #product-cards-container div.product-card h5.product-card-title {
+            font-size: 0.85rem !important; /* Restored tiny title */
+            font-weight: 700 !important;
+            color: #78350f !important;
+            margin-bottom: 0.2rem !important;
+            line-height: 1.2 !important;
+        }
+        #product-cards-container div.product-card p.product-card-description {
+            font-size: 0.75rem !important; /* Restored tiny description */
+            color: #92400e !important;
+            line-height: 1.4 !important;
+            margin-bottom: 0.5rem !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 1 !important; /* Restored 1 line */
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
+            font-weight: 500 !important;
+        }
+        #product-cards-container div.product-card div.product-price {
+            font-size: 1rem !important; /* Restored small price */
+            font-weight: 800 !important;
+            color: #78350f !important;
+            margin-bottom: 0.1rem !important;
+            margin-top: auto !important;
+        }
+        #product-cards-container div.product-card div.product-price span {
+            color: #b45309 !important;
+            font-weight: 600 !important;
+            font-size: 0.7rem !important;
+        }
+        #product-cards-container div.product-card div.product-moq {
+            font-size: 0.7rem !important;
+            color: #b45309 !important;
+            margin-bottom: 0.6rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 4px !important;
+            font-weight: 500 !important;
+        }
+        #product-cards-container div.product-card div.product-moq i {
+            color: #d97706 !important;
+        }
+        #product-cards-container div.product-card div.product-card-footer {
+            margin-top: auto !important;
+        }
+        #product-cards-container div.product-card div.product-card-footer a.btn {
+            width: 100% !important;
+            border-radius: 4px !important;
+            font-weight: 600 !important;
+            padding: 0.35rem !important; /* Restored very thin button */
+            background: transparent !important;
+            border: 1px solid #78350f !important;
+            color: #78350f !important;
+            text-transform: none !important;
+            font-size: 0.75rem !important;
+            transition: all 0.2s ease !important;
+            display: block !important;
+            text-align: center !important;
+        }
+        #product-cards-container div.product-card div.product-card-footer a.btn:hover {
+            background: #78350f !important;
+            color: #fef3c7 !important;
+            border-color: #78350f !important;
+        }
+        #product-cards-container div.product-card span.badge-custom {
+            display: inline-block !important;
+            background: #fde68a !important;
+            color: #78350f !important;
+            padding: 2px 4px !important;
+            border-radius: 4px !important;
+            font-size: 0.6rem !important;
+            font-weight: 600 !important;
+            margin-right: 4px !important;
+            margin-bottom: 4px !important;
+            border: 1px solid #fcd34d !important;
+        }
+    </style>
 </head>
 <body>
     <%- include('../partials/navbar-new') %>
@@ -22,7 +162,7 @@
     </section>
 
     <!-- PRODUCTS SECTION -->
-    <section>
+    <section id="product-cards-container">
         <div class="container">
             <!-- CATEGORY FILTER -->
             <%- include('../partials/category-filter') %>
