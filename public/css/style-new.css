@@ -3273,7 +3273,7 @@ textarea.form-control {
 @media (max-width: 768px) {
     .chat-popup-wrapper {
         right: 16px;
-        bottom: 16px;
+        bottom: 110px; /* Moved up to clear the new mobile bottom nav */
     }
 
     .chat-capsule-btn {
@@ -3310,7 +3310,7 @@ textarea.form-control {
 @media (max-width: 576px) {
     .chat-popup-wrapper {
         right: 12px;
-        bottom: 12px;
+        bottom: 110px; /* Moved up to clear the new mobile bottom nav */
     }
 
     .chat-capsule-btn {

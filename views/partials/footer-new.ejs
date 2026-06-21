@@ -5,10 +5,11 @@
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="footer-brand-wrapper mb-3">
                     <% if (siteSettings && siteSettings.logo && siteSettings.logo.url) { %>
-                        <img src="<%= siteSettings.logo.url %>" alt="Swadesi Carts" class="footer-logo mb-2" style="max-height: 45px; object-fit: contain;">
-                    <% } else { %>
-                        <span class="footer-brand-text">Swadesi<span>Carts</span></span>
-                    <% } %>
+                        <img src="<%= siteSettings.logo.url %>" alt="Swadesi Carts" class="footer-logo mb-2"
+                            style="max-height: 45px; object-fit: contain;">
+                        <% } else { %>
+                            <span class="footer-brand-text">Swadesi<span>Carts</span></span>
+                            <% } %>
                 </div>
                 <p class="footer-tagline">
                     Sourcing the purity and trust of Bharat's finest organic and seasonal products, built for the world.
@@ -19,29 +20,33 @@
                             <a href="<%= siteSettings.socialMedia.facebook %>" target="_blank" aria-label="Facebook">
                                 <i class="bi bi-facebook"></i>
                             </a>
-                        <% } %>
-                        <% if (siteSettings.socialMedia.twitter) { %>
-                            <a href="<%= siteSettings.socialMedia.twitter %>" target="_blank" aria-label="Twitter">
-                                <i class="bi bi-twitter"></i>
-                            </a>
-                        <% } %>
-                        <% if (siteSettings.socialMedia.instagram) { %>
-                            <a href="<%= siteSettings.socialMedia.instagram %>" target="_blank" aria-label="Instagram">
-                                <i class="bi bi-instagram"></i>
-                            </a>
-                        <% } %>
-                        <% if (siteSettings.socialMedia.linkedin) { %>
-                            <a href="<%= siteSettings.socialMedia.linkedin %>" target="_blank" aria-label="LinkedIn">
-                                <i class="bi bi-linkedin"></i>
-                            </a>
-                        <% } %>
-                        <% if (siteSettings.socialMedia.youtube) { %>
-                            <a href="<%= siteSettings.socialMedia.youtube %>" target="_blank" aria-label="YouTube">
-                                <i class="bi bi-youtube"></i>
-                            </a>
-                        <% } %>
+                            <% } %>
+                                <% if (siteSettings.socialMedia.twitter) { %>
+                                    <a href="<%= siteSettings.socialMedia.twitter %>" target="_blank"
+                                        aria-label="Twitter">
+                                        <i class="bi bi-twitter"></i>
+                                    </a>
+                                    <% } %>
+                                        <% if (siteSettings.socialMedia.instagram) { %>
+                                            <a href="<%= siteSettings.socialMedia.instagram %>" target="_blank"
+                                                aria-label="Instagram">
+                                                <i class="bi bi-instagram"></i>
+                                            </a>
+                                            <% } %>
+                                                <% if (siteSettings.socialMedia.linkedin) { %>
+                                                    <a href="<%= siteSettings.socialMedia.linkedin %>" target="_blank"
+                                                        aria-label="LinkedIn">
+                                                        <i class="bi bi-linkedin"></i>
+                                                    </a>
+                                                    <% } %>
+                                                        <% if (siteSettings.socialMedia.youtube) { %>
+                                                            <a href="<%= siteSettings.socialMedia.youtube %>"
+                                                                target="_blank" aria-label="YouTube">
+                                                                <i class="bi bi-youtube"></i>
+                                                            </a>
+                                                            <% } %>
                     </div>
-                <% } %>
+                    <% } %>
             </div>
 
             <!-- QUICK LINKS -->
@@ -71,19 +76,24 @@
                 <ul class="footer-contact-info">
                     <li>
                         <i class="bi bi-envelope"></i>
-                        <a href="mailto:<%= siteSettings && siteSettings.footer ? siteSettings.footer.email : 'info@swadesicarts.com' %>">
-                            <%= siteSettings && siteSettings.footer ? siteSettings.footer.email : 'info@swadesicarts.com' %>
+                        <a
+                            href="mailto:<%= siteSettings && siteSettings.footer ? siteSettings.footer.email : 'info@swadesicarts.com' %>">
+                            <%= siteSettings && siteSettings.footer ? siteSettings.footer.email
+                                : 'info@swadesicarts.com' %>
                         </a>
                     </li>
                     <li>
                         <i class="bi bi-telephone"></i>
-                        <a href="tel:<%= siteSettings && siteSettings.footer ? siteSettings.footer.phone : '+91-000-0000000' %>">
+                        <a
+                            href="tel:<%= siteSettings && siteSettings.footer ? siteSettings.footer.phone : '+91-000-0000000' %>">
                             <%= siteSettings && siteSettings.footer ? siteSettings.footer.phone : '+91-000-0000000' %>
                         </a>
                     </li>
                     <li>
                         <i class="bi bi-geo-alt"></i>
-                        <span><%= siteSettings && siteSettings.footer ? siteSettings.footer.address : 'India' %></span>
+                        <span>
+                            <%= siteSettings && siteSettings.footer ? siteSettings.footer.address : 'India' %>
+                        </span>
                     </li>
                 </ul>
             </div>
@@ -94,3 +104,122 @@
         </div>
     </div>
 </footer>
+
+<!-- MOBILE BOTTOM NAVIGATION (iOS LIQUID GLASS STYLE) -->
+<div class="mobile-bottom-nav d-md-none">
+    <a href="/" class="nav-item">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
+    </a>
+    <a href="/organic-products" class="nav-item">
+        <i class="bi bi-tree"></i>
+        <span>Organic</span>
+    </a>
+    <a href="/seasonal-products" class="nav-item">
+        <i class="bi bi-basket"></i>
+        <span>Seasonal</span>
+    </a>
+    <a href="/tech-packages" class="nav-item">
+        <i class="bi bi-cpu"></i>
+        <span>Tech</span>
+    </a>
+</div>
+
+<style>
+    /* ULTRA-AESTHETIC iOS LIQUID GLASS FLOATING PILL */
+    .mobile-bottom-nav {
+        display: none;
+        /* Hidden by default on larger screens */
+    }
+
+    @media (max-width: 767px) {
+        body {
+            /* Add padding so bottom nav doesn't hide content */
+            padding-bottom: 90px !important;
+        }
+
+        .mobile-bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: fixed;
+            bottom: 24px;
+            left: 5%;
+            width: 90%;
+            height: 70px;
+            /* Slightly taller for liquid look */
+
+            /* iOS Liquid Glass / VisionOS Style */
+            background: rgba(20, 25, 40, 0.45);
+            /* Deep translucent tint */
+            border-radius: 40px;
+            z-index: 1050;
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            /* Light catching upper edge */
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            padding: 0 10px;
+        }
+
+        .mobile-bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fef3c7 !important; /* Permanently buttery yellow */
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            flex: 1;
+            height: 85%;
+            border-radius: 20px;
+            margin: 0 4px;
+            position: relative;
+        }
+
+        .mobile-bottom-nav .nav-item i {
+            color: #fef3c7 !important;
+            font-size: 1.35rem;
+            margin-bottom: 3px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .mobile-bottom-nav .nav-item:hover,
+        .mobile-bottom-nav .nav-item:active {
+            color: #fef3c7;
+            /* Buttery yellow highlight */
+            background: rgba(255, 255, 255, 0.08);
+            /* Soft glass highlight behind item */
+            transform: translateY(-2px);
+        }
+
+        /* Liquid glowing active indicator line */
+        .mobile-bottom-nav .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 16px;
+            height: 3px;
+            border-radius: 10px;
+            background-color: #fef3c7;
+            opacity: 0;
+            transform: scaleX(0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 12px #fef3c7;
+        }
+
+        .mobile-bottom-nav .nav-item:hover::after,
+        .mobile-bottom-nav .nav-item:active::after {
+            opacity: 1;
+            transform: scaleX(1);
+        }
+
+        /* Add extra padding to footer to ensure scroll clears the floating nav */
+        footer {
+            padding-bottom: 100px !important;
+        }
+    }
+</style>
