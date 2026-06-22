@@ -12,6 +12,34 @@
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
     <%- include('../partials/seo-meta') %>
+    <style>
+        /* Force product card text to brown as requested */
+        .home-page .product-card .product-category,
+        .home-page .product-card .product-card-title,
+        .home-page .product-card .product-card-description,
+        .home-page .product-card .product-price {
+            color: #5C3A21 !important;
+        }
+        
+        .home-page .product-card:hover .product-card-title {
+            color: #8B4513 !important;
+        }
+        
+        .home-page .product-card .product-badge {
+            background: #8B4513 !important;
+        }
+        
+        .home-page .product-card-footer .btn {
+            border: 2px solid #5C3A21 !important;
+            color: #5C3A21 !important;
+            background: transparent !important;
+        }
+        
+        .home-page .product-card-footer .btn:hover {
+            background-color: #5C3A21 !important;
+            color: #FFF !important;
+        }
+    </style>
 </head>
 
 <body class="home-page">
@@ -373,20 +401,20 @@
                                                                         <span class="product-badge">New</span>
                                                         </div>
                                                         <div class="product-card-body">
-                                                            <span class="product-category">
+                                                            <span class="product-category" style="color: #5C3A21 !important;">
                                                                 <%= product.category %>
                                                             </span>
-                                                            <h5 class="product-card-title">
+                                                            <h5 class="product-card-title" style="color: #5C3A21 !important;">
                                                                 <%= product.title %>
                                                             </h5>
-                                                            <p class="product-card-description">
+                                                            <p class="product-card-description" style="color: #5C3A21 !important;">
                                                                 <%= product.shortDescription %>
                                                             </p>
                                                             <% if (product.price) { %>
-                                                                <div class="product-price">
+                                                                <div class="product-price" style="color: #5C3A21 !important;">
                                                                     ₹<%= product.price %>
                                                                     <% if (product.priceUnit) { %>
-                                                                        <span class="text-muted-custom small" style="font-size: 0.75rem; font-weight: normal;">/ <%= product.priceUnit %></span>
+                                                                        <span style="color: #5C3A21 !important; font-weight: 800;">/ <%= product.priceUnit %></span>
                                                                     <% } %>
                                                                 </div>
                                                             <% } %>
@@ -441,16 +469,16 @@
                                                                         <span class="product-badge">Featured</span>
                                                         </div>
                                                         <div class="product-card-body">
-                                                            <span class="product-category">
+                                                            <span class="product-category" style="color: #5C3A21 !important;">
                                                                 <%= package.category %>
                                                             </span>
-                                                            <h5 class="product-card-title">
+                                                            <h5 class="product-card-title" style="color: #5C3A21 !important;">
                                                                 <%= package.title %>
                                                             </h5>
-                                                            <p class="product-card-description">
+                                                            <p class="product-card-description" style="color: #5C3A21 !important;">
                                                                 <%= package.shortDescription %>
                                                             </p>
-                                                            <div class="product-price">
+                                                            <div class="product-price" style="color: #5C3A21 !important;">
                                                                 <%= package.price.displayText || package.price %>
                                                             </div>
                                                             <div class="product-card-footer">
@@ -499,20 +527,20 @@
                                                                         <span class="product-badge">Organic</span>
                                                         </div>
                                                         <div class="product-card-body">
-                                                            <span class="product-category">
+                                                            <span class="product-category" style="color: #5C3A21 !important;">
                                                                 <%= product.category %>
                                                             </span>
-                                                            <h5 class="product-card-title">
+                                                            <h5 class="product-card-title" style="color: #5C3A21 !important;">
                                                                 <%= product.title %>
                                                             </h5>
-                                                            <p class="product-card-description">
+                                                            <p class="product-card-description" style="color: #5C3A21 !important;">
                                                                 <%= product.shortDescription %>
                                                             </p>
                                                             <% if (product.price) { %>
-                                                                <div class="product-price">
+                                                                <div class="product-price" style="color: #5C3A21 !important;">
                                                                     ₹<%= product.price %>
                                                                     <% if (product.priceUnit) { %>
-                                                                        <span class="text-muted-custom small" style="font-size: 0.75rem; font-weight: normal;">/ <%= product.priceUnit %></span>
+                                                                        <span style="color: #5C3A21 !important; font-weight: 800;">/ <%= product.priceUnit %></span>
                                                                     <% } %>
                                                                 </div>
                                                             <% } %>

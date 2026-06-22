@@ -34,7 +34,7 @@ exports.getHome = async (req, res) => {
   try {
     const baseUrl = getSiteUrl(res.locals.siteSettings);
     const featuredSeasonal = await SeasonalProduct.find({ isVisible: true })
-      .select('title slug category shortDescription featuredImage order')
+      .select('title slug category shortDescription featuredImage price priceUnit minOrderQuantity minOrderUnit order')
       .sort({ order: 1 })
       .limit(3);
     
@@ -44,7 +44,7 @@ exports.getHome = async (req, res) => {
       .limit(3);
     
     const featuredOrganic = await OrganicProduct.find({ isVisible: true })
-      .select('title slug category shortDescription featuredImage order')
+      .select('title slug category shortDescription featuredImage price priceUnit minOrderQuantity minOrderUnit order')
       .sort({ order: 1 })
       .limit(3);
 

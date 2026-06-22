@@ -5,15 +5,32 @@ const websiteSettingSchema = new mongoose.Schema({
   logo: {
     url: { type: String, default: '' },
     publicId: { type: String, default: '' },
+    // Global fallback defaults
     width: { type: Number, default: 200 },
     height: { type: Number, default: 50 },
     horizontalPosition: { type: Number, default: 0, min: -100, max: 100 },
-    verticalPosition: { type: Number, default: 0, min: -100, max: 100 }
+    verticalPosition: { type: Number, default: 0, min: -100, max: 100 },
+    // Desktop specific overrides
+    desktop: {
+      width: { type: Number, default: 200 },
+      height: { type: Number, default: 50 },
+      horizontalPosition: { type: Number, default: 0, min: -100, max: 100 },
+      verticalPosition: { type: Number, default: 0, min: -100, max: 100 }
+    },
+    // Mobile specific overrides
+    mobile: {
+      width: { type: Number, default: 150 },
+      height: { type: Number, default: 40 },
+      horizontalPosition: { type: Number, default: 0, min: -100, max: 100 },
+      verticalPosition: { type: Number, default: 0, min: -100, max: 100 }
+    }
   },
 
   // Header Settings
   header: {
-    height: { type: Number, default: 72 } // Header height in pixels
+    height: { type: Number, default: 72 }, // Global fallback
+    desktopHeight: { type: Number, default: 72 },
+    mobileHeight: { type: Number, default: 60 }
   },
 
   // Site URL / Domain
@@ -43,7 +60,7 @@ const websiteSettingSchema = new mongoose.Schema({
     linkColor: { type: String, default: '#B5A886' }, // Link color for general content
     headerFooterLinkColor: { type: String, default: '#FFD700' }, // Link color for header/footer
     bodyBackgroundColor: { type: String, default: '#ffffff' }, // Body/Website background color
-    backgroundType: { type: String, enum: ['color','gradient'], default: 'color' },
+    backgroundType: { type: String, enum: ['color', 'gradient'], default: 'color' },
     backgroundGradient: { type: String, default: '' }, // Custom CSS gradient string
     backgroundGradientStop1: { type: String, default: '#000000' },
     backgroundGradientStop2: { type: String, default: '#444444' }

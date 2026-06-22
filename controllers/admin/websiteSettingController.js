@@ -131,7 +131,7 @@ const persistRobotsTxt = (siteUrl) => {
 exports.getSettings = async (req, res) => {
   try {
     let settings = await WebsiteSetting.findOne();
-    
+
     // If no settings exist, create default settings
     if (!settings) {
       settings = new WebsiteSetting({
@@ -163,7 +163,7 @@ exports.getSettings = async (req, res) => {
       });
       await settings.save();
     }
-    
+
     // Ensure teamMembers array exists
     if (!settings.about.teamMembers) {
       settings.about.teamMembers = [];
@@ -192,7 +192,7 @@ exports.getSettings = async (req, res) => {
       };
       await settings.save();
     }
-    
+
     // Ensure layout exists with defaults
     if (!settings.layout) {
       settings.layout = {
@@ -201,7 +201,7 @@ exports.getSettings = async (req, res) => {
       };
       await settings.save();
     }
-    
+
     // Ensure colors exist with defaults
     if (!settings.colors) {
       settings.colors = {
@@ -233,7 +233,7 @@ exports.getSettings = async (req, res) => {
         await settings.save();
       }
     }
-    
+
     res.render('admin/settings/edit', {
       title: 'Website Settings',
       settings,
@@ -619,14 +619,14 @@ exports.updateSettings = async (req, res) => {
       if (settings.logo.publicId) {
         await cloudinary.uploader.destroy(settings.logo.publicId);
       }
-      
+
       const result = await uploadToCloudinary(req.files.logo[0].buffer, 'swadesi-carts/settings');
-      
+
       settings.logo.url = result.secure_url;
       settings.logo.publicId = result.public_id;
     }
 
-    // Update logo size and position settings
+    // Update logo size and position settings (Global)
     if (req.body['logo.width']) {
       settings.logo.width = parseInt(req.body['logo.width']) || 200;
     }
@@ -640,9 +640,29 @@ exports.updateSettings = async (req, res) => {
       settings.logo.verticalPosition = parseInt(req.body['logo.verticalPosition']) || 0;
     }
 
+    // Desktop overrides
+    if (!settings.logo.desktop) settings.logo.desktop = {};
+    if (req.body['logo.desktop.width']) settings.logo.desktop.width = parseInt(req.body['logo.desktop.width']) || 200;
+    if (req.body['logo.desktop.height']) settings.logo.desktop.height = parseInt(req.body['logo.desktop.height']) || 50;
+    if (req.body['logo.desktop.horizontalPosition'] !== undefined) settings.logo.desktop.horizontalPosition = parseInt(req.body['logo.desktop.horizontalPosition']) || 0;
+    if (req.body['logo.desktop.verticalPosition'] !== undefined) settings.logo.desktop.verticalPosition = parseInt(req.body['logo.desktop.verticalPosition']) || 0;
+
+    // Mobile overrides
+    if (!settings.logo.mobile) settings.logo.mobile = {};
+    if (req.body['logo.mobile.width']) settings.logo.mobile.width = parseInt(req.body['logo.mobile.width']) || 150;
+    if (req.body['logo.mobile.height']) settings.logo.mobile.height = parseInt(req.body['logo.mobile.height']) || 40;
+    if (req.body['logo.mobile.horizontalPosition'] !== undefined) settings.logo.mobile.horizontalPosition = parseInt(req.body['logo.mobile.horizontalPosition']) || 0;
+    if (req.body['logo.mobile.verticalPosition'] !== undefined) settings.logo.mobile.verticalPosition = parseInt(req.body['logo.mobile.verticalPosition']) || 0;
+
     // Update header settings
     if (req.body['header.height']) {
       settings.header.height = parseInt(req.body['header.height']) || 72;
+    }
+    if (req.body['header.desktopHeight']) {
+      settings.header.desktopHeight = parseInt(req.body['header.desktopHeight']) || 72;
+    }
+    if (req.body['header.mobileHeight']) {
+      settings.header.mobileHeight = parseInt(req.body['header.mobileHeight']) || 60;
     }
 
     // Update site URL / domain
@@ -732,12 +752,12 @@ exports.updateSettings = async (req, res) => {
 
     // Update layout settings
     if (!settings.layout) settings.layout = {};
-    const heroPaddingTopRaw = req.body['layout.heroPaddingTop'] !== undefined 
-      ? req.body['layout.heroPaddingTop'] 
+    const heroPaddingTopRaw = req.body['layout.heroPaddingTop'] !== undefined
+      ? req.body['layout.heroPaddingTop']
       : (req.body.layout && req.body.layout.heroPaddingTop);
-      
-    const heroPaddingBottomRaw = req.body['layout.heroPaddingBottom'] !== undefined 
-      ? req.body['layout.heroPaddingBottom'] 
+
+    const heroPaddingBottomRaw = req.body['layout.heroPaddingBottom'] !== undefined
+      ? req.body['layout.heroPaddingBottom']
       : (req.body.layout && req.body.layout.heroPaddingBottom);
 
     if (heroPaddingTopRaw !== undefined && heroPaddingTopRaw !== null && heroPaddingTopRaw !== '') {
@@ -755,9 +775,9 @@ exports.updateSettings = async (req, res) => {
       if (settings.about.image.publicId) {
         await cloudinary.uploader.destroy(settings.about.image.publicId);
       }
-      
+
       const result = await uploadToCloudinary(req.files.aboutImage[0].buffer, 'swadesi-carts/settings');
-      
+
       settings.about.image = {
         url: result.secure_url,
         publicId: result.public_id
@@ -766,7 +786,7 @@ exports.updateSettings = async (req, res) => {
 
     await settings.save();
     persistRobotsTxt(settings.siteUrl || normalizeSiteUrl());
-    
+
     req.flash('success', 'Website settings updated successfully');
     res.redirect('/admin/settings');
   } catch (error) {
@@ -941,7 +961,7 @@ exports.deleteTeamMember = async (req, res) => {
 exports.getTeamMembers = async (req, res) => {
   try {
     let settings = await WebsiteSetting.findOne();
-    
+
     // If no settings exist, create default settings
     if (!settings) {
       settings = new WebsiteSetting({
@@ -973,13 +993,13 @@ exports.getTeamMembers = async (req, res) => {
       });
       await settings.save();
     }
-    
+
     // Ensure teamMembers array exists
     if (!settings.about.teamMembers) {
       settings.about.teamMembers = [];
       await settings.save();
     }
-    
+
     res.render('admin/settings/team', {
       title: 'Team Members',
       settings,
