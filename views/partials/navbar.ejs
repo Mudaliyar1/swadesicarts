@@ -208,3 +208,19 @@
                     </div>
                 </div>
             </nav>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var navbarNav = document.getElementById('navbarNav');
+                    var navbarBrand = document.querySelector('.navbar-brand');
+                    
+                    if (navbarNav && navbarBrand) {
+                        navbarNav.addEventListener('show.bs.collapse', function () {
+                            navbarBrand.style.setProperty('display', 'none', 'important');
+                        });
+                        navbarNav.addEventListener('hide.bs.collapse', function () {
+                            navbarBrand.style.setProperty('display', 'flex', 'important');
+                        });
+                    }
+                });
+            </script>

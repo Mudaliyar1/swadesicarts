@@ -154,6 +154,23 @@
                 object-fit: contain;
             }
         }
+
+        /* Dropdown Menu Styling */
+        .dropdown-menu {
+            background-color: #0a192f !important;
+            border: 1px solid ${siteSettings.colors.accent || '#B5A886'} !important;
+        }
+        
+        .dropdown-item {
+            color: ${siteSettings.colors.headerFooterLinkColor || '#FFD700'} !important;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            color: ${siteSettings.colors.headerFooterLinkColor || '#FFD700'} !important;
+            padding-left: 1.5rem !important;
+        }
     </style>` %>
 <% } %>
 
@@ -207,3 +224,19 @@
                     </div>
                 </div>
             </nav>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var navbarNav = document.getElementById('navbarNav');
+                    var navbarBrand = document.querySelector('.navbar-brand');
+                    
+                    if (navbarNav && navbarBrand) {
+                        navbarNav.addEventListener('show.bs.collapse', function () {
+                            navbarBrand.style.setProperty('display', 'none', 'important');
+                        });
+                        navbarNav.addEventListener('hide.bs.collapse', function () {
+                            navbarBrand.style.setProperty('display', 'flex', 'important');
+                        });
+                    }
+                });
+            </script>
