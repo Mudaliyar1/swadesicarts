@@ -18,6 +18,29 @@ exports.list = async (req, res) => {
     }
 };
 
+// View single user details
+exports.view = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            req.flash('error', 'User not found.');
+            return res.redirect('/admin/users');
+        }
+
+        res.render('admin/users/view', {
+            title: 'User Details',
+            user,
+            currentPage: 'users',
+            error: req.flash('error'),
+            success: req.flash('success')
+        });
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        req.flash('error', 'Failed to fetch user details.');
+        res.redirect('/admin/users');
+    }
+};
+
 // Toggle user active status (block/unblock)
 exports.toggleStatus = async (req, res) => {
     try {

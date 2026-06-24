@@ -38,67 +38,8 @@
     </style>
 </head>
 <body class="admin-body">
-    <nav class="navbar navbar-dark bg-swadesi d-lg-none">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <span class="navbar-brand mb-0">GEO Dashboard</span>
-            <a href="/admin/logout" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i></a>
-        </div>
-    </nav>
-
-    <div class="admin-sidebar d-none d-lg-flex flex-column" id="sidebarDesktop">
-        <div class="sidebar-header">
-            <h5 class="mb-0"><i class="bi bi-speedometer2"></i> <span class="sidebar-text">Admin Panel</span></h5>
-        </div>
-        <ul class="sidebar-nav flex-grow-1">
-            <li><a href="/admin/dashboard" title="Dashboard"><i class="bi bi-speedometer2"></i><span class="sidebar-text">Dashboard</span></a></li>
-            <li><a href="/admin/site-editor" title="Website Editor"><i class="bi bi-cursor"></i><span class="sidebar-text">Website Editor</span></a></li>
-            <li><a href="/admin/seasonal-products" title="Seasonal Products"><i class="bi bi-calendar3"></i><span class="sidebar-text">Seasonal Products</span></a></li>
-            <li><a href="/admin/tech-packages" title="Tech Packages"><i class="bi bi-laptop"></i><span class="sidebar-text">Tech Packages</span></a></li>
-            <li><a href="/admin/organic-products" title="Organic Products"><i class="bi bi-flower2"></i><span class="sidebar-text">Organic Products</span></a></li>
-            <li><a href="/admin/stories" title="Stories"><i class="bi bi-images"></i><span class="sidebar-text">Stories</span></a></li>
-            <li><a href="/admin/companies"><i class="bi bi-building"></i><span class="sidebar-text">Companies</span></a></li>
-            <li><a href="/admin/media" title="Media Management"><i class="bi bi-images"></i><span class="sidebar-text">Media Management</span></a></li>
-            <li><a href="/admin/inquiries" title="Inquiries"><i class="bi bi-chat-dots"></i><span class="sidebar-text">Inquiries</span></a></li>
-            <li><a href="/admin/visitors" title="Visitors"><i class="bi bi-person-lines-fill"></i><span class="sidebar-text">Visitors</span></a></li>
-            <li><a href="/admin/admins" title="Admin Users"><i class="bi bi-people"></i><span class="sidebar-text">Admin Users</span></a></li>
-            <li><a href="/admin/geo" class="active" title="GEO Optimization"><i class="bi bi-robot"></i><span class="sidebar-text">GEO Optimization</span></a></li>
-            <li><a href="/admin/settings" title="Website Settings"><i class="bi bi-gear"></i><span class="sidebar-text">Website Settings</span></a></li>
-        </ul>
-        <div class="sidebar-footer">
-            <a href="/" target="_blank" title="View Website"><i class="bi bi-globe"></i><span class="sidebar-text">View Website</span></a>
-            <a href="/admin/logout" title="Logout"><i class="bi bi-box-arrow-right"></i><span class="sidebar-text">Logout</span></a>
-        </div>
-        <button class="sidebar-toggle d-none d-lg-block" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
-    </div>
-
-    <div class="offcanvas offcanvas-start bg-swadesi text-white" tabindex="-1" id="sidebar">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Admin Panel</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body p-0">
-            <ul class="sidebar-nav-mobile">
-                <li><a href="/admin/dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                <li><a href="/admin/site-editor"><i class="bi bi-cursor"></i> Website Editor</a></li>
-                <li><a href="/admin/seasonal-products"><i class="bi bi-calendar3"></i> Seasonal Products</a></li>
-                <li><a href="/admin/tech-packages"><i class="bi bi-laptop"></i> Tech Packages</a></li>
-                <li><a href="/admin/organic-products"><i class="bi bi-flower2"></i> Organic Products</a></li>
-                <li><a href="/admin/stories"><i class="bi bi-images"></i> Stories</a></li>
-                <li><a href="/admin/companies"><i class="bi bi-building"></i> Companies</a></li>
-                <li><a href="/admin/media"><i class="bi bi-images"></i> Media Management</a></li>
-                <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
-                <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
-                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
-                <li><a href="/admin/geo"><i class="bi bi-robot"></i> GEO Optimization</a></li>
-                <li><a href="/admin/settings"><i class="bi bi-gear"></i> Website Settings</a></li>
-                <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
-                <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
-            </ul>
-        </div>
-    </div>
+    
+    <%- include('../../partials/admin-sidebar') %>
 
     <div class="admin-content">
         <div class="container-fluid p-4">

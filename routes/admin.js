@@ -85,6 +85,7 @@ router.delete('/admins/delete/:id', isAuthenticated, adminController.delete);
 
 // Registered users routes
 router.get('/users', isAuthenticated, adminUserController.list);
+router.get('/users/:id', isAuthenticated, adminUserController.view);
 router.post('/users/:id/toggle-status', isAuthenticated, adminUserController.toggleStatus);
 router.delete('/users/delete/:id', isAuthenticated, adminUserController.delete);
 

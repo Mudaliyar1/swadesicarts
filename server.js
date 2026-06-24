@@ -13,6 +13,9 @@ const geoMiddleware = require('./middleware/geoMiddleware');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxies to get correct internet IPs
+app.set('trust proxy', true);
+
 // Connect to MongoDB
 connectDB();
 

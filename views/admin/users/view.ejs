@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .detail-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+        }
+        .card-header-glass {
+            background: linear-gradient(135deg, rgba(76, 30, 79, 0.05) 0%, rgba(107, 46, 111, 0.05) 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding: 1.5rem;
+        }
+        .avatar-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4C1E4F, #6B2E6F);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 800;
+            box-shadow: 0 8px 24px rgba(76, 30, 79, 0.3);
+        }
+        .data-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        .data-value {
+            font-size: 1.05rem;
+            color: #1e293b;
+            font-weight: 500;
+        }
+        .code-block {
+            background: #1e1e2f;
+            color: #a5b4fc;
+            padding: 1rem;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body class="admin-body">
+    <%- include('../../partials/admin-sidebar') %>
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="/admin/users" class="btn btn-sm btn-outline-secondary mb-2 rounded-pill px-3">
+                        <i class="bi bi-arrow-left"></i> Back to Users
+                    </a>
+                    <h2 class="mb-1 fw-bold">User Details</h2>
+                    <p class="text-muted mb-0">Profile and security insights</p>
+                </div>
+                <div>
+                    <form action="/admin/users/<%= user._id %>/toggle-status" method="POST" class="d-inline">
+                        <% const actionText = user.isActive ? 'block' : 'unblock'; %>
+                        <button type="submit" class="btn <%= user.isActive ? 'btn-outline-warning' : 'btn-success' %> rounded-pill px-4 shadow-sm" 
+                                onclick="return confirm('Are you sure you want to <%= actionText %> this user?');">
+                            <i class="bi <%= user.isActive ? 'bi-slash-circle' : 'bi-check-circle' %>"></i> 
+                            <%= user.isActive ? 'Block User' : 'Unblock User' %>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Profile Information Card -->
+                <div class="col-lg-6">
+                    <div class="detail-card h-100">
+                        <div class="card-header-glass d-flex align-items-center gap-3">
+                            <div class="avatar-placeholder">
+                                <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
+                            </div>
+                            <div>
+                                <h4 class="mb-1 fw-bold"><%= user.name %></h4>
+                                <span class="badge <%= user.isVerified ? 'bg-success' : 'bg-warning text-dark' %> rounded-pill px-3">
+                                    <%= user.isVerified ? 'Verified Account' : 'Unverified Account' %>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <div class="data-label"><i class="bi bi-envelope"></i> Email Address</div>
+                                    <div class="data-value"><%= user.email %></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="data-label"><i class="bi bi-telephone"></i> Phone Number</div>
+                                    <div class="data-value"><%= user.phone %></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="data-label"><i class="bi bi-shield-check"></i> Account Status</div>
+                                    <div class="data-value">
+                                        <% if (user.isActive) { %>
+                                            <span class="text-success fw-bold"><i class="bi bi-check-circle-fill"></i> Active</span>
+                                        <% } else { %>
+                                            <span class="text-danger fw-bold"><i class="bi bi-x-circle-fill"></i> Blocked</span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="data-label"><i class="bi bi-calendar-check"></i> Account Created</div>
+                                    <div class="data-value"><%= new Date(user.createdAt).toLocaleString() %></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Insights Card -->
+                <div class="col-lg-6">
+                    <div class="detail-card h-100">
+                        <div class="card-header-glass">
+                            <h5 class="mb-0 fw-bold d-flex align-items-center gap-2">
+                                <i class="bi bi-shield-lock-fill text-primary"></i> Security Insights
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="alert alert-info border-0 bg-info bg-opacity-10 rounded-3 mb-4">
+                                <i class="bi bi-info-circle-fill me-2"></i> This data is captured automatically upon successful login to assist with security audits and fraud prevention.
+                            </div>
+
+                            <div class="mb-4">
+                                <div class="data-label"><i class="bi bi-globe"></i> Last Login IP Address</div>
+                                <% if (user.lastLoginIp) { %>
+                                    <div class="data-value d-flex align-items-center gap-2">
+                                        <span class="badge bg-dark bg-opacity-10 text-dark px-3 py-2 fs-6 rounded-3 border">
+                                            <%= user.lastLoginIp %>
+                                        </span>
+                                    </div>
+                                <% } else { %>
+                                    <div class="data-value text-muted fst-italic">No IP data recorded (User hasn't logged in recently)</div>
+                                <% } %>
+                            </div>
+
+                            <div>
+                                <div class="data-label"><i class="bi bi-laptop"></i> Device & Browser (User-Agent)</div>
+                                <% if (user.lastLoginUserAgent) { %>
+                                    <div class="code-block mt-2">
+                                        <%= user.lastLoginUserAgent %>
+                                    </div>
+                                <% } else { %>
+                                    <div class="data-value text-muted fst-italic">No device data recorded</div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

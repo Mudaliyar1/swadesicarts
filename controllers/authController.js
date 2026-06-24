@@ -1,4 +1,5 @@
 const Admin = require('../models/Admin');
+const User = require('../models/User');
 
 // Show login page
 exports.showLogin = (req, res) => {
@@ -36,10 +37,18 @@ exports.login = async (req, res) => {
       return res.redirect('/admin/login');
     }
 
-    // Set session
+    // Set Admin session
     req.session.adminId = admin._id;
     req.session.adminName = admin.name;
     req.session.adminEmail = admin.email;
+
+    // Check for linked User account and sync session
+    const linkedUser = await User.findOne({ email: admin.email, isVerified: true });
+    if (linkedUser) {
+      req.session.userId = linkedUser._id;
+      req.session.userName = linkedUser.name;
+      req.session.userEmail = linkedUser.email;
+    }
 
     req.flash('success', 'Login successful');
     res.redirect('/admin/dashboard');
@@ -53,9 +62,7 @@ exports.login = async (req, res) => {
 // Handle logout
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-    }
+    if (err) console.error('Logout error:', err);
     res.redirect('/admin/login');
   });
 };

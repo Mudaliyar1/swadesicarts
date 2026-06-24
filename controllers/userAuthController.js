@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 const sendEmail = require('../helpers/email');
 
 // Show register page
@@ -152,6 +153,14 @@ exports.verifyOTP = async (req, res) => {
     req.session.userName = user.name;
     req.session.userEmail = user.email;
 
+    // Check for linked Admin account and sync session
+    const linkedAdmin = await Admin.findOne({ email: user.email, isActive: true });
+    if (linkedAdmin) {
+      req.session.adminId = linkedAdmin._id;
+      req.session.adminName = linkedAdmin.name;
+      req.session.adminEmail = linkedAdmin.email;
+    }
+
     req.session.save((err) => {
         if (err) console.error('Session save error:', err);
         req.flash('success', 'Account verified successfully. Welcome!');
@@ -207,6 +216,19 @@ exports.login = async (req, res) => {
     req.session.userName = user.name;
     req.session.userEmail = user.email;
 
+    // Check for linked Admin account and sync session
+    const linkedAdmin = await Admin.findOne({ email: user.email, isActive: true });
+    if (linkedAdmin) {
+      req.session.adminId = linkedAdmin._id;
+      req.session.adminName = linkedAdmin.name;
+      req.session.adminEmail = linkedAdmin.email;
+    }
+
+    // Track security details
+    user.lastLoginIp = req.ip || req.connection.remoteAddress;
+    user.lastLoginUserAgent = req.headers['user-agent'] || 'Unknown Device';
+    await user.save();
+
     req.session.save((err) => {
         if (err) console.error('Session save error:', err);
         req.flash('success', 'Login successful');
@@ -222,9 +244,7 @@ exports.login = async (req, res) => {
 // Handle Logout
 exports.logout = (req, res) => {
   req.session.destroy((err) => {
-    if (err) {
-      console.error('Logout error:', err);
-    }
+    if (err) console.error('Logout error:', err);
     res.redirect('/');
   });
 };

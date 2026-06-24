@@ -291,8 +291,37 @@
                             <form action="/profile" method="POST" id="profileForm">
                                 <div class="row g-4">
                                     <div class="col-md-12">
-                                        <label class="profile-label">Email Address <span style="text-transform:none; font-weight:normal;">(Cannot be changed)</span></label>
-                                        <input type="email" class="form-control profile-input" value="<%= user.email %>" readonly disabled style="cursor: not-allowed;">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="profile-label mb-0">Email Address</label>
+                                            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1" id="btnChangeEmail" style="font-size: 0.75rem; border-color: rgba(255,255,255,0.2);">
+                                                <i class="bi bi-pencil me-1"></i> Change Email
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Step 1: Current Email -->
+                                        <div id="emailDisplayContainer">
+                                            <input type="email" class="form-control profile-input" id="currentEmailInput" value="<%= user.email %>" readonly disabled style="cursor: not-allowed; opacity: 0.7;">
+                                        </div>
+                                        
+                                        <!-- Step 2: OTP Verification -->
+                                        <div id="emailOtpContainer" class="mt-2 p-3 border rounded-3 border-warning" style="display: none; background: rgba(255,193,7,0.1);">
+                                            <label class="profile-label mb-2 text-warning"><i class="bi bi-envelope-check me-1"></i> Security Check: Enter OTP sent to your current email</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control profile-input border-warning" id="emailOtpInput" placeholder="6-digit OTP" maxlength="6" style="border-radius: 12px 0 0 12px !important;">
+                                                <button class="btn btn-warning fw-bold px-4 text-dark" type="button" id="btnVerifyEmailOtp" style="border-radius: 0 12px 12px 0 !important; z-index: 0;">Verify</button>
+                                            </div>
+                                            <small class="mt-2 d-block text-white" id="emailOtpMessage"></small>
+                                        </div>
+                                        
+                                        <!-- Step 3: New Email Entry -->
+                                        <div id="newEmailContainer" class="mt-2 p-3 border rounded-3 border-success" style="display: none; background: rgba(25,135,84,0.1);">
+                                            <label class="profile-label text-success mb-2"><i class="bi bi-check-circle me-1"></i> Identity Verified! Enter your new email address</label>
+                                            <div class="input-group">
+                                                <input type="email" class="form-control profile-input border-success" id="newEmailInput" placeholder="new.email@example.com" style="border-radius: 12px 0 0 12px !important;">
+                                                <button class="btn btn-success fw-bold px-4 text-white" type="button" id="btnSaveNewEmail" style="border-radius: 0 12px 12px 0 !important; z-index: 0;">Save Email</button>
+                                            </div>
+                                            <small class="mt-2 d-block text-white" id="newEmailMessage"></small>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -373,6 +402,129 @@
             var btn = document.getElementById('passwordSubmitBtn');
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Updating...';
             btn.disabled = true;
+        });
+
+        // Email Change Logic
+        const btnChangeEmail = document.getElementById('btnChangeEmail');
+        const emailDisplayContainer = document.getElementById('emailDisplayContainer');
+        const emailOtpContainer = document.getElementById('emailOtpContainer');
+        const newEmailContainer = document.getElementById('newEmailContainer');
+        const emailOtpInput = document.getElementById('emailOtpInput');
+        const btnVerifyEmailOtp = document.getElementById('btnVerifyEmailOtp');
+        const emailOtpMessage = document.getElementById('emailOtpMessage');
+        const newEmailInput = document.getElementById('newEmailInput');
+        const btnSaveNewEmail = document.getElementById('btnSaveNewEmail');
+        const newEmailMessage = document.getElementById('newEmailMessage');
+
+        btnChangeEmail.addEventListener('click', async () => {
+            btnChangeEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending OTP...';
+            btnChangeEmail.disabled = true;
+
+            try {
+                const response = await fetch('/profile/email/request-otp', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    btnChangeEmail.style.display = 'none';
+                    emailDisplayContainer.style.display = 'none';
+                    emailOtpContainer.style.display = 'block';
+                    emailOtpMessage.className = 'mt-2 d-block text-white';
+                    emailOtpMessage.innerText = data.message;
+                    emailOtpInput.focus(); // Auto-focus the OTP field
+                } else {
+                    btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
+                    btnChangeEmail.disabled = false;
+                    alert(data.message || 'Failed to send OTP.');
+                }
+            } catch (error) {
+                console.error(error);
+                btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
+                btnChangeEmail.disabled = false;
+                alert('Network error while requesting OTP.');
+            }
+        });
+
+        // Allow pressing Enter key to trigger Verify
+        emailOtpInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent main form submission
+                btnVerifyEmailOtp.click();
+            }
+        });
+
+        btnVerifyEmailOtp.addEventListener('click', async () => {
+            const otp = emailOtpInput.value.trim();
+            if (!otp) return alert('Please enter the OTP');
+
+            btnVerifyEmailOtp.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            btnVerifyEmailOtp.disabled = true;
+
+            try {
+                const response = await fetch('/profile/email/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    emailOtpContainer.style.display = 'none';
+                    newEmailContainer.style.display = 'block';
+                    newEmailInput.focus(); // Auto-focus new email field
+                } else {
+                    btnVerifyEmailOtp.innerHTML = 'Verify';
+                    btnVerifyEmailOtp.disabled = false;
+                    emailOtpMessage.className = 'mt-2 d-block text-danger fw-bold';
+                    emailOtpMessage.innerText = data.message || 'Invalid OTP';
+                }
+            } catch (error) {
+                console.error(error);
+                btnVerifyEmailOtp.innerHTML = 'Verify';
+                btnVerifyEmailOtp.disabled = false;
+                emailOtpMessage.innerText = 'Network error verifying OTP.';
+            }
+        });
+
+        // Allow pressing Enter key to trigger Save Email
+        newEmailInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent main form submission
+                btnSaveNewEmail.click();
+            }
+        });
+
+        btnSaveNewEmail.addEventListener('click', async () => {
+            const newEmail = newEmailInput.value.trim();
+            if (!newEmail) return alert('Please enter a new email address');
+
+            btnSaveNewEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+            btnSaveNewEmail.disabled = true;
+
+            try {
+                const response = await fetch('/profile/email/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newEmail })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    newEmailContainer.innerHTML = `<div class="alert alert-success border-0 bg-success bg-opacity-25 text-white mb-0"><i class="bi bi-check-circle-fill me-2"></i> ${data.message}</div>`;
+                    document.getElementById('currentEmailInput').value = newEmail;
+                    // Optionally, refresh page to reset UI after a few seconds
+                    setTimeout(() => window.location.reload(), 2000);
+                } else {
+                    btnSaveNewEmail.innerHTML = 'Save Email';
+                    btnSaveNewEmail.disabled = false;
+                    newEmailMessage.className = 'mt-2 d-block text-danger fw-bold';
+                    newEmailMessage.innerText = data.message || 'Failed to update email.';
+                }
+            } catch (error) {
+                console.error(error);
+                btnSaveNewEmail.innerHTML = 'Save Email';
+                btnSaveNewEmail.disabled = false;
+                newEmailMessage.innerText = 'Network error updating email.';
+            }
         });
     </script>
 </body>

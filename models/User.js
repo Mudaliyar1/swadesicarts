@@ -39,6 +39,14 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  lastLoginIp: {
+    type: String,
+    default: null
+  },
+  lastLoginUserAgent: {
+    type: String,
+    default: null
   }
 }, {
   timestamps: true
