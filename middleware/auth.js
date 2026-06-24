@@ -15,7 +15,24 @@ const isGuest = (req, res, next) => {
   next();
 };
 
+const isUserAuthenticated = (req, res, next) => {
+  if (req.session && req.session.userId) {
+    return next();
+  }
+  req.flash('error', 'Please login to access this page');
+  res.redirect('/login');
+};
+
+const isUserGuest = (req, res, next) => {
+  if (req.session && req.session.userId) {
+    return res.redirect('/');
+  }
+  next();
+};
+
 module.exports = {
   isAuthenticated,
-  isGuest
+  isGuest,
+  isUserAuthenticated,
+  isUserGuest
 };

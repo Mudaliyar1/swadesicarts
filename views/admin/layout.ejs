@@ -91,8 +91,14 @@
             </li>
             <li>
                 <a href="/admin/admins" class="<%= typeof currentPage !== 'undefined' && currentPage === 'admins' ? 'active' : '' %>" title="Admin Users">
-                    <i class="bi bi-people"></i>
+                    <i class="bi bi-shield-lock"></i>
                     <span class="sidebar-text">Admin Users</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/users" class="<%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>" title="Registered Users">
+                    <i class="bi bi-people"></i>
+                    <span class="sidebar-text">Registered Users</span>
                 </a>
             </li>
             <li>
@@ -137,7 +143,8 @@
                 <li><a href="/admin/media"><i class="bi bi-images"></i> Media Management</a></li>
                 <li><a href="/admin/inquiries"><i class="bi bi-chat-dots"></i> Inquiries</a></li>
                 <li><a href="/admin/visitors"><i class="bi bi-person-lines-fill"></i> Visitors</a></li>
-                <li><a href="/admin/admins"><i class="bi bi-people"></i> Admin Users</a></li>
+                <li><a href="/admin/admins"><i class="bi bi-shield-lock"></i> Admin Users</a></li>
+                <li><a href="/admin/users"><i class="bi bi-people"></i> Registered Users</a></li>
                 <li><a href="/admin/settings"><i class="bi bi-gear"></i> Website Settings</a></li>
                 <li><a href="/" target="_blank"><i class="bi bi-globe"></i> View Website</a></li>
                 <li><a href="/admin/logout"><i class="bi bi-box-arrow-right"></i> Logout</a></li>

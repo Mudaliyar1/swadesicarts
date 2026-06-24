@@ -11,6 +11,7 @@ const websiteSettingController = require('../controllers/admin/websiteSettingCon
 const companyRoutes = require('./companyRoutes');
 const mediaRoutes = require('./mediaRoutes');
 const visitorController = require('../controllers/admin/visitorController');
+const adminUserController = require('../controllers/admin/userController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
 
@@ -81,6 +82,11 @@ router.post('/admins/create', isAuthenticated, adminController.create);
 router.get('/admins/edit/:id', isAuthenticated, adminController.showEdit);
 router.post('/admins/edit/:id', isAuthenticated, adminController.update);
 router.delete('/admins/delete/:id', isAuthenticated, adminController.delete);
+
+// Registered users routes
+router.get('/users', isAuthenticated, adminUserController.list);
+router.post('/users/:id/toggle-status', isAuthenticated, adminUserController.toggleStatus);
+router.delete('/users/delete/:id', isAuthenticated, adminUserController.delete);
 
 // GEO / Generative AI Discoverability routes
 router.get('/geo', isAuthenticated, adminController.getGeoDashboard);

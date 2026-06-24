@@ -68,6 +68,8 @@ app.use((req, res, next) => {
   res.locals.error = req.flash('error');
   res.locals.isAdminLoggedIn = req.session && req.session.adminId ? true : false;
   res.locals.adminName = req.session ? req.session.adminName : '';
+  res.locals.isUserLoggedIn = req.session && req.session.userId ? true : false;
+  res.locals.userName = req.session ? req.session.userName : '';
   next();
 });
 
@@ -79,8 +81,12 @@ const techRoutes = require('./routes/tech');
 const organicRoutes = require('./routes/organic');
 const adminRoutes = require('./routes/admin');
 const llmsRoutes = require('./routes/llms');
+const userAuthRoutes = require('./routes/userAuth');
+const userRoutes = require('./routes/user');
 
 app.use('/', publicRoutes);
+app.use('/', userAuthRoutes);
+app.use('/', userRoutes);
 app.use('/', sitemapRoutes);
 app.use('/', llmsRoutes);
 app.use('/seasonal-products', seasonalRoutes);
