@@ -14,9 +14,17 @@ const sendEmail = async (to, subject, htmlContent) => {
         
         // Make sure the sender email is verified in your Brevo account
         sendSmtpEmail.sender = { 
-            name: "Swadesi Carts", 
+            name: "Swadesi Carts Support", 
             email: "noreply@swadesicarts.in" 
         };
+        
+        // Route replies to the IMAP sync inbox (so customers can reply via email)
+        if (process.env.IMAP_USER) {
+            sendSmtpEmail.replyTo = {
+                name: "Swadesi Carts Support",
+                email: process.env.IMAP_USER
+            };
+        }
         
         sendSmtpEmail.to = [{ email: to }];
         sendSmtpEmail.subject = subject;

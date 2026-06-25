@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Details - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .chat-container { max-width: 100%; margin: 0 auto; }
+        .chat-box { background: transparent; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .chat-header { background: #008069; color: #ffffff; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        
+        .chat-body { 
+            padding: 2rem; 
+            height: 600px; 
+            overflow-y: auto; 
+            background-color: #efeae2;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23d8d3cc' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+            display: flex; 
+            flex-direction: column; 
+            gap: 0.5rem; 
+        }
+        
+        .chat-message { display: flex; flex-direction: column; max-width: 75%; margin-bottom: 0.5rem; }
+        .chat-message.admin { align-self: flex-end; align-items: flex-end; }
+        .chat-message.user { align-self: flex-start; align-items: flex-start; }
+        
+        .msg-bubble { 
+            padding: 0.6rem 0.8rem 0.5rem 0.8rem; 
+            font-size: 0.95rem; 
+            line-height: 1.4; 
+            word-wrap: break-word;
+            box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+            position: relative;
+        }
+        
+        .msg-text { white-space: pre-wrap; margin-bottom: 2px; }
+        
+        /* Admin sent this (WhatsApp Green) */
+        .chat-message.admin .msg-bubble { 
+            background: #d9fdd3; color: #111b21; 
+            border-radius: 8px 0 8px 8px; 
+        }
+        
+        /* User sent this (WhatsApp White) */
+        .chat-message.user .msg-bubble { 
+            background: #ffffff; color: #111b21; 
+            border-radius: 0 8px 8px 8px;
+        }
+
+        /* The tiny tail on bubbles */
+        .chat-message.admin .msg-bubble::before {
+            content: ''; position: absolute; top: 0; right: -8px; width: 0; height: 0; 
+            border-top: 0 solid transparent; border-left: 8px solid #d9fdd3; border-bottom: 8px solid transparent;
+        }
+        .chat-message.user .msg-bubble::before {
+            content: ''; position: absolute; top: 0; left: -8px; width: 0; height: 0; 
+            border-top: 0 solid transparent; border-right: 8px solid #ffffff; border-bottom: 8px solid transparent;
+        }
+
+        .msg-author-name { font-size: 0.75rem; font-weight: 600; margin-bottom: 2px; }
+        .chat-message.user .msg-author-name { color: #008069; }
+
+        .msg-meta { font-size: 0.68rem; color: #667781; display: flex; align-items: center; justify-content: flex-end; margin-top: 4px; gap: 4px; float: right; margin-left: 15px; }
+        .msg-bubble::after { content: ""; display: table; clear: both; }
+        
+        .chat-footer { padding: 1rem; background: #f0f2f5; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .reply-box { border-radius: 8px; border: none; padding: 0.8rem 1.2rem; width: 100%; font-size: 1rem; resize: none; outline: none; background: #ffffff; height: 60px; }
+        .reply-box:focus { box-shadow: 0 0 0 1px #008069; }
+        
+        .send-btn { width: 50px; height: 50px; border-radius: 50%; background: #008069; color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .send-btn:hover { background: #016b58; }
+
+        /* Custom Scrollbar */
+        .chat-body::-webkit-scrollbar { width: 6px; }
+        .chat-body::-webkit-scrollbar-track { background: transparent; }
+        .chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+    </style>
+</head>
+<body class="admin-body">
+    <%- include('../../partials/admin-sidebar') %>
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="h3 mb-0 text-gray-800">
+        <a href="/admin/tickets" class="text-decoration-none text-muted"><i class="bi bi-arrow-left me-2"></i></a>
+        Ticket <%= ticket.ticketNumber %>
+      </h2>
+      <span class="badge bg-<%= ticket.status === 'open' ? 'primary' : (ticket.status === 'pending' ? 'warning text-dark' : (ticket.status === 'resolved' ? 'success' : 'secondary')) %> fs-6 px-3 py-2">
+        <%= ticket.status.toUpperCase() %>
+      </span>
+    </div>
+
+    <% if (locals.success && locals.success.length > 0) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= locals.success %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+    <% if (locals.error && locals.error.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= locals.error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
+    <div class="row">
+      <!-- WhatsApp Style Chat Interface -->
+      <div class="col-lg-8">
+        <div class="chat-box chat-container mb-4">
+          <!-- Header -->
+          <div class="chat-header">
+            <div class="d-flex align-items-center gap-3">
+              <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                <i class="bi bi-person-fill"></i>
+              </div>
+              <div>
+                <h5 class="mb-0 fw-bold" style="font-size: 1.1rem;"><%= ticket.name %></h5>
+                <div style="font-size: 0.8rem; opacity: 0.9;"><%= ticket.email %></div>
+              </div>
+            </div>
+            <div>
+              <span class="badge" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);"><%= ticket.status.toUpperCase() %></span>
+            </div>
+          </div>
+          
+          <!-- Body -->
+          <div class="chat-body" id="chatBody">
+            <div class="text-center mb-3">
+              <span class="badge" style="background: #e1f3fb; color: #435a64; font-weight: normal; padding: 6px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); font-size: 0.75rem;">
+                  Ticket Created on <%= new Date(ticket.createdAt).toLocaleDateString([], { dateStyle: 'long' }) %>
+              </span>
+            </div>
+
+            <!-- Initial Message (User) -->
+            <div class="chat-message user">
+              <div class="msg-bubble">
+                <div class="msg-author-name"><%= ticket.name %></div>
+                <div class="msg-text"><%= ticket.description %></div>
+                <div class="msg-meta">
+                  <%= new Date(ticket.createdAt).toLocaleTimeString([], { timeStyle: 'short' }) %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Replies -->
+            <% ticket.messages.forEach(msg => { %>
+              <div class="chat-message <%= msg.sender === 'admin' ? 'admin' : 'user' %>">
+                <div class="msg-bubble">
+                  <% if (msg.sender === 'user') { %>
+                    <div class="msg-author-name"><%= ticket.name %></div>
+                  <% } %>
+                  <div class="msg-text"><%= msg.message %></div>
+                  <div class="msg-meta">
+                    <% if(msg.isEmailSync) { %><i class="bi bi-envelope"></i><% } %>
+                    <%= new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' }) %>
+                    <% if (msg.sender === 'admin') { %><i class="bi bi-check-all text-primary ms-1" style="font-size: 1rem;"></i><% } %>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+            
+            <!-- Typing Indicator -->
+            <div id="typingIndicator" class="chat-message user" style="display: none;">
+              <div class="msg-bubble text-muted fst-italic" style="padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.8); font-size: 0.8rem;">
+                Customer is typing...
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer (Reply Box) -->
+          <div class="chat-footer">
+            <form id="replyForm" action="/admin/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="d-flex w-100 gap-2 align-items-center">
+              <div class="flex-grow-1">
+                <textarea id="messageInput" name="message" class="reply-box" placeholder="Type a reply... (This will be emailed to the customer)" required></textarea>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <div class="form-check mb-0">
+                  <input class="form-check-input" type="checkbox" id="closeTicket" name="status" value="resolved">
+                  <label class="form-check-label text-muted small" for="closeTicket" style="white-space: nowrap;">
+                    Mark Resolved
+                  </label>
+                </div>
+                <button type="submit" class="send-btn">
+                  <i class="bi bi-send-fill" style="margin-right: 2px; margin-top: 2px;"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- User & Ticket Info Sidebar -->
+      <div class="col-lg-4">
+        <div class="card shadow mb-4">
+          <div class="card-header py-3 bg-light">
+            <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-info-circle me-2"></i>Ticket Info</h6>
+          </div>
+          <div class="card-body">
+            <dl class="row mb-0">
+              <dt class="col-sm-4 text-muted small">Name</dt>
+              <dd class="col-sm-8"><%= ticket.name %></dd>
+
+              <dt class="col-sm-4 text-muted small">Email</dt>
+              <dd class="col-sm-8"><a href="mailto:<%= ticket.email %>"><%= ticket.email %></a></dd>
+
+              <dt class="col-sm-4 text-muted small">Mobile</dt>
+              <dd class="col-sm-8"><%= ticket.mobile || 'N/A' %></dd>
+
+              <dt class="col-sm-4 text-muted small mt-2">Subject</dt>
+              <dd class="col-sm-8 mt-2 fw-bold"><%= ticket.subject %></dd>
+
+              <dt class="col-sm-4 text-muted small mt-2">Product</dt>
+              <dd class="col-sm-8 mt-2">
+                <% if(ticket.productId) { %>
+                  <a href="/<%= ticket.productType === 'tech' ? 'tech-packages' : ticket.productType + '-products' %>/<%= ticket.productId %>" target="_blank">
+                    <%= ticket.productTitle || 'View Product' %> <i class="bi bi-box-arrow-up-right ms-1"></i>
+                  </a>
+                <% } else { %>
+                  General Inquiry
+                <% } %>
+              </dd>
+
+              <dt class="col-sm-4 text-muted small mt-3">Created</dt>
+              <dd class="col-sm-8 mt-3"><%= ticket.createdAt.toLocaleString() %></dd>
+            </dl>
+
+            <hr>
+            
+            <form action="/admin/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="mt-3">
+              <label class="form-label text-muted small fw-bold">Change Status (Without Replying)</label>
+              <div class="input-group">
+                <select name="status" class="form-select">
+                  <option value="open" <%= ticket.status === 'open' ? 'selected' : '' %>>Open</option>
+                  <option value="pending" <%= ticket.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                  <option value="resolved" <%= ticket.status === 'resolved' ? 'selected' : '' %>>Resolved</option>
+                  <option value="closed" <%= ticket.status === 'closed' ? 'selected' : '' %>>Closed</option>
+                </select>
+                <button type="submit" class="btn btn-outline-secondary">Update</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+        </div>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const ticketNumber = '<%= ticket.ticketNumber %>';
+    const chatBody = document.getElementById('chatBody');
+    const replyForm = document.getElementById('replyForm');
+    const messageInput = document.getElementById('messageInput');
+    const typingIndicator = document.getElementById('typingIndicator');
+    
+    // Auto-scroll chat to bottom
+    const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
+    scrollToBottom();
+    
+    // Socket.io Integration
+    const socket = io();
+    socket.emit('joinTicket', ticketNumber);
+    
+    // Handle incoming messages
+    socket.on('newMessage', (msg) => {
+        const isAdmin = msg.sender === 'admin';
+        const timeStr = new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' });
+        
+        let html = `
+            <div class="chat-message ${isAdmin ? 'admin' : 'user'}">
+                <div class="msg-bubble">
+                    ${!isAdmin ? '<div class="msg-author-name"><%= ticket.name %></div>' : ''}
+                    <div class="msg-text">${msg.message}</div>
+                    <div class="msg-meta">
+                        ${msg.isEmailSync ? '<i class="bi bi-envelope"></i>' : ''}
+                        ${timeStr}
+                        ${isAdmin ? '<i class="bi bi-check-all text-primary ms-1" style="font-size: 1rem;"></i>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        typingIndicator.insertAdjacentHTML('beforebegin', html);
+        scrollToBottom();
+    });
+    
+    // Handle typing indicator
+    socket.on('typing', (data) => {
+        if (data.sender === 'user') {
+            typingIndicator.style.display = 'flex';
+            scrollToBottom();
+        }
+    });
+    
+    socket.on('stopTyping', (data) => {
+        if (data.sender === 'user') {
+            typingIndicator.style.display = 'none';
+        }
+    });
+    
+    if (replyForm) {
+        let typingTimer;
+        messageInput.addEventListener('input', () => {
+            socket.emit('typing', { ticketNumber, sender: 'admin' });
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                socket.emit('stopTyping', { ticketNumber, sender: 'admin' });
+            }, 2000);
+        });
+        
+        replyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = messageInput.value.trim();
+            if(!text) return;
+            
+            messageInput.value = '';
+            socket.emit('stopTyping', { ticketNumber, sender: 'admin' });
+            
+            const formData = new FormData(replyForm);
+            const data = Object.fromEntries(formData.entries());
+            data.message = text;
+
+            try {
+                await fetch('/admin/tickets/' + ticketNumber + '/reply', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+            } catch (err) {
+                console.error('Failed to send message:', err);
+                alert('Failed to send message. Please try again.');
+            }
+        });
+        
+        // Enter to send (Shift+Enter for newline)
+        messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                replyForm.dispatchEvent(new Event('submit'));
+            }
+        });
+    }
+</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

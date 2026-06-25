@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style-new.css">
+    <style>
+        .sc-page-bg { background: #f6f4f0; min-height: 100vh; padding-top: 2rem; padding-bottom: 4rem; }
+        .sc-ticket-card {
+            background: #fff; border-radius: 16px; padding: 1.5rem;
+            margin-bottom: 1rem; border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .sc-ticket-card:hover {
+            transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+        }
+        .sc-ticket-id { font-family: 'Poppins', sans-serif; font-size: 1.1rem; color: #4C1E4F; margin-bottom: 0.2rem; }
+        .sc-ticket-subj { font-weight: 600; color: #222; font-size: 0.95rem; }
+        .sc-badge { font-size: 0.75rem; padding: 0.35rem 0.6rem; border-radius: 8px; font-weight: 600; text-transform: uppercase; }
+        .bg-open { background: #dbeafe; color: #1e3a8a; }
+        .bg-pending { background: #fef08a; color: #854d0e; }
+        .bg-resolved { background: #dcfce7; color: #14532d; }
+        .bg-closed { background: #f3f4f6; color: #374151; }
+    </style>
+</head>
+<body>
+<%- include('../partials/navbar-new') %>
+
+<div class="sc-page-bg">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 style="font-family:'Poppins', sans-serif; font-weight:800; font-size:2rem; color:#4C1E4F;">My Support Tickets</h1>
+            <a href="/profile" class="btn btn-outline-secondary rounded-pill"><i class="bi bi-arrow-left"></i> Back to Profile</a>
+        </div>
+
+        <% if (locals.success && locals.success.length > 0) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <%= locals.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (locals.error && locals.error.length > 0) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <%= locals.error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+
+        <% if (tickets && tickets.length > 0) { %>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <% tickets.forEach(ticket => { %>
+                        <a href="/tickets/<%= ticket.ticketNumber %>" style="text-decoration: none; color: inherit;">
+                            <div class="sc-ticket-card">
+                                <div>
+                                    <div class="sc-ticket-id"><i class="bi bi-ticket-detailed-fill me-2"></i><%= ticket.ticketNumber %></div>
+                                    <div class="sc-ticket-subj"><%= ticket.subject %></div>
+                                    <small class="text-muted"><i class="bi bi-clock me-1"></i>Last updated: <%= ticket.updatedAt.toLocaleDateString() %></small>
+                                </div>
+                                <div>
+                                    <span class="sc-badge bg-<%= ticket.status %>"><%= ticket.status %></span>
+                                    <i class="bi bi-chevron-right text-muted ms-3"></i>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            </div>
+        <% } else { %>
+            <div class="text-center py-5">
+                <div class="mb-3"><i class="bi bi-envelope-paper-heart" style="font-size: 3rem; color: #ccc;"></i></div>
+                <h4 class="text-muted">No tickets found</h4>
+                <p class="text-muted">You haven't submitted any inquiries yet.</p>
+                <a href="/tech-packages" class="btn btn-primary rounded-pill mt-3" style="background:#4C1E4F; border:none;">Explore Packages</a>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer-new') %>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 const OrganicProduct = require('../models/OrganicProduct');
-const Inquiry = require('../models/Inquiry');
+const Ticket = require('../models/Ticket');
+const sendEmail = require('../helpers/email');
 const Story = require('../models/Story');
 const { productSchema, faqSchema, breadcrumbSchema, toJsonLd } = require('../helpers/schemaHelper');
 const { getSiteUrl } = require('../helpers/siteUrl');
@@ -143,22 +144,35 @@ exports.submitInquiry = async (req, res) => {
       return res.redirect('/organic-products/inquiry');
     }
 
-    await Inquiry.create({
+    const ticket = await Ticket.create({
       name,
       mobile,
       email,
-      requirement,
+      user: req.session.userId || null,
+      subject: `Inquiry for ${product.title}`,
       productType: 'organic',
       productId: product._id,
       productModel: 'OrganicProduct',
-      productTitle: product.title
+      productTitle: product.title,
+      messages: [{
+        sender: 'user',
+        senderName: name,
+        message: requirement
+      }]
     });
 
-    res.render('public/inquiry-success', {
-      title: 'Inquiry Submitted - Swadesi Carts',
-      productType: 'organic',
-      currentPage: 'organic'
-    });
+    // Send confirmation email
+    const subject = `[${ticket.ticketNumber}] We received your inquiry`;
+    const html = `<p>Hello ${name},</p>
+                  <p>Thank you for inquiring about <strong>${product.title}</strong>.</p>
+                  <p>A support ticket has been opened for you: <strong>${ticket.ticketNumber}</strong>.</p>
+                  <p>Our team will review your requirement and get back to you shortly.</p>
+                  <hr>
+                  <p><em>You can reply directly to this email to add more information to your ticket.</em></p>`;
+    await sendEmail(email, subject, html).catch(err => console.error('Failed to send ticket email:', err));
+
+    req.flash('success', `Inquiry submitted successfully! Your ticket number is ${ticket.ticketNumber}. Check your email.`);
+    res.redirect('/organic-products/' + product.slug);
   } catch (error) {
     console.error('Inquiry submission error:', error);
     req.flash('error', 'An error occurred. Please try again.');

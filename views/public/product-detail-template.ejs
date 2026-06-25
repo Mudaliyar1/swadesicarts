@@ -560,23 +560,15 @@
 
             <!-- ─── CTA Buttons ─── -->
             <div class="sc-cta-grid">
-                <% if (wsUrl) { %>
-                    <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="sc-btn sc-btn-inquire">
-                        <i class="bi bi-chat-dots-fill"></i> Inquire Now
-                    </a>
-                <% } else { %>
-                    <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="sc-btn sc-btn-inquire">
-                        <i class="bi bi-chat-dots-fill"></i> Inquire Now
-                    </a>
-                <% } %>
+                <!-- Primary Inquiry Form Button (Always goes to inquiry page) -->
+                <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="sc-btn sc-btn-inquire">
+                    <i class="bi bi-chat-dots-fill"></i> Inquire Now
+                </a>
 
+                <!-- WhatsApp Button (Only shows if number is configured) -->
                 <% if (wsNumClean) { %>
                     <a href="<%= wsUrl %>" target="_blank" rel="noopener" class="sc-btn sc-btn-wa">
                         <i class="bi bi-whatsapp"></i> WhatsApp
-                    </a>
-                <% } else { %>
-                    <a href="<%= inquiryPath %>?productId=<%= product._id %>" class="sc-btn sc-btn-wa">
-                        <i class="bi bi-envelope-fill"></i> Inquire
                     </a>
                 <% } %>
 

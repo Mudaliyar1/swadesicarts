@@ -9,6 +9,8 @@ const connectDB = require('./config/database');
 const { loadWebsiteSettings } = require('./middleware/websiteSettings');
 const seoMiddleware = require('./middleware/seoMiddleware');
 const geoMiddleware = require('./middleware/geoMiddleware');
+const startEmailSync = require('./services/emailSync');
+const { Server } = require('socket.io');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -86,6 +88,7 @@ const adminRoutes = require('./routes/admin');
 const llmsRoutes = require('./routes/llms');
 const userAuthRoutes = require('./routes/userAuth');
 const userRoutes = require('./routes/user');
+const ticketRoutes = require('./routes/ticket');
 
 app.use('/', publicRoutes);
 app.use('/', userAuthRoutes);
@@ -96,6 +99,7 @@ app.use('/seasonal-products', seasonalRoutes);
 app.use('/tech-packages', techRoutes);
 app.use('/organic-products', organicRoutes);
 app.use('/admin', adminRoutes);
+app.use('/tickets', ticketRoutes);
 
 // 404 Handler
 app.use((req, res) => {
@@ -156,6 +160,31 @@ const server = app.listen(PORT, () => {
   console.log('');
   console.log('  Press Ctrl+C to stop the server');
   console.log('');
+  
+  // Start the IMAP background worker
+  startEmailSync(app);
+});
+
+// Setup Socket.io
+const io = new Server(server);
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  // Client joins a specific ticket room
+  socket.on('joinTicket', (ticketNumber) => {
+    socket.join(ticketNumber);
+  });
+
+  // Client emits typing event
+  socket.on('typing', (data) => {
+    // data should contain { ticketNumber, sender: 'admin' | 'user' }
+    socket.to(data.ticketNumber).emit('typing', data);
+  });
+
+  // Client emits stop typing event
+  socket.on('stopTyping', (data) => {
+    socket.to(data.ticketNumber).emit('stopTyping', data);
+  });
 });
 
 // Increase server timeout for large file uploads (10 minutes)

@@ -12,6 +12,7 @@ const companyRoutes = require('./companyRoutes');
 const mediaRoutes = require('./mediaRoutes');
 const visitorController = require('../controllers/admin/visitorController');
 const adminUserController = require('../controllers/admin/userController');
+const ticketController = require('../controllers/ticketController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const upload = require('../config/multer');
 
@@ -68,10 +69,14 @@ router.post('/organic-products/edit/:id', isAuthenticated, upload.fields([
 router.delete('/organic-products/:id', isAuthenticated, organicProductController.delete);
 router.delete('/organic-products/:productId/gallery/:itemId', isAuthenticated, organicProductController.deleteGalleryItem);
 
-// Inquiries routes
+// Inquiries routes (Old)
 router.get('/inquiries', isAuthenticated, inquiryController.list);
-router.get('/inquiries/:id', isAuthenticated, inquiryController.view);
 router.post('/inquiries/:id/status', isAuthenticated, inquiryController.updateStatus);
+
+// Support Tickets routes
+router.get('/tickets', isAuthenticated, ticketController.getAdminTickets);
+router.get('/tickets/:ticketNumber', isAuthenticated, ticketController.getAdminTicketDetail);
+router.post('/tickets/:ticketNumber/reply', isAuthenticated, ticketController.replyTicketAdmin);
 router.delete('/inquiries/:id', isAuthenticated, inquiryController.delete);
 router.get('/inquiries/:id/pdf', isAuthenticated, inquiryController.downloadPDF);
 
