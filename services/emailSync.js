@@ -19,15 +19,11 @@ let connection = null;
 
 const startEmailSync = async (app) => {
   try {
-    console.log('[EmailSync] Connecting to IMAP server...');
     connection = await imaps.connect(config);
-    
     // Prevent socket errors from crashing the main Node.js process
     connection.on('error', (err) => {
       console.error('[EmailSync] Socket Error:', err.message);
     });
-
-    console.log('[EmailSync] Successfully connected. Opening INBOX...');
 
     await connection.openBox('INBOX');
 
@@ -39,7 +35,9 @@ const startEmailSync = async (app) => {
     };
 
     const messages = await connection.search(searchCriteria, fetchOptions);
-    console.log(`[EmailSync] Found ${messages.length} emails matching ticket format.`);
+    if (messages.length > 0) {
+      console.log(`[EmailSync] Found ${messages.length} emails matching ticket format.`);
+    }
 
     for (const msg of messages) {
       const all = msg.parts.find(part => part.which === '');
