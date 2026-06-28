@@ -6,94 +6,782 @@
     <title><%= title %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
     <% if (typeof seo !== 'undefined') { %>
         <%- include('../partials/seo-meta') %>
     <% } %>
+    <style>
+        /* MNC CLEAN SINGLE-COLUMN REGISTRATION PAGE */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc !important; /* Premium light slate background */
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #334155;
+        }
+
+        .mnc-viewport {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 4rem 1.5rem;
+        }
+
+        .mnc-card-wrapper {
+            width: 100%;
+            max-width: 700px; /* Standard Apple/Stripe card width */
+            background: #ffffff !important; /* Crisp pure white */
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            padding: 3.5rem 3.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Override EJS dynamic-styles inside form container to protect legibility */
+        .mnc-card-wrapper h2,
+        .mnc-card-wrapper p,
+        .mnc-card-wrapper label,
+        .mnc-card-wrapper span,
+        .mnc-card-wrapper div,
+        .mnc-card-wrapper input,
+        .mnc-card-wrapper a:not(.btn),
+        .mnc-card-wrapper h6 {
+            color: inherit;
+        }
+
+        .mnc-card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mnc-card-header .logo-box {
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .mnc-card-header .logo-box img {
+            max-height: 36px;
+            object-fit: contain;
+        }
+
+        .mnc-card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.1rem;
+            letter-spacing: -0.5px;
+            color: #000000 !important; /* Pure Black */
+            margin-bottom: 0.35rem;
+        }
+
+        .mnc-card-header p {
+            color: #64748b !important; /* Slate 500 */
+            font-size: 1.02rem;
+            font-weight: 500;
+        }
+
+        /* Clean Corporate Labels */
+        .mnc-label {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: #475569 !important; /* Slate 600 */
+            letter-spacing: 0.3px;
+            margin-left: 2px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Sleek Input Fields */
+        .mnc-input-group {
+            position: relative;
+            margin-bottom: 1.15rem;
+        }
+
+        .mnc-input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8; /* Slate 400 */
+            font-size: 1.3rem;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        .mnc-input {
+            width: 100%;
+            height: 56px;
+            padding: 10px 16px 10px 48px;
+            background: #ffffff !important;
+            border: 1.5px solid #e2e8f0 !important; /* Clean gray border */
+            border-radius: 12px;
+            font-size: 1.12rem;
+            color: #0f172a !important;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .mnc-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .mnc-input:focus {
+            background: #ffffff !important;
+            border-color: #000000 !important; /* Pure Black border focus */
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+            color: #000000 !important;
+        }
+
+        .mnc-input:focus + i {
+            color: #000000;
+        }
+
+        /* Passwords Grid row */
+        .mnc-pw-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.15rem;
+        }
+
+        .mnc-pw-col {
+            flex: 1;
+        }
+
+        .mnc-pw-col .mnc-input {
+            padding-left: 38px;
+        }
+
+        .mnc-pw-col i {
+            left: 14px;
+        }
+
+        /* Corporate Legal Scrollbox */
+        .mnc-tc-scrollbox {
+            height: 120px; /* Compact height */
+            overflow-y: auto;
+            padding: 12px;
+            background: #f8fafc !important; /* Light slate box */
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: #475569 !important; /* Slate 600 */
+        }
+
+        .mnc-tc-scrollbox::-webkit-scrollbar {
+            width: 5px;
+        }
+        .mnc-tc-scrollbox::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .mnc-tc-scrollbox::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .mnc-tc-scrollbox h6 {
+            color: #0f172a !important;
+            font-weight: 700;
+            font-size: 1.02rem;
+            margin-top: 0.6rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .mnc-tc-scrollbox p {
+            color: #475569 !important;
+            margin-bottom: 0.5rem;
+        }
+
+        .mnc-checkbox-wrap {
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .mnc-checkbox-wrap input[type="checkbox"] {
+            margin-top: 2px;
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mnc-checkbox-wrap label {
+            font-size: 1.02rem;
+            color: #475569 !important;
+            margin-left: 8px;
+            cursor: pointer;
+            line-height: 1.4;
+        }
+
+        .mnc-checkbox-wrap label a {
+            color: #000000 !important; /* Corporate black link */
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .mnc-checkbox-wrap label a:hover {
+            text-decoration: underline;
+        }
+
+        .mnc-scroll-hint {
+            font-size: 0.88rem;
+            color: #64748b !important;
+            margin-top: 0.25rem;
+            margin-left: 24px;
+        }
+
+        /* Solid Corporate Submit Button */
+        .mnc-btn-submit {
+            width: 100%;
+            height: 56px;
+            background: transparent !important;
+            border: 2px solid #000000 !important;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.12rem;
+            transition: all 0.2s ease;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+        }
+
+        .mnc-btn-submit,
+        .mnc-btn-submit span,
+        .mnc-btn-submit i {
+            color: #000000 !important; /* Force pure black text */
+        }
+
+        .mnc-btn-submit:not(:disabled) {
+            border: 2px solid #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) {
+            background: #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) span,
+        .mnc-btn-submit:hover:not(:disabled) i {
+            color: #ffffff !important; /* White text on hover */
+        }
+
+        .mnc-btn-submit:disabled {
+            background: #f1f5f9 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .mnc-btn-submit:disabled span,
+        .mnc-btn-submit:disabled i {
+            color: #000000 !important; /* Force black text when disabled */
+        }
+
+        .btn-toggle-password:hover {
+            color: #000000 !important;
+        }
+
+        .mnc-signin-footer {
+            text-align: center;
+            font-size: 1.02rem;
+            color: #64748b !important;
+        }
+
+        .mnc-signin-footer a {
+            color: #0f172a !important;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .mnc-signin-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+    
     <%- include('../partials/navbar-new') %>
     
-    <!-- PAGE HEADER -->
-    <section class="page-header text-center">
-        <div class="container">
-            <h1>Create Account</h1>
-            <p>Join the Swadesi Carts community</p>
-        </div>
-    </section>
+    <div class="mnc-viewport">
+        <!-- Crisp Corporate MNC Card -->
+        <div class="mnc-card-wrapper">
+            <div class="mnc-card-header">
+                <div class="logo-box">
+                    <% if (siteSettings && siteSettings.logo && siteSettings.logo.url) { %>
+                        <img src="<%= siteSettings.logo.url %>" alt="Swadesi Carts">
+                    <% } else { %>
+                        <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.5px; font-family: 'Poppins', sans-serif;">Swadesi<span style="color: #FFD700;">Carts</span></h4>
+                    <% } %>
+                </div>
+                <h2>Create Account</h2>
+                <p>Register your account with Swadesi Carts</p>
+            </div>
 
-    <!-- REGISTER SECTION -->
-    <section class="py-5 bg-light-custom">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-10 col-lg-8 col-xl-6">
-                    <div class="card border-0 shadow-sm" style="border-radius: 24px;">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <i class="bi bi-person-plus mb-3" style="font-size: 3rem; color: var(--accent);"></i>
-                            </div>
+            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+                <div class="alert alert-danger border-0 mb-4" role="alert" style="border-radius: 12px; font-size: 0.9rem; background-color: #fef2f2; color: #b91c1c;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
+                </div>
+            <% } %>
 
-                            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-                                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                                    <i class="bi bi-exclamation-circle me-2"></i><%= error %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            <% } %>
+            <form action="/register" method="POST" id="registerForm">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="content" id="contentInput">
 
-                            <form action="/register" method="POST" id="registerForm">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <div class="mb-4">
-                                    <label class="form-label fw-medium text-muted small ms-1 mb-1">Full Name *</label>
-                                    <input type="text" class="form-control form-control-lg" name="name" placeholder="John Doe" required autofocus style="border-radius: 12px; font-size: 1rem;">
-                                </div>
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label class="mnc-label">Full Name</label>
+                    <div class="mnc-input-group">
+                        <input type="text" class="mnc-input" name="name" id="nameInput" placeholder="John Doe" required autofocus autocomplete="off">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div id="nameAlert" class="text-danger mt-1 small fw-semibold" style="display: none; font-size: 0.85rem;"><i class="bi bi-exclamation-circle"></i> Emojis or Links are not allowed.</div>
+                </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label fw-medium text-muted small ms-1 mb-1">Email Address *</label>
-                                    <input type="email" class="form-control form-control-lg" name="email" placeholder="name@example.com" required style="border-radius: 12px; font-size: 1rem;">
-                                </div>
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="mnc-label">Email Address</label>
+                    <div class="mnc-input-group">
+                        <input type="email" class="mnc-input" name="email" id="emailInput" placeholder="name@example.com" required autocomplete="off">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <div id="emailAlert" class="text-danger mt-1 small fw-semibold" style="display: none; font-size: 0.85rem;"><i class="bi bi-exclamation-circle"></i> Emojis or Links are not allowed.</div>
+                </div>
 
-                                <div class="mb-4">
-                                    <label class="form-label fw-medium text-muted small ms-1 mb-1">Phone Number *</label>
-                                    <input type="tel" class="form-control form-control-lg" name="phone" placeholder="+91 9876543210" required style="border-radius: 12px; font-size: 1rem;">
-                                </div>
-                                
-                                <div class="row g-3 mb-5">
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-medium text-muted small ms-1 mb-1">Password *</label>
-                                        <input type="password" class="form-control form-control-lg" name="password" placeholder="Min 6 characters" minlength="6" required style="border-radius: 12px; font-size: 1rem;">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label fw-medium text-muted small ms-1 mb-1">Confirm Password *</label>
-                                        <input type="password" class="form-control form-control-lg" name="confirmPassword" placeholder="Repeat password" minlength="6" required style="border-radius: 12px; font-size: 1rem;">
-                                    </div>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-accent btn-lg w-100 mb-4" id="submitBtn" style="border-radius: 12px; font-weight: 600;">
-                                    Register
-                                </button>
-                                
-                                <div class="text-center">
-                                    <p class="text-muted-custom mb-0">Already have an account? <a href="/login" class="fw-bold text-decoration-none" style="color: var(--primary);">Sign in</a></p>
-                                </div>
-                            </form>
+                 <!-- Phone -->
+                <div class="mb-3">
+                    <label class="mnc-label">Phone Number</label>
+                    <div class="d-flex">
+                        <select class="form-select" id="countryCodeSelect" style="max-width: 110px; height: 56px; border: 1.5px solid #e2e8f0; border-radius: 12px 0 0 12px; font-size: 0.95rem; font-weight: 600; color: #000000; background-color: #f8fafc; outline: none; border-right: none;">
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+971">🇦🇪 +971</option>
+                            <option value="+61">🇦🇺 +61</option>
+                            <option value="+1">🇨🇦 +1</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+33">🇫🇷 +33</option>
+                        </select>
+                        <div class="mnc-input-group flex-grow-1" style="margin-bottom: 0;">
+                            <input type="tel" class="mnc-input" name="phone" id="phoneInput" placeholder="9876543210" required autocomplete="off" style="border-radius: 0 12px 12px 0; padding-left: 44px; height: 56px;">
+                            <i class="bi bi-telephone" style="left: 16px;"></i>
                         </div>
                     </div>
+                    <div id="phoneAlert" class="text-danger mt-1 small fw-semibold" style="display: none; font-size: 0.85rem;"><i class="bi bi-exclamation-circle"></i> Emojis or Links are not allowed.</div>
                 </div>
-            </div>
+
+                <!-- Passwords Side-by-Side (Saves Height) -->
+                <div class="mnc-pw-row" style="margin-bottom: 0.5rem;">
+                    <div class="mnc-pw-col">
+                        <label class="mnc-label">Password</label>
+                        <div class="mnc-input-group" style="margin-bottom: 0;">
+                            <input type="password" class="mnc-input" name="password" id="passwordInput" placeholder="Min 8 chars" minlength="8" required style="padding-right: 48px;">
+                            <i class="bi bi-lock"></i>
+                            <button type="button" class="btn-toggle-password" id="togglePasswordBtn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 0; color: #94a3b8; z-index: 15; outline: none;">
+                                <i class="bi bi-eye" id="pwIcon1" style="position: static; transform: none; font-size: 1.25rem; color: inherit;"></i>
+                            </button>
+                        </div>
+                        <div id="passwordAlert" class="text-danger mt-1 small fw-semibold" style="display: none; font-size: 0.85rem;"><i class="bi bi-exclamation-circle"></i> Emojis/Links are not allowed.</div>
+                    </div>
+                    <div class="mnc-pw-col">
+                        <label class="mnc-label">Confirm Password</label>
+                        <div class="mnc-input-group" style="margin-bottom: 0;">
+                            <input type="password" class="mnc-input" name="confirmPassword" id="confirmPasswordInput" placeholder="Confirm" minlength="8" required style="padding-right: 48px;">
+                            <i class="bi bi-key"></i>
+                            <button type="button" class="btn-toggle-password" id="toggleConfirmPasswordBtn" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; padding: 0; color: #94a3b8; z-index: 15; outline: none;">
+                                <i class="bi bi-eye" id="pwIcon2" style="position: static; transform: none; font-size: 1.25rem; color: inherit;"></i>
+                            </button>
+                        </div>
+                        <div id="confirmPasswordAlert" class="text-danger mt-1 small fw-semibold" style="display: none; font-size: 0.85rem;"><i class="bi bi-exclamation-circle"></i> Emojis/Links are not allowed.</div>
+                    </div>
+                </div>
+
+                <!-- Password Real-time Checklist -->
+                <div id="passwordChecklist" class="mb-3 p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.85rem; display: none;">
+                    <div class="fw-bold mb-2 text-dark" style="font-size: 0.88rem;">Password must contain:</div>
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-2" style="padding-left: 0;">
+                        <li id="reqLength" class="text-muted d-flex align-items-center gap-2" style="color: #64748b !important;"><i class="bi bi-x-circle text-danger"></i> At least 8 characters</li>
+                        <li id="reqLowercase" class="text-muted d-flex align-items-center gap-2" style="color: #64748b !important;"><i class="bi bi-x-circle text-danger"></i> At least one lowercase letter</li>
+                        <li id="reqNumber" class="text-muted d-flex align-items-center gap-2" style="color: #64748b !important;"><i class="bi bi-x-circle text-danger"></i> At least one number</li>
+                        <li id="reqSpecial" class="text-muted d-flex align-items-center gap-2" style="color: #64748b !important;"><i class="bi bi-x-circle text-danger"></i> At least one special character (@, ., #)</li>
+                    </ul>
+                    <div id="pwMatchHint" class="mt-2 fw-semibold text-danger" style="font-size: 0.82rem; display: none;">
+                        <i class="bi bi-x-circle"></i> Passwords do not match
+                    </div>
+                </div>
+
+                <!-- T&C Scrollbox -->
+                <div class="mb-3">
+                    <label class="mnc-label">Terms & Conditions & Privacy Policy</label>
+                    <div id="tcScrollBox" class="mnc-tc-scrollbox">
+                        <h6 class="fw-bold mb-1">Swadesi Carts User Agreement</h6>
+                        <p>Welcome to Swadesi Carts. By registering an account on our platform, you agree to comply with and be bound by the following terms, conditions, and policies. Please review them carefully.</p>
+                        
+                        <h6 class="fw-bold mb-1">1. Website Usage & Scope</h6>
+                        <p>You agree to use our website and services only for lawful purposes. You represent and warrant that all information you submit (including name, email, and phone number) is accurate and truthful.</p>
+                        
+                        <h6 class="fw-bold mb-1">2. Privacy & Data Collection</h6>
+                        <p>We collect and securely process your personal information (such as email, name, and phone) to verify your account, coordinate orders, and manage inquiries. Your media uploads (like avatars and ticket attachments) are hosted securely on Cloudinary.</p>
+                        
+                        <h6 class="fw-bold mb-1">3. Indian Jurisdiction</h6>
+                        <p>Any contracts, disputes, or legal actions arising from using Swadesi Carts are strictly governed by and construed in accordance with the laws of India.</p>
+                        
+                        <h6 class="fw-bold mb-1">4. Intellectual Property</h6>
+                        <p>All content, logo designs, custom code, and assets on this website are owned by Swadesi Carts. Unauthorized duplication or framing is strictly prohibited.</p>
+                        
+                        <h6 class="fw-bold mb-1">5. Returns & Cancellations</h6>
+                        <p>Cancellation of physical or custom tech services must be requested in accordance with our official Cancellation and Refund Policies. Perishable organic items require immediate delivery verification within 24 hours of receipt.</p>
+                        
+                        <p class="text-success fw-bold mt-2 mb-0" id="scrollbox-end-marker"><i class="bi bi-check-circle-fill"></i> End of Terms. You have reached the bottom of the document.</p>
+                    </div>
+                    
+                    <div class="mnc-checkbox-wrap">
+                        <input type="checkbox" id="acceptCheckbox" disabled>
+                        <label for="acceptCheckbox">
+                            I read and accept the <a href="/terms-and-conditions" target="_blank">Terms</a> & <a href="/privacy-policy" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+                    <div id="scrollHint" class="mnc-scroll-hint">
+                        <i class="bi bi-arrow-down-short"></i> Please scroll to the bottom to accept.
+                    </div>
+                </div>
+
+                 <button type="submit" class="mnc-btn-submit" id="submitBtn" disabled style="background: #f1f5f9 !important; border: 1.5px solid #cbd5e1 !important;">
+                    <span style="color: #000000 !important;">Register Account</span> <i class="bi bi-arrow-right" style="color: #000000 !important;"></i>
+                </button>
+                
+                <div class="mnc-signin-footer">
+                    Already have an account? <a href="/login" class="fw-bold">Sign in here</a>
+                </div>
+
+            </form>
         </div>
-    </section>
+    </div>
 
     <%- include('../partials/footer-new') %>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', function() {
-            var btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing...';
-            btn.disabled = true;
+        document.addEventListener('DOMContentLoaded', () => {
+            const tcBox = document.getElementById('tcScrollBox');
+            const acceptChk = document.getElementById('acceptCheckbox');
+            const submitBtn = document.getElementById('submitBtn');
+            const scrollHint = document.getElementById('scrollHint');
+            const form = document.getElementById('registerForm');
+
+            // Initially disable submit button
+            submitBtn.disabled = true;
+
+            tcBox.addEventListener('scroll', () => {
+                // Check if user scrolled to the bottom of the box
+                const scrolledToBottom = tcBox.scrollHeight - tcBox.scrollTop - tcBox.clientHeight <= 8;
+                
+                if (scrolledToBottom && acceptChk.disabled) {
+                    acceptChk.disabled = false;
+                    scrollHint.innerHTML = '<span class="text-success fw-semibold"><i class="bi bi-patch-check"></i> You can now accept the terms and conditions.</span>';
+                }
+            });
+
+             const passwordInput = document.getElementById('passwordInput');
+             const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+             const checklist = document.getElementById('passwordChecklist');
+             const matchHint = document.getElementById('pwMatchHint');
+
+             const reqLength = document.getElementById('reqLength');
+             const reqLowercase = document.getElementById('reqLowercase');
+             const reqNumber = document.getElementById('reqNumber');
+             const reqSpecial = document.getElementById('reqSpecial');
+
+             // Toggle password event listeners
+             const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+             const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPasswordBtn');
+
+             togglePasswordBtn.addEventListener('click', () => {
+                 const icon = document.getElementById('pwIcon1');
+                 if (passwordInput.type === 'password') {
+                     passwordInput.type = 'text';
+                     icon.classList.remove('bi-eye');
+                     icon.classList.add('bi-eye-slash');
+                 } else {
+                     passwordInput.type = 'password';
+                     icon.classList.remove('bi-eye-slash');
+                     icon.classList.add('bi-eye');
+                 }
+             });
+
+             toggleConfirmPasswordBtn.addEventListener('click', () => {
+                 const icon = document.getElementById('pwIcon2');
+                 if (confirmPasswordInput.type === 'password') {
+                     confirmPasswordInput.type = 'text';
+                     icon.classList.remove('bi-eye');
+                     icon.classList.add('bi-eye-slash');
+                 } else {
+                     confirmPasswordInput.type = 'password';
+                     icon.classList.remove('bi-eye-slash');
+                     icon.classList.add('bi-eye');
+                 }
+             });
+
+             let isPasswordValid = false;
+
+             function validatePassword() {
+                 const val = passwordInput.value;
+                 const confirmVal = confirmPasswordInput.value;
+
+                 // Show checklist once user starts typing
+                 if (val.length > 0) {
+                     checklist.style.display = 'block';
+                 } else {
+                     checklist.style.display = 'none';
+                 }
+
+                 // 1. Length rule (>= 8)
+                 const lenOk = val.length >= 8;
+                 updateRuleIndicator(reqLength, lenOk);
+
+                 // 2. Lowercase rule (/[a-z]/)
+                 const lowerOk = /[a-z]/.test(val);
+                 updateRuleIndicator(reqLowercase, lowerOk);
+
+                 // 3. Number rule (/[0-9]/)
+                 const numOk = /[0-9]/.test(val);
+                 updateRuleIndicator(reqNumber, numOk);
+
+                 // 4. Special character rule (/[@.#]/)
+                 const specOk = /[@.#]/.test(val);
+                 updateRuleIndicator(reqSpecial, specOk);
+
+                 // 5. Match rule
+                 const matchOk = val === confirmVal;
+                 if (confirmVal.length > 0) {
+                     matchHint.style.display = 'block';
+                     if (matchOk) {
+                         matchHint.className = 'mt-2 fw-semibold text-success';
+                         matchHint.innerHTML = '<i class="bi bi-check-circle-fill"></i> Passwords match';
+                     } else {
+                         matchHint.className = 'mt-2 fw-semibold text-danger';
+                         matchHint.innerHTML = '<i class="bi bi-x-circle"></i> Passwords do not match';
+                     }
+                 } else {
+                     matchHint.style.display = 'none';
+                 }
+
+                 isPasswordValid = lenOk && lowerOk && numOk && specOk && matchOk;
+                 updateSubmitState();
+             }
+
+             function updateRuleIndicator(el, isOk) {
+                 const icon = el.querySelector('i');
+                 if (isOk) {
+                     icon.className = 'bi bi-check-circle-fill text-success';
+                     el.style.setProperty('color', '#15803d', 'important');
+                 } else {
+                     icon.className = 'bi bi-x-circle text-danger';
+                     el.style.setProperty('color', '#64748b', 'important');
+                 }
+             }
+
+              // Emoji and URL link validation checks
+              const emojiRegex = /[\p{Emoji_Presentation}\p{Extended_Pictographic}]/u;
+              const linkRegex = /https?:\/\/[^\s]+|www\.[^\s]+/i; // Only check for explicit http/https/www to prevent email false-triggers
+
+              const fieldErrors = { name: false, email: false, phone: false, password: false, confirmPassword: false };
+
+              function checkForEmojiOrLink(input, fieldKey, fieldName, alertId) {
+                  const alertDiv = document.getElementById(alertId);
+                  const val = input.value;
+                  let hasError = false;
+                  let errorMsg = '';
+
+                  if (emojiRegex.test(val)) {
+                      hasError = true;
+                      errorMsg = `<i class="bi bi-exclamation-circle"></i> Emojis are not allowed in the ${fieldName} field.`;
+                  } else if (linkRegex.test(val)) {
+                      hasError = true;
+                      errorMsg = `<i class="bi bi-exclamation-circle"></i> Links or URLs are not allowed in the ${fieldName} field.`;
+                  }
+
+                  if (hasError) {
+                      alertDiv.innerHTML = errorMsg;
+                      alertDiv.style.display = 'block';
+                      input.style.setProperty('border-color', '#ef4444', 'important');
+                      input.style.setProperty('border-width', '2px', 'important');
+                      fieldErrors[fieldKey] = true;
+                  } else {
+                      alertDiv.style.display = 'none';
+                      input.style.setProperty('border-color', '#e2e8f0', 'important');
+                      input.style.setProperty('border-width', '1.5px', 'important');
+                      fieldErrors[fieldKey] = false;
+                  }
+
+                  // Recalculate submit button availability
+                  updateSubmitState();
+                  return !hasError;
+              }
+
+              // Bind inputs for dynamic checks
+              const nameInput = document.getElementById('nameInput');
+              const emailInput = document.getElementById('emailInput');
+              const rawPhoneInput = document.getElementById('phoneInput');
+
+              nameInput.addEventListener('input', () => checkForEmojiOrLink(nameInput, 'name', 'Full Name', 'nameAlert'));
+              emailInput.addEventListener('input', () => checkForEmojiOrLink(emailInput, 'email', 'Email Address', 'emailAlert'));
+              
+              rawPhoneInput.addEventListener('input', () => {
+                  // phone can only contain digits in the raw input box
+                  rawPhoneInput.value = rawPhoneInput.value.replace(/[^0-9]/g, '');
+                  checkForEmojiOrLink(rawPhoneInput, 'phone', 'Phone Number', 'phoneAlert');
+              });
+              
+              passwordInput.addEventListener('input', () => {
+                  checkForEmojiOrLink(passwordInput, 'password', 'Password', 'passwordAlert');
+                  validatePassword();
+              });
+              confirmPasswordInput.addEventListener('input', () => {
+                  checkForEmojiOrLink(confirmPasswordInput, 'confirmPassword', 'Confirm Password', 'confirmPasswordAlert');
+                  validatePassword();
+              });
+
+              passwordInput.addEventListener('input', validatePassword);
+              confirmPasswordInput.addEventListener('input', validatePassword);
+
+              // Database availability checking helper via API
+              async function checkDbAvailability(emailVal, phoneVal) {
+                  try {
+                      const csrf = document.querySelector('input[name="_csrf"]').value;
+                      const response = await fetch('/api/auth/check-availability', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json',
+                              'x-csrf-token': csrf
+                          },
+                          body: JSON.stringify({ email: emailVal, phone: phoneVal })
+                      });
+                      return await response.json();
+                  } catch (err) {
+                      console.error('Error checking availability:', err);
+                      return { success: false, emailAvailable: true, phoneAvailable: true };
+                  }
+              }
+
+              // Bind blur events to check database availability in real time
+              emailInput.addEventListener('blur', async () => {
+                  if (emailInput.value.length > 0 && !fieldErrors.email) {
+                      const res = await checkDbAvailability(emailInput.value, null);
+                      const alertDiv = document.getElementById('emailAlert');
+                      if (res.success && !res.emailAvailable) {
+                          alertDiv.innerHTML = `<i class="bi bi-exclamation-circle"></i> This email address is already registered.`;
+                          alertDiv.style.display = 'block';
+                          emailInput.style.setProperty('border-color', '#ef4444', 'important');
+                          emailInput.style.setProperty('border-width', '2px', 'important');
+                          fieldErrors.email = true;
+                      } else if (!fieldErrors.email) {
+                          alertDiv.style.display = 'none';
+                          emailInput.style.setProperty('border-color', '#e2e8f0', 'important');
+                          emailInput.style.setProperty('border-width', '1.5px', 'important');
+                          fieldErrors.email = false;
+                      }
+                      updateSubmitState();
+                  }
+              });
+
+              rawPhoneInput.addEventListener('blur', async () => {
+                  const countryCode = document.getElementById('countryCodeSelect').value;
+                  const rawPhone = rawPhoneInput.value;
+                  if (rawPhone.length > 0 && !fieldErrors.phone) {
+                      const fullPhone = countryCode + rawPhone.replace(/\s+/g, '');
+                      const res = await checkDbAvailability(null, fullPhone);
+                      const alertDiv = document.getElementById('phoneAlert');
+                      if (res.success && !res.phoneAvailable) {
+                          alertDiv.innerHTML = `<i class="bi bi-exclamation-circle"></i> This phone number is already registered.`;
+                          alertDiv.style.display = 'block';
+                          rawPhoneInput.style.setProperty('border-color', '#ef4444', 'important');
+                          rawPhoneInput.style.setProperty('border-width', '2px', 'important');
+                          fieldErrors.phone = true;
+                      } else if (!fieldErrors.phone) {
+                          alertDiv.style.display = 'none';
+                          rawPhoneInput.style.setProperty('border-color', '#e2e8f0', 'important');
+                          rawPhoneInput.style.setProperty('border-width', '1.5px', 'important');
+                          fieldErrors.phone = false;
+                      }
+                      updateSubmitState();
+                  }
+              });
+
+              // State update
+              function updateSubmitState() {
+                  const hasAnyFieldErrors = Object.values(fieldErrors).some(err => err === true);
+                  const isFormValid = acceptChk.checked && isPasswordValid && !hasAnyFieldErrors;
+                  submitBtn.disabled = !isFormValid;
+
+                  if (isFormValid) {
+                      submitBtn.style.setProperty('background', 'transparent', 'important');
+                      submitBtn.style.setProperty('border', '2px solid #000000', 'important');
+                      submitBtn.querySelector('span').style.setProperty('color', '#000000', 'important');
+                      submitBtn.querySelector('i').style.setProperty('color', '#000000', 'important');
+                  } else {
+                      submitBtn.style.setProperty('background', '#f1f5f9', 'important');
+                      submitBtn.style.setProperty('border', '1.5px solid #cbd5e1', 'important');
+                      submitBtn.querySelector('span').style.setProperty('color', '#000000', 'important');
+                      submitBtn.querySelector('i').style.setProperty('color', '#000000', 'important');
+                  }
+              }
+
+              acceptChk.addEventListener('change', updateSubmitState);
+
+              // Add hover listeners dynamically via JS to guarantee pure black background and white text on hover
+              submitBtn.addEventListener('mouseover', () => {
+                  if (!submitBtn.disabled) {
+                      submitBtn.style.setProperty('background', '#000000', 'important');
+                      submitBtn.querySelector('span').style.setProperty('color', '#ffffff', 'important');
+                      submitBtn.querySelector('i').style.setProperty('color', '#ffffff', 'important');
+                  }
+              });
+              submitBtn.addEventListener('mouseout', () => {
+                  if (!submitBtn.disabled) {
+                      submitBtn.style.setProperty('background', 'transparent', 'important');
+                      submitBtn.querySelector('span').style.setProperty('color', '#000000', 'important');
+                      submitBtn.querySelector('i').style.setProperty('color', '#000000', 'important');
+                  }
+              });
+
+             // Check if scroll is not needed (small screens, etc.)
+             function checkScrollable() {
+                 if (tcBox.scrollHeight <= tcBox.clientHeight) {
+                      acceptChk.disabled = false;
+                      scrollHint.innerHTML = '<span class="text-success fw-semibold"><i class="bi bi-patch-check"></i> You can now accept the terms and conditions.</span>';
+                 }
+             }
+             
+             // Run initial check and bind to resize
+              checkScrollable();
+              window.addEventListener('resize', checkScrollable);
+
+              form.addEventListener('submit', function(e) {
+                  const countryCode = document.getElementById('countryCodeSelect').value;
+                  const rawPhone = rawPhoneInput.value;
+                  
+                  // Clean rawPhone from spaces or dashes just in case
+                  const cleanRawPhone = rawPhone.replace(/\s+/g, '');
+                  
+                  // Combine and set value of phone input before posting
+                  rawPhoneInput.value = countryCode + cleanRawPhone;
+
+                  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Processing... <i class="bi bi-arrow-right"></i>';
+                  submitBtn.disabled = true;
+              });
         });
     </script>
 </body>

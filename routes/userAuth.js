@@ -16,4 +16,7 @@ router.post('/login', isUserGuest, loginLimiter, validate(loginSchema), userAuth
 
 router.get('/logout', userAuthController.logout);
 
+router.post('/api/auth/check-availability', isUserGuest, userAuthController.checkAvailability);
+router.post('/api/auth/resend-otp', isUserGuest, authLimiter, userAuthController.resendOTP);
+
 module.exports = router;

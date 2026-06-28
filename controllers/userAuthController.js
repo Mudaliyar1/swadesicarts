@@ -1,6 +1,110 @@
 const User = require('../models/User');
 const Admin = require('../models/Admin');
 const sendEmail = require('../helpers/email');
+const CriticalAlert = require('../models/CriticalAlert');
+
+// In-memory cache for tracking IP OTP attempts
+const ipOtpAttempts = {};
+
+async function checkBlockedStatus(req, email, phone) {
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    
+    // 1. Check if IP is blocked in CriticalAlert (unresolved & unexpired)
+    const activeIpAlert = await CriticalAlert.findOne({
+        ipAddress: clientIp,
+        isResolved: false,
+        blockedUntil: { $gt: new Date() }
+    });
+    if (activeIpAlert) {
+        return { blocked: true, message: 'Too many requests. Please try again after 1 hour.' };
+    }
+
+    // 2. Check if Email/Phone is blocked on existing User (unverified or verified)
+    const matchConditions = [];
+    if (email) matchConditions.push({ email: email.trim().toLowerCase() });
+    if (phone) matchConditions.push({ phone: phone.trim() });
+
+    if (matchConditions.length > 0) {
+        const existingUser = await User.findOne({ $or: matchConditions });
+        if (existingUser && existingUser.otpBlockedUntil && existingUser.otpBlockedUntil > new Date()) {
+            return { blocked: true, message: 'Too many requests. Please try again after 1 hour.' };
+        }
+    }
+
+    return { blocked: false };
+}
+
+async function recordOtpAttempt(req, email, phone) {
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    const cleanEmail = email ? email.trim().toLowerCase() : null;
+    const cleanPhone = phone ? phone.trim() : null;
+    
+    let user = null;
+    const matchConditions = [];
+    if (cleanEmail) matchConditions.push({ email: cleanEmail });
+    if (cleanPhone) matchConditions.push({ phone: cleanPhone });
+    
+    if (matchConditions.length > 0) {
+        user = await User.findOne({ $or: matchConditions });
+    }
+
+    const now = Date.now();
+    
+    // Track IP-level attempts
+    if (!ipOtpAttempts[clientIp]) {
+        ipOtpAttempts[clientIp] = { count: 0, lastAttempt: now };
+    }
+    
+    if (now - ipOtpAttempts[clientIp].lastAttempt > 10 * 60 * 1000) {
+        ipOtpAttempts[clientIp].count = 0;
+    }
+    
+    ipOtpAttempts[clientIp].count += 1;
+    ipOtpAttempts[clientIp].lastAttempt = now;
+
+    const blockedTime = new Date(Date.now() + 60 * 60 * 1000); // 1 hour block
+
+    // If IP attempts exceed 3
+    if (ipOtpAttempts[clientIp].count >= 3) {
+        await CriticalAlert.create({
+            userEmail: cleanEmail,
+            userPhone: cleanPhone,
+            ipAddress: clientIp,
+            reason: 'IP OTP spamming - 3 attempts from same IP',
+            blockedUntil: blockedTime,
+            isResolved: false
+        });
+        
+        if (user) {
+            user.otpBlockedUntil = blockedTime;
+            user.otpAttempts = ipOtpAttempts[clientIp].count;
+            await user.save();
+        }
+        return { blocked: true };
+    }
+
+    // Track User-level attempts
+    if (user) {
+        user.otpAttempts = (user.otpAttempts || 0) + 1;
+        if (user.otpAttempts >= 3) {
+            user.otpBlockedUntil = blockedTime;
+            await user.save();
+
+            await CriticalAlert.create({
+                userEmail: user.email,
+                userPhone: user.phone,
+                ipAddress: clientIp,
+                reason: 'OTP spamming - more than 3 attempts',
+                blockedUntil: blockedTime,
+                isResolved: false
+            });
+            return { blocked: true };
+        }
+        await user.save();
+    }
+
+    return { blocked: false };
+}
 
 // Show register page
 exports.showRegister = (req, res) => {
@@ -22,6 +126,16 @@ exports.register = async (req, res) => {
       return res.redirect('/register');
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = phone.trim();
+
+    // Check if blocked by IP or email/phone
+    const blockCheck = await checkBlockedStatus(req, cleanEmail, cleanPhone);
+    if (blockCheck.blocked) {
+      req.flash('error', blockCheck.message);
+      return res.redirect('/register');
+    }
+
     // Email regex validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -39,15 +153,16 @@ exports.register = async (req, res) => {
       return res.redirect('/register');
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    // Check if user already exists (forcing lowercase check)
+    const existingUser = await User.findOne({ $or: [{ email: cleanEmail }, { phone: cleanPhone }] });
     if (existingUser) {
       if (existingUser.isVerified) {
         req.flash('error', 'Email or Phone number already registered. Please login.');
         return res.redirect('/login');
       } else {
-        // Unverified user, allow to register again and resend OTP
-        await User.findByIdAndDelete(existingUser._id);
+        // Unverified user, block re-registration and redirect to verify page
+        req.flash('success', 'An account with this email or phone is already registered and pending verification. Please verify your OTP.');
+        return res.redirect(`/verify-otp?email=${encodeURIComponent(existingUser.email)}`);
       }
     }
 
@@ -58,8 +173,8 @@ exports.register = async (req, res) => {
     // Create user
     const newUser = new User({
       name,
-      email,
-      phone,
+      email: cleanEmail,
+      phone: cleanPhone,
       password,
       isVerified: false,
       otp,
@@ -67,6 +182,9 @@ exports.register = async (req, res) => {
     });
 
     await newUser.save();
+
+    // Record OTP attempt (registers first attempt)
+    await recordOtpAttempt(req, cleanEmail, cleanPhone);
 
     // Send OTP via Nodemailer
     try {
@@ -110,36 +228,44 @@ exports.showVerifyOTP = (req, res) => {
 
 // Handle OTP Verification
 exports.verifyOTP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
+  const { email, otp } = req.body;
+  const sendResponse = (success, message, redirectUrl, status = 200) => {
+    const isAjax = req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1);
+    if (isAjax) {
+      return res.status(status).json({ success, message, redirect: redirectUrl });
+    } else {
+      if (success) {
+        req.flash('success', message);
+      } else {
+        req.flash('error', message);
+      }
+      return res.redirect(redirectUrl);
+    }
+  };
 
+  try {
     if (!email || !otp) {
-      req.flash('error', 'Email and OTP are required');
-      return res.redirect(`/verify-otp?email=${encodeURIComponent(email || '')}`);
+      return sendResponse(false, 'Email and OTP are required', `/verify-otp?email=${encodeURIComponent(email || '')}`, 400);
     }
 
-    const user = await User.findOne({ email });
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
-      req.flash('error', 'User not found. Please register.');
-      return res.redirect('/register');
+      return sendResponse(false, 'User not found. Please register.', '/register', 404);
     }
 
     if (user.isVerified) {
-      req.flash('info', 'Account is already verified. Please login.');
-      return res.redirect('/login');
+      return sendResponse(true, 'Account is already verified. Please login.', '/login');
     }
 
     if (user.otp !== otp) {
-      req.flash('error', 'Invalid OTP');
-      return res.redirect(`/verify-otp?email=${encodeURIComponent(email)}`);
+      return sendResponse(false, 'Invalid OTP', `/verify-otp?email=${encodeURIComponent(email)}`, 400);
     }
 
     if (user.otpExpires < new Date()) {
-      req.flash('error', 'OTP has expired. Please register again.');
-      // Actually we should provide a way to resend OTP, but for simplicity we ask to register again
       await User.findByIdAndDelete(user._id);
-      return res.redirect('/register');
+      return sendResponse(false, 'OTP has expired. Please register again.', '/register', 400);
     }
 
     // Verify user
@@ -163,13 +289,17 @@ exports.verifyOTP = async (req, res) => {
 
     req.session.save((err) => {
         if (err) console.error('Session save error:', err);
-        req.flash('success', 'Account verified successfully. Welcome!');
-        res.redirect('/');
+        const isAjax = req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1);
+        if (isAjax) {
+          return res.json({ success: true, redirect: '/' });
+        } else {
+          req.flash('success', 'Account verified successfully. Welcome!');
+          return res.redirect('/');
+        }
     });
   } catch (error) {
     console.error('OTP Verification error:', error);
-    req.flash('error', 'An error occurred during verification');
-    res.redirect(`/verify-otp?email=${encodeURIComponent(req.body.email || '')}`);
+    return sendResponse(false, 'An error occurred during verification', `/verify-otp?email=${encodeURIComponent(email || '')}`, 500);
   }
 };
 
@@ -192,7 +322,8 @@ exports.login = async (req, res) => {
       return res.redirect('/login');
     }
 
-    const user = await User.findOne({ email, isActive: true }).select('+password +loginAttempts +lockUntil');
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail, isActive: true }).select('+password +loginAttempts +lockUntil');
 
     if (!user) {
       req.flash('error', 'Invalid credentials');
@@ -272,4 +403,99 @@ exports.logout = (req, res) => {
     if (err) console.error('Logout error:', err);
     res.redirect('/');
   });
+};
+
+// Check availability of email and phone in real time
+exports.checkAvailability = async (req, res) => {
+  try {
+    const { email, phone } = req.body;
+    let emailAvailable = true;
+    let phoneAvailable = true;
+
+    if (email) {
+      const cleanEmail = email.trim().toLowerCase();
+      const existingEmail = await User.findOne({ email: cleanEmail });
+      if (existingEmail) {
+        emailAvailable = false;
+      }
+    }
+
+    if (phone) {
+      const cleanPhone = phone.trim();
+      const existingPhone = await User.findOne({ phone: cleanPhone });
+      if (existingPhone) {
+        phoneAvailable = false;
+      }
+    }
+
+    return res.json({
+      success: true,
+      emailAvailable,
+      phoneAvailable
+    });
+  } catch (error) {
+    console.error('Check availability error:', error);
+    return res.status(500).json({ success: false, message: 'Server error check' });
+  }
+};
+
+// Handle Resend OTP via AJAX
+exports.resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    
+    // Check if blocked by IP or Email
+    const blockCheck = await checkBlockedStatus(req, cleanEmail, null);
+    if (blockCheck.blocked) {
+      return res.status(429).json({ success: false, message: blockCheck.message });
+    }
+
+    // Record attempt
+    const attemptCheck = await recordOtpAttempt(req, cleanEmail, null);
+    if (attemptCheck.blocked) {
+      return res.status(429).json({ success: false, message: 'Too many requests. Please try again after 1 hour.' });
+    }
+
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ success: false, message: 'Account is already verified. Please login.' });
+    }
+
+    // Generate new OTP and update expiry
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await user.save();
+
+    // Send email
+    try {
+      const subject = 'Verify your account - Resend OTP - Swadesi Carts';
+      const htmlContent = `<p>Hello ${user.name},</p><p>Your new OTP for account verification is: <strong>${otp}</strong></p><p>This OTP is valid for 10 minutes.</p>`;
+      await sendEmail(user.email, subject, htmlContent);
+    } catch (emailError) {
+      console.error('Error sending resend email:', emailError);
+      return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+    }
+
+    return res.json({ success: true, message: 'OTP resent successfully. Please check your email.' });
+  } catch (error) {
+    console.error('Resend OTP error:', error);
+    return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+  }
+};
+
+// Clear in-memory IP OTP attempts cache when admin releases the block
+exports.clearIpAttempts = (ip) => {
+  if (ip && ipOtpAttempts[ip]) {
+    delete ipOtpAttempts[ip];
+  }
 };

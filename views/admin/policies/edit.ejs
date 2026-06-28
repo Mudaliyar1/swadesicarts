@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        .ql-editor {
+            min-height: 320px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.8rem 1.2rem;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-tabs .nav-link.active {
+            color: #4C1E4F;
+            border-bottom: 2px solid #4C1E4F;
+            background: transparent;
+        }
+    </style>
+</head>
+<body class="admin-body">
+    
+    <%- include('../../partials/admin-sidebar') %>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="fw-bold mb-1"><i class="bi bi-file-earmark-diff"></i> Edit Policy Page</h2>
+                    <p class="text-muted mb-0">Update policy details, content, SEO values, or GEO keywords</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <% if (policy.status === 'published') { %>
+                        <a href="/<%= policy.slug %>" target="_blank" class="btn btn-outline-info" style="border-radius: 10px; font-weight: 500;"><i class="bi bi-eye"></i> View Live Page</a>
+                    <% } %>
+                    <a href="/admin/policies" class="btn btn-outline-secondary" style="border-radius: 10px; font-weight: 500;"><i class="bi bi-arrow-left"></i> Back to List</a>
+                </div>
+            </div>
+
+            <% if (error && error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <form id="policyForm" action="/admin/policies/edit/<%= policy._id %>" method="POST">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="content" id="contentInput">
+
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <!-- Primary Content Card -->
+                        <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                            <div class="card-body p-4">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark">Policy Title *</label>
+                                        <input type="text" class="form-control" name="title" id="policyTitle" value="<%= policy.title %>" required style="border-radius: 8px;">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-dark">URL Slug *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light text-muted" style="border-radius: 8px 0 0 8px;">/</span>
+                                            <input type="text" class="form-control" name="slug" id="policySlug" value="<%= policy.slug %>" required style="border-radius: 0 8px 8px 0;">
+                                        </div>
+                                        <small class="text-muted">Use lowercase letters, numbers, and dashes.</small>
+                                    </div>
+                                    <div class="col-12 mt-4">
+                                        <label class="form-label fw-bold text-dark mb-2">Policy Content *</label>
+                                        <!-- Rich Text Editor Container -->
+                                        <div id="editor-container" style="border-radius: 8px;">
+                                            <%- policy.content %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Metadata Configuration Tabs -->
+                        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                                <ul class="nav nav-tabs border-bottom" id="metaTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab"><i class="bi bi-search me-2"></i>SEO Management</button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="geo-tab" data-bs-toggle="tab" data-bs-target="#geo" type="button" role="tab"><i class="bi bi-globe me-2"></i>GEO & AI Search</button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="tab-content" id="metaTabsContent">
+                                    <!-- SEO Tab -->
+                                    <div class="tab-pane fade show active" id="seo" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold text-dark">SEO Custom Title</label>
+                                                <input type="text" class="form-control" name="seoTitle" value="<%= policy.seoTitle %>" placeholder="e.g. Privacy Policy & Data Protection | Swadesi Carts" style="border-radius: 8px;">
+                                                <small class="text-muted">Will fall back to "Title - Swadesi Carts" if left blank.</small>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold text-dark">Meta Description</label>
+                                                <textarea class="form-control" name="seoDescription" rows="3" placeholder="Brief summary of this policy (150-160 characters)..." style="border-radius: 8px;"><%= policy.seoDescription %></textarea>
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold text-dark">Keywords (comma-separated)</label>
+                                                <input type="text" class="form-control" name="seoKeywords" value="<%= policy.seoKeywords %>" placeholder="e.g. privacy, security, cookies, user rights" style="border-radius: 8px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- GEO & AI Tab -->
+                                    <div class="tab-pane fade" id="geo" role="tabpanel">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-dark">GEO Summary</label>
+                                                <textarea class="form-control" name="geoSummary" rows="3" placeholder="Regional scopes, jurisdictions, delivery limits..." style="border-radius: 8px;"><%= policy.geoSummary %></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-dark">AI Optimization Description</label>
+                                                <textarea class="form-control" name="aiDescription" rows="3" placeholder="Clear summary tailored for Large Language Models and AI engines..." style="border-radius: 8px;"><%= policy.aiDescription %></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-dark">Entity Description</label>
+                                                <input type="text" class="form-control" name="entityDescription" value="<%= policy.entityDescription %>" placeholder="e.g. Legal agreement, copyright terms" style="border-radius: 8px;">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-dark">AI Search Keywords</label>
+                                                <input type="text" class="form-control" name="aiSearchKeywords" value="<%= policy.aiSearchKeywords %>" placeholder="comma-separated tags..." style="border-radius: 8px;">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold text-dark">Structured AI Metadata (JSON Format)</label>
+                                                <textarea class="form-control" name="structuredAiMetadata" rows="3" style="border-radius: 8px; font-family: monospace;"><%= policy.structuredAiMetadata %></textarea>
+                                                <small class="text-muted">Specify details as a valid JSON object.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <!-- Sidebar Publish Card -->
+                        <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                            <div class="card-header bg-white border-0 pt-4 px-4 pb-0">
+                                <h5 class="fw-bold text-dark mb-0">Publish Panel</h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold text-dark d-block">Status</label>
+                                    <div class="form-check form-check-inline mt-1">
+                                        <input class="form-check-input" type="radio" name="status" id="statusDraft" value="draft" <%= policy.status === 'draft' ? 'checked' : '' %>>
+                                        <label class="form-check-label text-dark fw-medium" for="statusDraft">Draft</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="status" id="statusPublished" value="published" <%= policy.status === 'published' ? 'checked' : '' %>>
+                                        <label class="form-check-label text-dark fw-medium" for="statusPublished">Publish</label>
+                                    </div>
+                                </div>
+                                <div class="mb-2 text-muted x-small" style="font-size: 0.8rem;">
+                                    <div><strong>Created:</strong> <%= new Date(policy.createdAt).toLocaleString() %></div>
+                                    <div><strong>Last Updated:</strong> <%= new Date(policy.updatedAt).toLocaleString() %></div>
+                                </div>
+                                <hr class="my-3 text-muted">
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 10px; font-weight: 500; font-size: 1rem;">
+                                        <i class="bi bi-check-circle-fill me-2"></i> Update Policy
+                                    </button>
+                                    <a href="/admin/policies" class="btn btn-light btn-lg" style="border-radius: 10px; font-weight: 500; font-size: 1rem; color: #64748b;">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto generate slug from title (only if slug was empty or modified manually)
+            const titleInput = document.getElementById('policyTitle');
+            const slugInput = document.getElementById('policySlug');
+            
+            // Keep original slug to verify if manual changes were made
+            const originalSlug = slugInput.value;
+
+            // Initialize Quill Rich Text Editor
+            const quill = new Quill('#editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'blockquote'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            // Copy Quill HTML content to hidden input prior to submit
+            const form = document.getElementById('policyForm');
+            const contentInput = document.getElementById('contentInput');
+
+            form.addEventListener('submit', (e) => {
+                const contentHtml = quill.getSemanticHTML();
+                
+                // Content validation
+                if (quill.getText().trim() === '') {
+                    e.preventDefault();
+                    alert('Policy content cannot be empty.');
+                    return;
+                }
+                
+                contentInput.value = contentHtml;
+            });
+        });
+    </script>
+</body>
+</html>

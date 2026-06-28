@@ -21,6 +21,8 @@ const cookieParser = require('cookie-parser');
 const { csrfMiddleware } = require('./middleware/csrfProtection');
 const { globalLimiter } = require('./middleware/rateLimiters');
 const { errorHandler } = require('./middleware/errorHandler');
+const seedPolicies = require('./services/policySeeder');
+const { publicRouter: publicPolicyRoutes } = require('./routes/policyRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,7 +60,9 @@ app.use(helmet({
 app.use(cors());
 
 // Connect to MongoDB
-connectDB();
+connectDB().then(() => {
+    seedPolicies();
+});
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -153,6 +157,7 @@ const userRoutes = require('./routes/user');
 const ticketRoutes = require('./routes/ticket');
 
 app.use('/', publicRoutes);
+app.use('/', publicPolicyRoutes);
 app.use('/', userAuthRoutes);
 app.use('/', userRoutes);
 app.use('/', sitemapRoutes);

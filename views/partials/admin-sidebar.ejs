@@ -252,6 +252,27 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
                 <i class="bi bi-graph-up-arrow"></i> <span class="sidebar-text">Visitors</span>
             </a>
         </li>
+        <li>
+            <a class="d-flex align-items-center justify-content-between <%= current === 'policies' ? 'active' : '' %>" data-bs-toggle="collapse" href="#collapsePolicies" role="button" aria-expanded="<%= current === 'policies' ? 'true' : 'false' %>" aria-controls="collapsePolicies" title="Legal & Policies">
+                <span class="d-flex align-items-center">
+                    <i class="bi bi-shield-check"></i> <span class="sidebar-text">Legal & Policies</span>
+                </span>
+                <i class="bi bi-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
+            </a>
+            <div class="collapse <%= current === 'policies' ? 'show' : '' %>" id="collapsePolicies">
+                <ul class="list-unstyled ps-4 mt-1 small" style="background: rgba(0, 0, 0, 0.15); border-radius: 8px; padding: 4px 0;">
+                    <li><a href="/admin/policies" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-grid-fill me-2" style="font-size: 0.9rem;"></i> Dashboard</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/privacy-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Privacy Policy</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/terms-and-conditions" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Terms & Conditions</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/cookie-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Cookie Policy</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/disclaimer" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Disclaimer</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/refund-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Refund Policy</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/cancellation-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Cancellation Policy</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/shipping-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Shipping Policy</a></li>
+                    <li><a href="/admin/policies/edit-by-slug/dmca-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> DMCA Policy</a></li>
+                </ul>
+            </div>
+        </li>
         
         <li class="mt-3 mb-2 px-3">
             <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.3); font-weight: 700;">Access Control</span>
@@ -265,6 +286,11 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
         <li>
             <a href="/admin/users" class="<%= current === 'users' ? 'active' : '' %>" title="Registered Users">
                 <i class="bi bi-people-fill"></i> <span class="sidebar-text">Registered Users</span>
+            </a>
+        </li>
+        <li>
+            <a href="/admin/critical-alerts" class="<%= current === 'critical-alerts' ? 'active' : '' %>" title="Critical Alerts">
+                <i class="bi bi-exclamation-octagon-fill text-warning"></i> <span class="sidebar-text">Critical Alerts</span>
             </a>
         </li>
         <li>
@@ -308,12 +334,33 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
             <li><a href="/admin/tickets" class="<%= current === 'tickets' ? 'active' : '' %>"><i class="bi bi-headset"></i> Support Tickets</a></li>
             <li><a href="/admin/visitors" class="<%= current === 'visitors' ? 'active' : '' %>"><i class="bi bi-graph-up-arrow"></i> Visitors</a></li>
             
+            <li>
+                <a class="d-flex align-items-center justify-content-between <%= current === 'policies' ? 'active' : '' %>" data-bs-toggle="collapse" href="#collapsePoliciesMobile" role="button" aria-expanded="<%= current === 'policies' ? 'true' : 'false' %>" aria-controls="collapsePoliciesMobile">
+                    <span><i class="bi bi-shield-check"></i> Legal & Policies</span>
+                    <i class="bi bi-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
+                </a>
+                <div class="collapse <%= current === 'policies' ? 'show' : '' %>" id="collapsePoliciesMobile">
+                    <ul class="list-unstyled ps-4 mt-1 small" style="background: rgba(0, 0, 0, 0.15); border-radius: 8px; padding: 4px 0;">
+                        <li><a href="/admin/policies" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-grid-fill me-2" style="font-size: 0.9rem;"></i> Dashboard</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/privacy-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Privacy Policy</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/terms-and-conditions" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Terms & Conditions</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/cookie-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Cookie Policy</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/disclaimer" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Disclaimer</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/refund-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Refund Policy</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/cancellation-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Cancellation Policy</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/shipping-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> Shipping Policy</a></li>
+                        <li><a href="/admin/policies/edit-by-slug/dmca-policy" style="padding: 0.4rem 1rem; font-size: 0.8rem; font-weight: normal; margin-bottom: 0;"><i class="bi bi-file-earmark-text me-2" style="font-size: 0.9rem;"></i> DMCA Policy</a></li>
+                    </ul>
+                </div>
+            </li>
+            
             <li class="mt-3 mb-2 px-3">
                 <span style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.3); font-weight: 700;">Access Control</span>
             </li>
             
             <li><a href="/admin/admins" class="<%= current === 'admins' ? 'active' : '' %>"><i class="bi bi-shield-check"></i> Admin Users</a></li>
             <li><a href="/admin/users" class="<%= current === 'users' ? 'active' : '' %>"><i class="bi bi-people-fill"></i> Registered Users</a></li>
+            <li><a href="/admin/critical-alerts" class="<%= current === 'critical-alerts' ? 'active' : '' %>"><i class="bi bi-exclamation-octagon-fill text-warning"></i> Critical Alerts</a></li>
             <li><a href="/admin/settings" class="<%= current === 'settings' ? 'active' : '' %>"><i class="bi bi-gear-fill"></i> Website Settings</a></li>
             
             <li class="mt-4"><a href="/" target="_blank"><i class="bi bi-box-arrow-up-right"></i> View Website</a></li>

@@ -242,3 +242,67 @@ exports.bulkGenerateGeo = async (req, res) => {
   }
 };
 
+// GET /admin/critical-alerts
+exports.getCriticalAlerts = async (req, res) => {
+  try {
+    const CriticalAlert = require('../../models/CriticalAlert');
+    const alerts = await CriticalAlert.find().sort({ createdAt: -1 });
+
+    res.render('admin/critical-alerts/list', {
+      title: 'Critical Security Alerts',
+      alerts,
+      adminName: req.session.adminName,
+      currentPage: 'critical-alerts',
+      success: req.flash('success'),
+      error: req.flash('error')
+    });
+  } catch (error) {
+    console.error('Critical Alerts list error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
+// POST /admin/critical-alerts/resolve/:id
+exports.resolveCriticalAlert = async (req, res) => {
+  try {
+    const CriticalAlert = require('../../models/CriticalAlert');
+    const User = require('../../models/User');
+
+    const alert = await CriticalAlert.findById(req.params.id);
+    if (!alert) {
+      req.flash('error', 'Alert not found');
+      return res.redirect('/admin/critical-alerts');
+    }
+
+    // Mark alert as resolved
+    alert.isResolved = true;
+    alert.blockedUntil = new Date(0); // set to past date immediately
+    await alert.save();
+
+    // Find user by email or phone and clear their OTP blocks
+    const matchConditions = [];
+    if (alert.userEmail) matchConditions.push({ email: alert.userEmail });
+    if (alert.userPhone) matchConditions.push({ phone: alert.userPhone });
+
+    if (matchConditions.length > 0) {
+      const user = await User.findOne({ $or: matchConditions });
+      if (user) {
+        user.otpAttempts = 0;
+        user.otpBlockedUntil = null;
+        await user.save();
+      }
+    }
+
+    // Clear in-memory IP attempts cache
+    const userAuthController = require('../userAuthController');
+    userAuthController.clearIpAttempts(alert.ipAddress);
+
+    req.flash('success', 'Critical Alert resolved and user time limits removed successfully.');
+    res.redirect('/admin/critical-alerts');
+  } catch (error) {
+    console.error('Resolve critical alert error:', error);
+    req.flash('error', 'An error occurred while resolving the alert.');
+    res.redirect('/admin/critical-alerts');
+  }
+};
+

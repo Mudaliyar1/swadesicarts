@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+    
+    <%- include('../../partials/admin-sidebar', { current: 'critical-alerts' }) %>
+
+    <div class="admin-content">
+        <div class="container-fluid p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold mb-0 text-danger"><i class="bi bi-exclamation-octagon-fill text-danger me-2"></i>Critical Security Alerts</h2>
+                    <p class="text-muted mb-0">Track and resolve rate limits and OTP abuse events.</p>
+                </div>
+            </div>
+
+            <% if (success && success.length > 0) { %>
+                <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-left: 4px solid #198754 !important;">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i><%= success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <% if (error && error.length > 0) { %>
+                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-left: 4px solid #dc3545 !important;">
+                    <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i><%= error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
+
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-secondary">
+                                <tr>
+                                    <th>IP Address</th>
+                                    <th>Account Details</th>
+                                    <th>Reason / Incident</th>
+                                    <th>Blocked Status</th>
+                                    <th>Time Logged</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (alerts && alerts.length > 0) { %>
+                                    <% alerts.forEach(alert => { %>
+                                    <tr>
+                                        <td class="ps-3">
+                                            <span class="font-monospace fw-bold bg-light px-2 py-1 rounded text-dark"><%= alert.ipAddress %></span>
+                                        </td>
+                                        <td>
+                                            <div><strong>Email:</strong> <%= alert.userEmail || 'N/A' %></div>
+                                            <div class="text-muted small"><strong>Phone:</strong> <%= alert.userPhone || 'N/A' %></div>
+                                        </td>
+                                        <td>
+                                            <div class="fw-semibold text-danger"><%= alert.reason %></div>
+                                        </td>
+                                        <td>
+                                            <% if (alert.isResolved) { %>
+                                                <span class="badge bg-success-subtle text-success px-2.5 py-1.5 rounded-pill font-semibold" style="font-size: 0.8rem; background-color: #d1e7dd; color: #0f5132;">
+                                                    <i class="bi bi-shield-check me-1"></i> Resolved
+                                                </span>
+                                            <% } else if (new Date(alert.blockedUntil) > new Date()) { %>
+                                                <span class="badge bg-danger-subtle text-danger px-2.5 py-1.5 rounded-pill font-semibold" style="font-size: 0.8rem; background-color: #f8d7da; color: #842029;">
+                                                    <i class="bi bi-clock-fill me-1"></i> Blocked (Active)
+                                                </span>
+                                                <div class="text-muted-custom small mt-1" style="font-size: 0.75rem;">
+                                                    Until: <%= new Date(alert.blockedUntil).toLocaleString() %>
+                                                </div>
+                                            <% } else { %>
+                                                <span class="badge bg-warning-subtle text-warning px-2.5 py-1.5 rounded-pill font-semibold" style="font-size: 0.8rem; background-color: #fff3cd; color: #664d03;">
+                                                    <i class="bi bi-hourglass-split me-1"></i> Expired Limit
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td>
+                                            <div><%= new Date(alert.createdAt).toLocaleDateString() %></div>
+                                            <div class="text-muted small"><%= new Date(alert.createdAt).toLocaleTimeString() %></div>
+                                        </td>
+                                        <td class="text-end pe-4">
+                                            <% if (!alert.isResolved) { %>
+                                                <form action="/admin/critical-alerts/resolve/<%= alert._id %>" method="POST" class="d-inline">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <button type="submit" class="btn btn-sm btn-swadesi py-1.5 px-3">
+                                                        <i class="bi bi-unlock-fill me-1"></i> Release & Resolve
+                                                    </button>
+                                                </form>
+                                            <% } else { %>
+                                                <span class="text-success small fw-semibold"><i class="bi bi-check-lg text-success"></i> Limit Removed</span>
+                                            <% } %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="bi bi-shield-check text-success" style="font-size: 3.5rem;"></i>
+                                            <h5 class="mt-3 font-semibold">No critical alerts detected</h5>
+                                            <p class="text-muted mb-0">System is secure. No IP spamming or security abuse records found.</p>
+                                        </td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

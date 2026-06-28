@@ -50,39 +50,190 @@
                                 </div>
                             <% } %>
 
-                            <form action="/verify-otp" method="POST" id="verifyForm">
+                              <form action="/verify-otp" method="POST" id="verifyForm">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <input type="hidden" name="email" value="<%= email %>">
-                                
-                                <div class="mb-4">
-                                    <input type="text" class="form-control form-control-lg text-center" name="otp" pattern="[0-9]{6}" title="Please enter 6 digit OTP" placeholder="000000" maxlength="6" required autofocus autocomplete="one-time-code" style="border-radius: 12px; font-size: 1.5rem; letter-spacing: 0.5rem; padding: 1rem;">
-                                </div>
-                                
-                                <button type="submit" class="btn btn-accent btn-lg w-100 mb-4" id="submitBtn" style="border-radius: 12px; font-weight: 600;">
-                                    Verify & Login
-                                </button>
-                            </form>
-                            
-                            <div class="text-center">
-                                <p class="text-muted-custom small mb-0">Didn't receive the code? Check your spam folder or <a href="/register" class="fw-bold text-decoration-none" style="color: var(--primary);">register again</a>.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+                                 <input type="hidden" name="email" value="<%= email %>">
+                                 
+                                 <!-- Hidden metadata dataset elements for safe decoupling of variables -->
+                                 <div id="otpMeta" data-email="<%= email %>" data-error="<%= (typeof error !== 'undefined' && error) ? error : '' %>" style="display: none;"></div>
 
-    <%- include('../partials/footer-new') %>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/main.js"></script>
-    <script>
-        document.getElementById('verifyForm').addEventListener('submit', function() {
-            var btn = document.getElementById('submitBtn');
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
-            btn.disabled = true;
-        });
-    </script>
+                                 <div class="mb-4">
+                                      <input type="text" class="form-control form-control-lg text-center" id="otpInput" name="otp" pattern="[0-9]{6}" title="Please enter 6 digit OTP" placeholder="000000" maxlength="6" required autofocus autocomplete="one-time-code" style="border-radius: 12px; font-size: 1.5rem; letter-spacing: 0.5rem; padding: 1rem;">
+                                      <div id="otpAlert" class="text-danger mt-2 small fw-semibold text-center" style="display: none; font-size: 0.85rem;">
+                                          <i class="bi bi-exclamation-circle"></i> Only numeric digits are allowed. Emojis and letters are blocked.
+                                      </div>
+                                  </div>
+                                 
+                                 <button type="submit" class="btn btn-accent btn-lg w-100 mb-4" id="submitBtn" style="border-radius: 12px; font-weight: 600;">
+                                     Verify & Login
+                                 </button>
+                              </form>
+                              
+                              <div class="text-center">
+                                  <div id="resendContainer" class="small text-muted-custom">
+                                      Didn't receive the code? <button type="button" id="resendBtn" class="btn btn-link p-0 fw-bold text-decoration-none" style="color: var(--primary); vertical-align: baseline;" disabled>Resend OTP (30s)</button>
+                                  </div>
+                                  <div id="resendAlert" class="mt-2 alert alert-info py-2 px-3 small rounded-3" style="display: none;"></div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+      <%- include('../partials/footer-new') %>
+      
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="/js/main.js"></script>
+      <script>
+          const otpInput = document.getElementById('otpInput');
+          const otpAlert = document.getElementById('otpAlert');
+          
+          // Read server parameters from the decoupled metadata elements
+          const otpMeta = document.getElementById('otpMeta');
+          const serverEmail = otpMeta ? otpMeta.getAttribute('data-email') : '';
+          const serverError = otpMeta ? otpMeta.getAttribute('data-error') : '';
+
+          // Apply initial error state from server if Invalid OTP error exists
+          if (serverError && serverError.includes('Invalid OTP')) {
+              otpAlert.innerHTML = '<i class="bi bi-exclamation-circle"></i> Invalid OTP. Please check the code sent to your email.';
+              otpAlert.style.display = 'block';
+              otpInput.style.setProperty('border-color', '#ef4444', 'important');
+              otpInput.style.setProperty('border-width', '2px', 'important');
+          }
+
+          otpInput.addEventListener('input', () => {
+              const originalVal = otpInput.value;
+              // Remove anything that is not a number (letters, emojis, signs, etc.)
+              const cleanedVal = originalVal.replace(/[^0-9]/g, '');
+              
+              if (originalVal !== cleanedVal) {
+                  otpAlert.innerHTML = '<i class="bi bi-exclamation-circle"></i> Only numeric digits are allowed. Emojis and letters are blocked.';
+                  otpAlert.style.display = 'block';
+                  otpInput.style.setProperty('border-color', '#ef4444', 'important');
+                  otpInput.style.setProperty('border-width', '2px', 'important');
+              } else {
+                  otpAlert.style.display = 'none';
+                  otpInput.style.setProperty('border-color', '', '');
+                  otpInput.style.setProperty('border-width', '', '');
+              }
+              
+              otpInput.value = cleanedVal;
+          });
+ 
+          document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+              e.preventDefault();
+              var btn = document.getElementById('submitBtn');
+              
+              btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Verifying...';
+              btn.disabled = true;
+
+              try {
+                  const otpVal = otpInput.value;
+                  const csrf = document.querySelector('input[name="_csrf"]').value;
+                  
+                  const response = await fetch('/verify-otp', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json',
+                          'x-csrf-token': csrf
+                      },
+                      body: JSON.stringify({ email: serverEmail, otp: otpVal })
+                  });
+
+                  const res = await response.json();
+
+                  if (res.success) {
+                      window.location.href = res.redirect || '/';
+                  } else {
+                      // Show inline error red highlight and message
+                      otpAlert.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${res.message}`;
+                      otpAlert.style.display = 'block';
+                      otpInput.style.setProperty('border-color', '#ef4444', 'important');
+                      otpInput.style.setProperty('border-width', '2px', 'important');
+                      
+                      // Reset button state
+                      btn.innerHTML = 'Verify & Login';
+                      btn.disabled = false;
+                  }
+              } catch (err) {
+                  console.error('Error verifying OTP:', err);
+                  otpAlert.innerHTML = `<i class="bi bi-exclamation-circle"></i> Too many requests. Please try again later.`;
+                  otpAlert.style.display = 'block';
+                  otpInput.style.setProperty('border-color', '#ef4444', 'important');
+                  otpInput.style.setProperty('border-width', '2px', 'important');
+                  
+                  btn.innerHTML = 'Verify & Login';
+                  btn.disabled = false;
+              }
+          });
+
+          // Resend OTP Countdown Timer and AJAX call
+          const resendBtn = document.getElementById('resendBtn');
+          const resendAlert = document.getElementById('resendAlert');
+          let timerSec = 30;
+          let intervalId = null;
+
+          function startCountdown() {
+              resendBtn.disabled = true;
+              timerSec = 30;
+              resendBtn.innerText = `Resend OTP (${timerSec}s)`;
+              
+              if (intervalId) clearInterval(intervalId);
+              
+              intervalId = setInterval(() => {
+                  timerSec--;
+                  if (timerSec <= 0) {
+                      clearInterval(intervalId);
+                      resendBtn.disabled = false;
+                      resendBtn.innerText = 'Resend OTP';
+                  } else {
+                      resendBtn.innerText = `Resend OTP (${timerSec}s)`;
+                  }
+              }, 1000);
+          }
+
+          // Initial countdown trigger
+          startCountdown();
+
+          resendBtn.addEventListener('click', async () => {
+              try {
+                  resendBtn.disabled = true;
+                  resendBtn.innerText = 'Sending...';
+                  
+                  const csrf = document.querySelector('input[name="_csrf"]').value;
+                  const response = await fetch('/api/auth/resend-otp', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'x-csrf-token': csrf
+                      },
+                      body: JSON.stringify({ email: serverEmail })
+                  });
+
+                  const res = await response.json();
+                  
+                  resendAlert.style.display = 'block';
+                  if (res.success) {
+                      resendAlert.className = 'mt-2 alert alert-success py-2 px-3 small rounded-3';
+                      resendAlert.innerHTML = `<i class="bi bi-check-circle"></i> ${res.message}`;
+                      startCountdown();
+                  } else {
+                      resendAlert.className = 'mt-2 alert alert-danger py-2 px-3 small rounded-3';
+                      resendAlert.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${res.message}`;
+                      resendBtn.innerText = 'Resend OTP';
+                      resendBtn.disabled = false;
+                  }
+              } catch (err) {
+                  console.error('Error resending OTP:', err);
+                  resendAlert.className = 'mt-2 alert alert-danger py-2 px-3 small rounded-3';
+                  resendAlert.innerHTML = `<i class="bi bi-exclamation-circle"></i> Too many requests. Please try again later.`;
+                  resendBtn.innerText = 'Resend OTP';
+                  resendBtn.disabled = false;
+              }
+          });
+      </script>
 </body>
 </html>

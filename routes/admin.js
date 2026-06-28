@@ -10,6 +10,7 @@ const storyController = require('../controllers/admin/storyController');
 const websiteSettingController = require('../controllers/admin/websiteSettingController');
 const companyRoutes = require('./companyRoutes');
 const mediaRoutes = require('./mediaRoutes');
+const { adminRouter: policyAdminRoutes } = require('./policyRoutes');
 const visitorController = require('../controllers/admin/visitorController');
 const adminUserController = require('../controllers/admin/userController');
 const ticketController = require('../controllers/ticketController');
@@ -128,6 +129,13 @@ router.use('/companies', companyRoutes);
 
 // Media Management routes
 router.use('/media', mediaRoutes);
+
+// Legal & Policies routes
+router.use('/policies', policyAdminRoutes);
+
+// Critical Alerts routes
+router.get('/critical-alerts', isAuthenticated, adminController.getCriticalAlerts);
+router.post('/critical-alerts/resolve/:id', isAuthenticated, adminController.resolveCriticalAlert);
 
 // Website Settings routes
 router.get('/settings', isAuthenticated, websiteSettingController.getSettings);
