@@ -32,11 +32,11 @@ app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
 // Production Logging
-if (process.env.NODE_ENV === 'production') {
-    app.use(morgan('combined'));
-} else {
-    app.use(morgan('dev'));
-}
+// if (process.env.NODE_ENV === 'production') {
+//     app.use(morgan('combined'));
+// } else {
+//     app.use(morgan('dev'));
+// }
 
 // Helmet Security Headers (Strict CSP)
 app.use(helmet({
