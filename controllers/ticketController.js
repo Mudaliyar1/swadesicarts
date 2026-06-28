@@ -1,5 +1,6 @@
 const Ticket = require('../models/Ticket');
 const sendEmail = require('../helpers/email');
+const { uploadTicketAttachment } = require('../helpers/uploadToCloudinary');
 
 // Get all tickets for logged in user
 exports.getUserTickets = async (req, res) => {
@@ -25,11 +26,7 @@ exports.getTicket = async (req, res) => {
       return res.redirect('/tickets');
     }
 
-    const userAgent = req.headers['user-agent'] || '';
-    const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
-    const viewFile = isMobile ? 'public/ticket-detail' : 'public/ticket-detail-desktop';
-
-    res.render(viewFile, {
+    res.render('public/ticket-detail', {
       title: `Ticket ${ticket.ticketNumber} - Swadesi Carts`,
       ticket,
       currentPage: 'profile'
@@ -44,11 +41,11 @@ exports.getTicket = async (req, res) => {
 // Reply to a ticket as User
 exports.replyTicketUser = async (req, res) => {
   try {
-    const { message } = req.body;
-    
-    if (!message || !message.trim()) {
-      req.flash('error', 'Message cannot be empty');
-      return res.redirect(`/tickets/${req.params.ticketNumber}`);
+    const message = (req.body.message || '').trim();
+    const files   = req.files || [];
+
+    if (!message && files.length === 0) {
+      return res.status(400).json({ success: false, message: 'Message or attachment required.' });
     }
 
     const ticket = await Ticket.findOne({ 
@@ -57,14 +54,26 @@ exports.replyTicketUser = async (req, res) => {
     });
 
     if (!ticket) {
-      req.flash('error', 'Ticket not found');
-      return res.redirect('/tickets');
+      return res.status(404).json({ success: false, message: 'Ticket not found.' });
+    }
+
+    // Upload attachments concurrently
+    let attachments = [];
+    if (files.length > 0) {
+      attachments = await Promise.all(
+        files.map(file => uploadTicketAttachment(file, {
+          ticketNumber:    ticket.ticketNumber,
+          uploadedByModel: 'User',
+          uploadedById:    String(req.session.userId || '')
+        }))
+      );
     }
 
     ticket.messages.push({
       sender: 'user',
       senderName: req.session.userName,
-      message: message.trim()
+      message: message || '',
+      attachments
     });
     
     // Auto-reopen ticket if it was closed
@@ -80,7 +89,7 @@ exports.replyTicketUser = async (req, res) => {
       io.to(ticket.ticketNumber).emit('newMessage', ticket.messages[ticket.messages.length - 1]);
     }
 
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
       return res.json({ success: true, message: ticket.messages[ticket.messages.length - 1] });
     }
     
@@ -88,6 +97,9 @@ exports.replyTicketUser = async (req, res) => {
     res.redirect(`/tickets/${ticket.ticketNumber}`);
   } catch (error) {
     console.error('Error replying to ticket:', error);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.status(500).json({ success: false, message: 'Could not send reply.' });
+    }
     req.flash('error', 'Could not send reply');
     res.redirect('back');
   }
@@ -174,30 +186,48 @@ exports.getAdminTicketDetail = async (req, res) => {
 
 exports.replyTicketAdmin = async (req, res) => {
   try {
-    const { message, status } = req.body;
+    const message = (req.body.message || '').trim();
+    const status  = req.body.status;
+    const files   = req.files || [];
     
     const ticket = await Ticket.findOne({ ticketNumber: req.params.ticketNumber });
     if (!ticket) {
       return res.redirect('/admin/tickets');
     }
 
-    if (message && message.trim()) {
+    // Upload attachments concurrently
+    let attachments = [];
+    if (files.length > 0) {
+      attachments = await Promise.all(
+        files.map(file => uploadTicketAttachment(file, {
+          ticketNumber:    ticket.ticketNumber,
+          uploadedByModel: 'Admin',
+          uploadedById:    String(req.session.adminId || '')
+        }))
+      );
+    }
+
+    if (message || attachments.length > 0) {
       ticket.messages.push({
         sender: 'admin',
         senderName: req.session.adminName || 'Support Team',
-        message: message.trim()
+        message: message || '',
+        attachments
       });
 
       // Send email to the user so they see the reply!
-      const subject = `Re: [${ticket.ticketNumber}] ${ticket.subject}`;
-      const html = `<p>Hello ${ticket.name},</p>
-                    <p>Our support team has replied to your ticket <strong>${ticket.ticketNumber}</strong>:</p>
-                    <div style="background:#f4f4f5; padding:15px; border-radius:8px; margin: 15px 0;">
-                      <p style="margin:0;">${message.trim()}</p>
-                    </div>
-                    <p>To view your ticket online or reply, please visit your account dashboard, or simply reply directly to this email.</p>`;
-      
-      await sendEmail(ticket.email, subject, html).catch(err => console.error('Admin reply email failed:', err));
+      if (message) {
+        const subject = `Re: [${ticket.ticketNumber}] ${ticket.subject}`;
+        const html = `<p>Hello ${ticket.name},</p>
+                      <p>Our support team has replied to your ticket <strong>${ticket.ticketNumber}</strong>:</p>
+                      <div style="background:#f4f4f5; padding:15px; border-radius:8px; margin: 15px 0;">
+                        <p style="margin:0;">${message}</p>
+                      </div>
+                      ${attachments.length > 0 ? `<p><em>${attachments.length} attachment(s) were also sent — view them in your ticket dashboard.</em></p>` : ''}
+                      <p>To view your ticket online or reply, please visit your account dashboard, or simply reply directly to this email.</p>`;
+        
+        await sendEmail(ticket.email, subject, html).catch(err => console.error('Admin reply email failed:', err));
+      }
     }
 
     if (status && ['open', 'pending', 'resolved', 'closed'].includes(status)) {
@@ -212,7 +242,7 @@ exports.replyTicketAdmin = async (req, res) => {
       io.to(ticket.ticketNumber).emit('newMessage', ticket.messages[ticket.messages.length - 1]);
     }
 
-    if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
       return res.json({ success: true, message: ticket.messages[ticket.messages.length - 1] });
     }
     
@@ -220,7 +250,11 @@ exports.replyTicketAdmin = async (req, res) => {
     res.redirect(`/admin/tickets/${ticket.ticketNumber}`);
   } catch (error) {
     console.error('Admin reply error:', error);
+    if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
+      return res.status(500).json({ success: false, message: 'Could not update ticket.' });
+    }
     req.flash('error', 'Could not update ticket');
     res.redirect('back');
   }
 };
+

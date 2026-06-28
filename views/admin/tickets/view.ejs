@@ -77,6 +77,20 @@
         .chat-body::-webkit-scrollbar { width: 6px; }
         .chat-body::-webkit-scrollbar-track { background: transparent; }
         .chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+
+        /* Attachment styles */
+        .attach-btn { width: 40px; height: 40px; border-radius: 50%; background: transparent; color: #54656f; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .attach-btn:hover { background: rgba(0,0,0,0.08); }
+        .reply-area-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .attachment-preview-bar { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 0; }
+        .att-preview-chip { display: flex; align-items: center; gap: 6px; background: rgba(0,128,105,0.1); border: 1px solid rgba(0,128,105,0.3); border-radius: 20px; padding: 4px 10px; font-size: 0.78rem; max-width: 160px; }
+        .att-preview-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .att-preview-chip .remove-att { cursor: pointer; color: #666; }
+        .msg-attachments { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+        .msg-attachment-img { max-width: 220px; max-height: 220px; border-radius: 8px; cursor: pointer; object-fit: cover; display: block; }
+        .msg-attachment-video { max-width: 280px; border-radius: 8px; display: block; }
+        .msg-attachment-pdf { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #333; background: rgba(0,0,0,0.05); border-radius: 8px; padding: 8px 12px; }
+        .msg-attachment-pdf:hover { background: rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="admin-body">
@@ -152,7 +166,30 @@
                   <% if (msg.sender === 'user') { %>
                     <div class="msg-author-name"><%= ticket.name %></div>
                   <% } %>
+                  <% if (msg.message) { %>
                   <div class="msg-text"><%= msg.message %></div>
+                  <% } %>
+                  <% if (msg.attachments && msg.attachments.length > 0) { %>
+                  <div class="msg-attachments">
+                      <% msg.attachments.forEach(att => { %>
+                          <% if (att.fileType === 'image') { %>
+                              <a href="<%= att.url %>" target="_blank" rel="noopener noreferrer">
+                                  <img src="<%= att.url %>" alt="<%= att.filename %>" class="msg-attachment-img" loading="lazy">
+                              </a>
+                          <% } else if (att.fileType === 'video') { %>
+                              <video class="msg-attachment-video" controls preload="metadata">
+                                  <source src="<%= att.url %>">
+                                  Your browser does not support the video tag.
+                              </video>
+                          <% } else if (att.fileType === 'pdf') { %>
+                              <a href="https://docs.google.com/viewer?url=<%= encodeURIComponent(att.url) %>" target="_blank" rel="noopener noreferrer" class="msg-attachment-pdf">
+                                  <i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
+                                  <span><%= att.filename || 'document.pdf' %></span>
+                              </a>
+                          <% } %>
+                      <% }) %>
+                  </div>
+                  <% } %>
                   <div class="msg-meta">
                     <% if(msg.isEmailSync) { %><i class="bi bi-envelope"></i><% } %>
                     <%= new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' }) %>
@@ -172,10 +209,15 @@
 
           <!-- Footer (Reply Box) -->
           <div class="chat-footer">
-            <form id="replyForm" action="/admin/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="d-flex w-100 gap-2 align-items-center">
+            <form id="replyForm" action="/admin/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="d-flex w-100 gap-2 align-items-center" enctype="multipart/form-data">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-              <div class="flex-grow-1">
-                <textarea id="messageInput" name="message" class="reply-box" placeholder="Type a reply... (This will be emailed to the customer)" required></textarea>
+              <input type="file" id="attachmentInput" name="attachments" multiple accept="image/*,video/*,application/pdf" style="display:none;">
+              <button type="button" id="attachBtn" class="attach-btn" title="Attach file">
+                <i class="bi bi-paperclip"></i>
+              </button>
+              <div class="reply-area-wrap">
+                <textarea id="messageInput" name="message" class="reply-box" placeholder="Type a reply... (This will be emailed to the customer)"></textarea>
+                <div id="attachmentPreview" class="attachment-preview-bar" style="display:none;"></div>
               </div>
               <div class="d-flex align-items-center gap-3">
                 <div class="form-check mb-0">
@@ -258,6 +300,9 @@
     const replyForm = document.getElementById('replyForm');
     const messageInput = document.getElementById('messageInput');
     const typingIndicator = document.getElementById('typingIndicator');
+    const attachBtn = document.getElementById('attachBtn');
+    const attachmentInput = document.getElementById('attachmentInput');
+    const attachmentPreview = document.getElementById('attachmentPreview');
     
     // Auto-scroll chat to bottom
     const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
@@ -266,6 +311,21 @@
     // Socket.io Integration
     const socket = io();
     socket.emit('joinTicket', ticketNumber);
+
+    // Render attachments HTML from socket message
+    const renderAttachments = (attachments) => {
+        if (!attachments || attachments.length === 0) return '';
+        return `<div class="msg-attachments">${attachments.map(att => {
+            if (att.fileType === 'image') {
+                return `<a href="${att.url}" target="_blank" rel="noopener noreferrer"><img src="${att.url}" alt="${att.filename}" class="msg-attachment-img" loading="lazy"></a>`;
+            } else if (att.fileType === 'video') {
+                return `<video class="msg-attachment-video" controls preload="metadata"><source src="${att.url}">Your browser does not support the video tag.</video>`;
+            } else if (att.fileType === 'pdf') {
+                return `<a href="https://docs.google.com/viewer?url=${encodeURIComponent(att.url)}" target="_blank" rel="noopener noreferrer" class="msg-attachment-pdf"><i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i><span>${att.filename || 'document.pdf'}</span></a>`;
+            }
+            return '';
+        }).join('')}</div>`;
+    };
     
     // Handle incoming messages
     socket.on('newMessage', (msg) => {
@@ -275,8 +335,9 @@
         let html = `
             <div class="chat-message ${isAdmin ? 'admin' : 'user'}">
                 <div class="msg-bubble">
-                    ${!isAdmin ? '<div class="msg-author-name"><%= ticket.name %></div>' : ''}
-                    <div class="msg-text">${msg.message}</div>
+                    ${!isAdmin ? `<div class="msg-author-name"><%= ticket.name %></div>` : ''}
+                    ${msg.message ? `<div class="msg-text">${msg.message}</div>` : ''}
+                    ${renderAttachments(msg.attachments)}
                     <div class="msg-meta">
                         ${msg.isEmailSync ? '<i class="bi bi-envelope"></i>' : ''}
                         ${timeStr}
@@ -303,6 +364,43 @@
             typingIndicator.style.display = 'none';
         }
     });
+
+    // Attachment file picker
+    if (attachBtn && attachmentInput) {
+        attachBtn.addEventListener('click', () => attachmentInput.click());
+
+        attachmentInput.addEventListener('change', () => {
+            const files = Array.from(attachmentInput.files);
+            if (files.length > 5) {
+                alert('You can attach a maximum of 5 files at once.');
+                attachmentInput.value = '';
+                return;
+            }
+            const oversized = files.filter(f => f.size > 25 * 1024 * 1024);
+            if (oversized.length > 0) {
+                alert(`File(s) too large: ${oversized.map(f => f.name).join(', ')}. Max size is 25MB per file.`);
+                attachmentInput.value = '';
+                return;
+            }
+
+            attachmentPreview.innerHTML = files.map((f, i) => `
+                <div class="att-preview-chip" data-index="${i}">
+                    <i class="bi ${f.type.startsWith('image/') ? 'bi-image' : f.type.startsWith('video/') ? 'bi-camera-video' : 'bi-file-earmark-pdf'}"></i>
+                    <span title="${f.name}">${f.name}</span>
+                    <span class="remove-att" data-index="${i}">✕</span>
+                </div>
+            `).join('');
+            attachmentPreview.style.display = files.length > 0 ? 'flex' : 'none';
+
+            attachmentPreview.querySelectorAll('.remove-att').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    attachmentInput.value = '';
+                    attachmentPreview.innerHTML = '';
+                    attachmentPreview.style.display = 'none';
+                });
+            });
+        });
+    }
     
     if (replyForm) {
         let typingTimer;
@@ -317,28 +415,44 @@
         replyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = messageInput.value.trim();
-            if(!text) return;
-            
+            const files = attachmentInput ? attachmentInput.files : [];
+            if (!text && (!files || files.length === 0)) return;
+
             messageInput.value = '';
+            if (attachmentPreview) { attachmentPreview.innerHTML = ''; attachmentPreview.style.display = 'none'; }
             socket.emit('stopTyping', { ticketNumber, sender: 'admin' });
-            
-            const formData = new FormData(replyForm);
-            const data = Object.fromEntries(formData.entries());
-            data.message = text;
+
+            const sendBtn = replyForm.querySelector('.send-btn');
+            if (sendBtn) { sendBtn.disabled = true; sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; }
+
+            const formData = new FormData();
+            formData.append('_csrf', '<%= csrfToken %>');
+            if (text) formData.append('message', text);
+            const statusCheck = document.getElementById('closeTicket');
+            if (statusCheck && statusCheck.checked) formData.append('status', statusCheck.value);
+            if (files && files.length > 0) {
+                Array.from(files).forEach(f => formData.append('attachments', f));
+            }
 
             try {
-                await fetch('/admin/tickets/' + ticketNumber + '/reply', {
+                const response = await fetch('/admin/tickets/' + ticketNumber + '/reply', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+                    credentials: 'same-origin',
+                    headers: { 
                         'Accept': 'application/json',
-                        'x-csrf-token': '<%= csrfToken %>'
+                        'x-csrf-token': '<%= csrfToken %>' 
                     },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
+                if (!response.ok) {
+                    throw new Error('Failed to send message: ' + response.statusText);
+                }
+                if (attachmentInput) attachmentInput.value = '';
             } catch (err) {
                 console.error('Failed to send message:', err);
                 alert('Failed to send message. Please try again.');
+            } finally {
+                if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="bi bi-send-fill" style="margin-right: 2px; margin-top: 2px;"></i>'; }
             }
         });
         

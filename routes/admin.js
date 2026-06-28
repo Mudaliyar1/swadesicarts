@@ -16,6 +16,7 @@ const ticketController = require('../controllers/ticketController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
 const { loginLimiter } = require('../middleware/rateLimiters');
 const upload = require('../config/multer');
+const { ticketAttachmentUpload, validateAttachmentMagicNumbers } = require('../middleware/ticketAttachmentUpload');
 
 // Auth routes
 router.get('/login', isGuest, authController.showLogin);
@@ -77,7 +78,13 @@ router.post('/inquiries/:id/status', isAuthenticated, inquiryController.updateSt
 // Support Tickets routes
 router.get('/tickets', isAuthenticated, ticketController.getAdminTickets);
 router.get('/tickets/:ticketNumber', isAuthenticated, ticketController.getAdminTicketDetail);
-router.post('/tickets/:ticketNumber/reply', isAuthenticated, ticketController.replyTicketAdmin);
+router.post(
+  '/tickets/:ticketNumber/reply',
+  isAuthenticated,
+  ticketAttachmentUpload.array('attachments', 5),
+  validateAttachmentMagicNumbers,
+  ticketController.replyTicketAdmin
+);
 router.delete('/inquiries/:id', isAuthenticated, inquiryController.delete);
 router.get('/inquiries/:id/pdf', isAuthenticated, inquiryController.downloadPDF);
 

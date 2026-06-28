@@ -1,9 +1,10 @@
 const cloudinary = require('../config/cloudinary');
 
-const inferFileType = (resourceType, format) => {
+const inferFileType = (resourceType, format, filenameOrMime) => {
   const normalizedFormat = (format || '').toLowerCase();
+  const lowerStr = (filenameOrMime || '').toLowerCase();
   if (resourceType === 'video') return 'video';
-  if (normalizedFormat === 'pdf') return 'pdf';
+  if (normalizedFormat === 'pdf' || lowerStr.endsWith('.pdf') || lowerStr.includes('application/pdf')) return 'pdf';
   if (resourceType === 'image') return 'image';
   if (resourceType === 'raw') return normalizedFormat ? 'document' : 'raw';
   return 'unknown';

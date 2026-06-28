@@ -1,5 +1,13 @@
 const mongoose = require('mongoose');
 
+const attachmentSchema = new mongoose.Schema({
+  publicId:  { type: String, default: '' },
+  url:       { type: String, default: '' },
+  fileType:  { type: String, enum: ['image', 'video', 'pdf', 'document', 'raw', 'unknown'], default: 'unknown' },
+  filename:  { type: String, default: '' },
+  bytes:     { type: Number, default: 0 }
+}, { _id: false });
+
 const messageSchema = new mongoose.Schema({
   sender: {
     type: String,
@@ -9,8 +17,9 @@ const messageSchema = new mongoose.Schema({
   senderName: String,
   message: {
     type: String,
-    required: true
+    default: ''
   },
+  attachments: { type: [attachmentSchema], default: [] },
   isEmailSync: {
     type: Boolean,
     default: false

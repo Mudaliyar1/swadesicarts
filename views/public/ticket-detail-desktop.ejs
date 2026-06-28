@@ -1,721 +1,1370 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
-    
+
     <%- include('../partials/dynamic-styles') %>
-    <% if (typeof seo !=='undefined' ) { %>
-        <%- include('../partials/seo-meta') %>
-    <% } %>
-    
-    <% 
-        let isDarkTheme = false; 
-        let btnTextColor = '#111111'; 
-        if (typeof siteSettings !== 'undefined' && siteSettings.colors) { 
-            let accentValue = siteSettings.colors.accent || '#FFD700';
-            accentValue = accentValue.trim();
-            if (accentValue.startsWith('#')) {
-                let hex = accentValue.replace('#', '');
-                if (hex.length === 6) {
-                    const r = parseInt(hex.substr(0, 2), 16);
-                    const g = parseInt(hex.substr(2, 2), 16);
-                    const b = parseInt(hex.substr(4, 2), 16);
-                    const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-                    if (brightness < 128) btnTextColor = '#ffffff'; 
-                } 
-            } 
-        } 
-    %>
-    
-    <style>
-                                    :root {
-                                        --ent-bg: #f8f9fa;
-                                        --ent-card-bg: #ffffff;
-                                        --ent-border: rgba(0,0,0,0.1);
-                                        --ent-text-main: #000000;
-                                        --ent-text-muted: #334155;
-                                        --ent-input-bg: #ffffff;
-                                        --ent-input-border: rgba(0,0,0,0.15);
-                                        --ent-hover: rgba(0,0,0,0.03);
-                                        --accent-color: <%=(typeof siteSettings !=='undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent: '#0070f3' %>;
-                                        --btn-text-color: <%=btnTextColor %>;
-                                    }
+        <% if (typeof seo !=='undefined' ) { %>
+            <%- include('../partials/seo-meta') %>
+                <% } %>
 
-                                    body {
-                                        background-color: var(--ent-bg);
-                                        color: var(--ent-text-main) !important;
-                                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                                    }
+                    <% let isDarkTheme=false; let btnTextColor='#111111' ; if (typeof siteSettings !=='undefined' &&
+                        siteSettings.colors) { let accentValue=siteSettings.colors.accent || '#FFD700' ;
+                        accentValue=accentValue.trim(); if (accentValue.startsWith('#')) { let
+                        hex=accentValue.replace('#', '' ); if (hex.length===6) { const r=parseInt(hex.substr(0, 2), 16);
+                        const g=parseInt(hex.substr(2, 2), 16); const b=parseInt(hex.substr(4, 2), 16); const
+                        brightness=((r * 299) + (g * 587) + (b * 114)) / 1000; if (brightness < 128)
+                        btnTextColor='#ffffff' ; } } } %>
 
-                                    .ent-layout h1, 
-                                    .ent-layout h2, 
-                                    .ent-layout h3, 
-                                    .ent-layout h4, 
-                                    .ent-layout h5, 
-                                    .ent-layout h6, 
-                                    .ent-layout p, 
-                                    .ent-layout span, 
-                                    .ent-layout label,
-                                    .ent-layout div,
-                                    .ent-page-title,
-                                    .ent-card-title,
-                                    .ent-label-title {
-                                        color: #000000 !important;
-                                    }
-                                    
-                                    .text-muted-custom,
-                                    .ent-label-desc,
-                                    .ent-card-desc,
-                                    .ent-nav-link,
-                                    .ent-sidebar-heading {
-                                        color: #334155 !important;
-                                    }
+                        <style>
+                            :root {
+                                --ent-bg: #f8f9fa;
+                                --ent-card-bg: #ffffff;
+                                --ent-border: rgba(0, 0, 0, 0.1);
+                                --ent-text-main: #000000;
+                                --ent-text-muted: #334155;
+                                --ent-input-bg: #ffffff;
+                                --ent-input-border: rgba(0, 0, 0, 0.15);
+                                --ent-hover: rgba(0, 0, 0, 0.03);
+                                --accent-color: <%=(typeof siteSettings !=='undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent: '#0070f3' %>;
+                                --btn-text-color: <%=btnTextColor %>;
+                            }
 
-                                    .text-muted-custom {
-                                        font-size: 1.05rem;
-                                    }
+                            body {
+                                background-color: var(--ent-bg);
+                                color: var(--ent-text-main) !important;
+                                font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                            }
 
-                                    /* Desktop Glassmorphism Page Wrapper */
-                                    .glass-page-bg {
-                                        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-                                        min-height: calc(100vh - var(--navbar-offset, 0px));
-                                        padding: 60px 24px;
-                                    }
-                                    .glass-container {
-                                        max-width: 1600px;
-                                        width: 95%;
-                                        margin: 0 auto;
-                                        background: rgba(255, 255, 255, 0.4);
-                                        backdrop-filter: blur(20px);
-                                        -webkit-backdrop-filter: blur(20px);
-                                        border: 1px solid rgba(255, 255, 255, 0.7);
-                                        border-radius: 24px;
-                                        padding: 16px;
-                                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-                                    }
+                            .ent-layout h1,
+                            .ent-layout h2,
+                            .ent-layout h3,
+                            .ent-layout h4,
+                            .ent-layout h5,
+                            .ent-layout h6,
+                            .ent-layout p,
+                            .ent-layout span,
+                            .ent-layout label,
+                            .ent-layout div,
+                            .ent-page-title,
+                            .ent-card-title,
+                            .ent-label-title {
+                                color: #000000 !important;
+                            }
 
-                                    /* Enterprise Layout */
-                                    .ent-layout {
-                                        display: flex;
-                                        background: rgba(255, 255, 255, 0.95);
-                                        border-radius: 16px;
-                                        min-height: 700px;
-                                        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 1);
-                                        overflow: hidden;
-                                        margin: 0;
-                                        padding: 0;
-                                        gap: 0;
-                                    }
+                            .text-muted-custom,
+                            .ent-label-desc,
+                            .ent-card-desc,
+                            .ent-nav-link,
+                            .ent-sidebar-heading {
+                                color: #334155 !important;
+                            }
 
-                                    /* Sidebar */
-                                    .ent-sidebar {
-                                        width: 280px;
-                                        flex-shrink: 0;
-                                        position: sticky;
-                                        top: 100px;
-                                        background: #f8fafc;
-                                        padding: 32px 24px;
-                                        border-right: 1px solid rgba(0, 0, 0, 0.03);
-                                    }
+                            .text-muted-custom {
+                                font-size: 1.05rem;
+                            }
 
-                                    .ent-nav-link {
-                                        display: flex;
-                                        align-items: center;
-                                        padding: 12px 16px;
-                                        margin-bottom: 8px;
-                                        border-radius: 12px;
-                                        font-size: 1.05rem;
-                                        font-weight: 500;
-                                        color: #64748b !important;
-                                        text-decoration: none;
-                                        transition: all 0.3s ease;
-                                    }
+                            /* Desktop Glassmorphism Page Wrapper */
+                            .glass-page-bg {
+                                background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+                                min-height: calc(100vh - var(--navbar-offset, 0px));
+                                padding: 60px 24px;
+                            }
 
-                                    .ent-nav-link i {
-                                        margin-right: 12px;
-                                        font-size: 1.3rem;
-                                    }
+                            .glass-container {
+                                max-width: 1600px;
+                                width: 95%;
+                                margin: 0 auto;
+                                background: rgba(255, 255, 255, 0.4);
+                                backdrop-filter: blur(20px);
+                                -webkit-backdrop-filter: blur(20px);
+                                border: 1px solid rgba(255, 255, 255, 0.7);
+                                border-radius: 24px;
+                                padding: 16px;
+                                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+                            }
 
-                                    .ent-nav-link:hover {
-                                        background: #ffffff;
-                                        color: #3b82f6 !important;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-                                    }
+                            /* Enterprise Layout */
+                            .ent-layout {
+                                display: flex;
+                                background: rgba(255, 255, 255, 0.95);
+                                border-radius: 16px;
+                                min-height: 700px;
+                                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 1);
+                                overflow: hidden;
+                                margin: 0;
+                                padding: 0;
+                                gap: 0;
+                            }
 
-                                    .ent-nav-link.active {
-                                        background: #ffffff;
-                                        color: #3b82f6 !important;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-                                        font-weight: 600;
-                                    }
-                                    .ent-nav-link.active i {
-                                        color: #3b82f6 !important;
-                                    }
+                            /* Sidebar */
+                            .ent-sidebar {
+                                width: 280px;
+                                flex-shrink: 0;
+                                position: sticky;
+                                top: 100px;
+                                background: #f8fafc;
+                                padding: 32px 24px;
+                                border-right: 1px solid rgba(0, 0, 0, 0.03);
+                            }
 
-                                    /* Main Content */
-                                    .ent-content {
-                                        flex: 1;
-                                        max-width: 100%;
-                                        padding: 40px;
-                                    }
-                                    
-                                    .ent-page-header {
-                                        margin-bottom: 32px;
-                                        padding-bottom: 24px;
-                                        border-bottom: 1px solid rgba(0,0,0,0.03);
-                                    }
+                            .ent-nav-link {
+                                display: flex;
+                                align-items: center;
+                                padding: 12px 16px;
+                                margin-bottom: 8px;
+                                border-radius: 12px;
+                                font-size: 1.05rem;
+                                font-weight: 500;
+                                color: #64748b !important;
+                                text-decoration: none;
+                                transition: all 0.3s ease;
+                            }
 
-                                    .ent-page-title {
-                                        font-size: 2.25rem;
-                                        font-weight: 600;
-                                        letter-spacing: -0.02em;
-                                        margin-bottom: 8px;
-                                    }
+                            .ent-nav-link i {
+                                margin-right: 12px;
+                                font-size: 1.3rem;
+                            }
 
-                                    /* Enterprise Card */
-                                    .ent-card {
-                                        border: none;
-                                        border-radius: 16px;
-                                        background: #ffffff;
-                                        overflow: hidden;
-                                        margin-bottom: 32px;
-                                        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-                                    }
+                            .ent-nav-link:hover {
+                                background: #ffffff;
+                                color: #3b82f6 !important;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                            }
 
-                                    .ent-card-header {
-                                        padding: 24px;
-                                        border-bottom: 1px solid rgba(0,0,0,0.03);
-                                    }
+                            .ent-nav-link.active {
+                                background: #ffffff;
+                                color: #3b82f6 !important;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                                font-weight: 600;
+                            }
 
-                                    .ent-card-title {
-                                        font-size: 1.25rem;
-                                        font-weight: 600;
-                                        margin-bottom: 4px;
-                                    }
-                                    
-                                    .ent-card-desc {
-                                        font-size: 0.95rem;
-                                        color: var(--ent-text-muted) !important;
-                                        margin: 0;
-                                    }
+                            .ent-nav-link.active i {
+                                color: #3b82f6 !important;
+                            }
 
-                                    .ent-card-body {
-                                        padding: 24px;
-                                    }
-                                    
-                                    .ent-card-footer {
-                                        padding: 16px 24px;
-                                        background: #f8fafc;
-                                        border-top: 1px solid rgba(0,0,0,0.03);
-                                        display: flex;
-                                        justify-content: flex-end;
-                                        align-items: center;
-                                    }
+                            /* Main Content */
+                            .ent-content {
+                                flex: 1;
+                                max-width: 100%;
+                                padding: 40px;
+                            }
 
-                                    /* Split Form Layout inside Card */
-                                    .ent-form-row {
-                                        display: flex;
-                                        padding: 24px 0;
-                                        border-bottom: 1px solid rgba(0,0,0,0.03);
-                                    }
-                                    
-                                    .ent-form-row:first-child {
-                                        padding-top: 0;
-                                    }
-                                    
-                                    .ent-form-row:last-child {
-                                        padding-bottom: 0;
-                                        border-bottom: none;
-                                    }
+                            .ent-page-header {
+                                margin-bottom: 32px;
+                                padding-bottom: 24px;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+                            }
 
-                                    .ent-form-label-col {
-                                        width: 35%;
-                                        padding-right: 32px;
-                                    }
+                            .ent-page-title {
+                                font-size: 2.25rem;
+                                font-weight: 600;
+                                letter-spacing: -0.02em;
+                                margin-bottom: 8px;
+                            }
 
-                                    .ent-form-input-col {
-                                        width: 65%;
-                                    }
+                            /* Enterprise Card */
+                            .ent-card {
+                                border: none;
+                                border-radius: 16px;
+                                background: #ffffff;
+                                overflow: hidden;
+                                margin-bottom: 32px;
+                                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+                            }
 
-                                    .ent-label-title {
-                                        display: block;
-                                        font-size: 1rem;
-                                        font-weight: 600;
-                                        margin-bottom: 4px;
-                                    }
+                            .ent-card-header {
+                                padding: 24px;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+                            }
 
-                                    .ent-label-desc {
-                                        display: block;
-                                        font-size: 0.95rem;
-                                        color: var(--ent-text-muted) !important;
-                                        line-height: 1.5;
-                                    }
+                            .ent-card-title {
+                                font-size: 1.25rem;
+                                font-weight: 600;
+                                margin-bottom: 4px;
+                            }
 
-                                    /* Inputs & Buttons */
-                                    .ent-input {
-                                        width: 100%;
-                                        background: var(--ent-input-bg) !important;
-                                        border: 1px solid var(--ent-input-border) !important;
-                                        border-radius: 6px !important;
-                                        padding: 10px 14px !important;
-                                        font-size: 1rem !important;
-                                        color: var(--ent-text-main) !important;
-                                        transition: all 0.2s ease;
-                                    }
+                            .ent-card-desc {
+                                font-size: 0.95rem;
+                                color: var(--ent-text-muted) !important;
+                                margin: 0;
+                            }
 
-                                    .ent-input:focus {
-                                        outline: none;
-                                        border-color: var(--accent-color) !important;
-                                        box-shadow: 0 0 0 1px var(--accent-color) !important;
-                                    }
-                                    
-                                    .ent-input:disabled, .ent-input[readonly] {
-                                        background: var(--ent-hover) !important;
-                                        color: var(--ent-text-muted) !important;
-                                        cursor: not-allowed;
-                                    }
+                            .ent-card-body {
+                                padding: 24px;
+                            }
 
-                                    .ent-btn-primary {
-                                        background: var(--accent-color);
-                                        color: var(--btn-text-color);
-                                        border: 1px solid transparent;
-                                        border-radius: 6px;
-                                        padding: 6px 16px;
-                                        font-size: 0.875rem;
-                                        font-weight: 500;
-                                        transition: opacity 0.2s;
-                                        cursor: pointer;
-                                    }
+                            .ent-card-footer {
+                                padding: 16px 24px;
+                                background: #f8fafc;
+                                border-top: 1px solid rgba(0, 0, 0, 0.03);
+                                display: flex;
+                                justify-content: flex-end;
+                                align-items: center;
+                            }
 
-                                    .ent-btn-primary:hover {
-                                        opacity: 0.9;
-                                        color: var(--btn-text-color);
-                                    }
-                                    
-                                    .ent-btn-secondary {
-                                        background: transparent;
-                                        color: var(--ent-text-main);
-                                        border: 1px solid var(--ent-input-border);
-                                        border-radius: 6px;
-                                        padding: 6px 16px;
-                                        font-size: 0.875rem;
-                                        font-weight: 500;
-                                        transition: all 0.2s;
-                                        cursor: pointer;
-                                    }
-                                    
-                                    .ent-btn-secondary:hover {
-                                        border-color: var(--ent-text-muted);
-                                    }
+                            /* Split Form Layout inside Card */
+                            .ent-form-row {
+                                display: flex;
+                                padding: 24px 0;
+                                border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+                            }
 
-                                    .ent-avatar-container {
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 20px;
-                                    }
+                            .ent-form-row:first-child {
+                                padding-top: 0;
+                            }
 
-                                    .ent-avatar {
-                                        width: 64px;
-                                        height: 64px;
-                                        border-radius: 50%;
-                                        background: var(--accent-color);
-                                        color: var(--btn-text-color);
-                                        display: flex;
-                                        align-items: center;
-                                        justify-content: center;
-                                        font-size: 1.5rem;
-                                        font-weight: 600;
-                                    }
+                            .ent-form-row:last-child {
+                                padding-bottom: 0;
+                                border-bottom: none;
+                            }
 
-                                    @media (max-width: 768px) {
-                                        /* Mobile Reset for Glassmorphism */
-                                        .glass-page-bg { background: #fff; padding: 0; min-height: auto; }
-                                        .glass-container { background: none; backdrop-filter: none; border: none; box-shadow: none; padding: 0; border-radius: 0; }
-                                        
-                                        .ent-layout {
-                                            flex-direction: column;
-                                            gap: 0;
-                                            margin: 0 auto;
-                                            padding: 0;
-                                            border-radius: 0;
-                                            min-height: auto;
-                                            box-shadow: none;
-                                            background: #fff;
-                                        }
-                                        /* Mobile Settings Menu Logic */
-                                        .ent-layout.mobile-menu-active .ent-sidebar { display: block; }
-                                        .ent-layout.mobile-menu-active .ent-content { display: none; }
-                                        .ent-layout:not(.mobile-menu-active) .ent-sidebar { display: none; }
-                                        .ent-layout:not(.mobile-menu-active) .ent-content { display: block; padding: 20px; }
-                                        
-                                        .ent-sidebar {
-                                            width: 100%;
-                                            background: #fff;
-                                            min-height: calc(100vh - 60px);
-                                        }
-                                        .ent-nav-link {
-                                            padding: 18px 24px;
-                                            border-bottom: 1px solid #f0f0f0;
-                                            border-radius: 0;
-                                            font-size: 1.05rem;
-                                            color: #262626 !important;
-                                            background: #fff;
-                                        }
-                                        .ent-nav-link:hover, .ent-nav-link.active {
-                                            background: #fafafa;
-                                            color: #262626 !important;
-                                            font-weight: 500;
-                                        }
-                                        .ent-nav-link::after {
-                                            content: '\F285';
-                                            font-family: 'bootstrap-icons';
-                                            margin-left: auto;
-                                            color: #ccc;
-                                            font-size: 1.1rem;
-                                        }
-                                        .ent-sidebar-heading {
-                                            padding: 24px 24px 8px 24px !important;
-                                            margin-bottom: 0 !important;
-                                        }
+                            .ent-form-label-col {
+                                width: 35%;
+                                padding-right: 32px;
+                            }
 
-                                        .ent-form-row {
-                                            flex-direction: column;
-                                        }
-                                        .ent-form-label-col, .ent-form-input-col {
-                                            width: 100%;
-                                            padding-right: 0;
-                                        }
-                                        .ent-form-label-col {
-                                            margin-bottom: 12px;
-                                        }
-                                    }
+                            .ent-form-input-col {
+                                width: 65%;
+                            }
 
-                                    /* Mobile Back Button */
-                                    .mobile-back-btn {
-                                        display: none;
-                                    }
-                                    @media (max-width: 768px) {
-                                        .mobile-back-btn {
-                                            display: inline-flex;
-                                            align-items: center;
-                                            color: #007bff;
-                                            font-weight: 500;
-                                            font-size: 1.05rem;
-                                            cursor: pointer;
-                                            margin-bottom: 20px;
-                                        }
-                                        .mobile-back-btn i {
-                                            margin-right: 8px;
-                                            font-size: 1.2rem;
-                                        }
-                                    }
+                            .ent-label-title {
+                                display: block;
+                                font-size: 1rem;
+                                font-weight: 600;
+                                margin-bottom: 4px;
+                            }
+
+                            .ent-label-desc {
+                                display: block;
+                                font-size: 0.95rem;
+                                color: var(--ent-text-muted) !important;
+                                line-height: 1.5;
+                            }
+
+                            /* Inputs & Buttons */
+                            .ent-input {
+                                width: 100%;
+                                background: var(--ent-input-bg) !important;
+                                border: 1px solid var(--ent-input-border) !important;
+                                border-radius: 6px !important;
+                                padding: 10px 14px !important;
+                                font-size: 1rem !important;
+                                color: var(--ent-text-main) !important;
+                                transition: all 0.2s ease;
+                            }
+
+                            .ent-input:focus {
+                                outline: none;
+                                border-color: var(--accent-color) !important;
+                                box-shadow: 0 0 0 1px var(--accent-color) !important;
+                            }
+
+                            .ent-input:disabled,
+                            .ent-input[readonly] {
+                                background: var(--ent-hover) !important;
+                                color: var(--ent-text-muted) !important;
+                                cursor: not-allowed;
+                            }
+
+                            .ent-btn-primary {
+                                background: var(--accent-color);
+                                color: var(--btn-text-color);
+                                border: 1px solid transparent;
+                                border-radius: 6px;
+                                padding: 6px 16px;
+                                font-size: 0.875rem;
+                                font-weight: 500;
+                                transition: opacity 0.2s;
+                                cursor: pointer;
+                            }
+
+                            .ent-btn-primary:hover {
+                                opacity: 0.9;
+                                color: var(--btn-text-color);
+                            }
+
+                            .ent-btn-secondary {
+                                background: transparent;
+                                color: var(--ent-text-main);
+                                border: 1px solid var(--ent-input-border);
+                                border-radius: 6px;
+                                padding: 6px 16px;
+                                font-size: 0.875rem;
+                                font-weight: 500;
+                                transition: all 0.2s;
+                                cursor: pointer;
+                            }
+
+                            .ent-btn-secondary:hover {
+                                border-color: var(--ent-text-muted);
+                            }
+
+                            .ent-avatar-container {
+                                display: flex;
+                                align-items: center;
+                                gap: 20px;
+                            }
+
+                            .ent-avatar {
+                                width: 64px;
+                                height: 64px;
+                                border-radius: 50%;
+                                background: var(--accent-color);
+                                color: var(--btn-text-color);
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 1.5rem;
+                                font-weight: 600;
+                            }
+
+                            @media (max-width: 768px) {
+
+                                /* Mobile Reset for Glassmorphism */
+                                .glass-page-bg {
+                                    background: #fff;
+                                    padding: 0;
+                                    min-height: auto;
+                                }
+
+                                .glass-container {
+                                    background: none;
+                                    backdrop-filter: none;
+                                    border: none;
+                                    box-shadow: none;
+                                    padding: 0;
+                                    border-radius: 0;
+                                }
+
+                                .ent-layout {
+                                    flex-direction: column;
+                                    gap: 0;
+                                    margin: 0 auto;
+                                    padding: 0;
+                                    border-radius: 0;
+                                    min-height: auto;
+                                    box-shadow: none;
+                                    background: #fff;
+                                }
+
+                                /* Mobile Settings Menu Logic */
+                                .ent-layout.mobile-menu-active .ent-sidebar {
+                                    display: block;
+                                }
+
+                                .ent-layout.mobile-menu-active .ent-content {
+                                    display: none;
+                                }
+
+                                .ent-layout:not(.mobile-menu-active) .ent-sidebar {
+                                    display: none;
+                                }
+
+                                .ent-layout:not(.mobile-menu-active) .ent-content {
+                                    display: block;
+                                    padding: 20px;
+                                }
+
+                                .ent-sidebar {
+                                    width: 100%;
+                                    background: #fff;
+                                    min-height: calc(100vh - 60px);
+                                }
+
+                                .ent-nav-link {
+                                    padding: 18px 24px;
+                                    border-bottom: 1px solid #f0f0f0;
+                                    border-radius: 0;
+                                    font-size: 1.05rem;
+                                    color: #262626 !important;
+                                    background: #fff;
+                                }
+
+                                .ent-nav-link:hover,
+                                .ent-nav-link.active {
+                                    background: #fafafa;
+                                    color: #262626 !important;
+                                    font-weight: 500;
+                                }
+
+                                .ent-nav-link::after {
+                                    content: '\F285';
+                                    font-family: 'bootstrap-icons';
+                                    margin-left: auto;
+                                    color: #ccc;
+                                    font-size: 1.1rem;
+                                }
+
+                                .ent-sidebar-heading {
+                                    padding: 24px 24px 8px 24px !important;
+                                    margin-bottom: 0 !important;
+                                }
+
+                                .ent-form-row {
+                                    flex-direction: column;
+                                }
+
+                                .ent-form-label-col,
+                                .ent-form-input-col {
+                                    width: 100%;
+                                    padding-right: 0;
+                                }
+
+                                .ent-form-label-col {
+                                    margin-bottom: 12px;
+                                }
+                            }
+
+                            /* Mobile Back Button */
+                            .mobile-back-btn {
+                                display: none;
+                            }
+
+                            @media (max-width: 768px) {
+                                .mobile-back-btn {
+                                    display: inline-flex;
+                                    align-items: center;
+                                    color: #007bff;
+                                    font-weight: 500;
+                                    font-size: 1.05rem;
+                                    cursor: pointer;
+                                    margin-bottom: 20px;
+                                }
+
+                                .mobile-back-btn i {
+                                    margin-right: 8px;
+                                    font-size: 1.2rem;
+                                }
+                            }
 
 
-                                    /* Tabs */
-                                    .ent-tab-content {
-                                        display: none;
-                                        animation: fadeIn 0.3s ease;
-                                    }
-                                    .ent-tab-content.active {
-                                        display: block;
-                                    }
-                                    @keyframes fadeIn {
-                                        from { opacity: 0; transform: translateY(5px); }
-                                        to { opacity: 1; transform: translateY(0); }
-                                    }
+                            /* Tabs */
+                            .ent-tab-content {
+                                display: none;
+                                animation: fadeIn 0.3s ease;
+                            }
 
-                                    /* Tickets */
-                                    .sc-ticket-card {
-                                        background: var(--ent-card-bg);
-                                        border: 1px solid var(--ent-border);
-                                        border-radius: 8px;
-                                        padding: 20px;
-                                        margin-bottom: 16px;
-                                        display: flex;
-                                        justify-content: space-between;
-                                        align-items: center;
-                                        transition: all 0.2s ease;
-                                        text-decoration: none;
-                                        color: inherit;
-                                    }
-                                    .sc-ticket-card:hover {
-                                        border-color: var(--ent-text-muted);
-                                        background: var(--ent-hover);
-                                        color: inherit;
-                                    }
-                                    .sc-ticket-id {
-                                        font-family: 'Inter', sans-serif;
-                                        font-size: 1rem;
-                                        font-weight: 600;
-                                        color: var(--ent-text-main);
-                                        margin-bottom: 4px;
-                                    }
-                                    .sc-ticket-subj {
-                                        font-size: 0.9rem;
-                                        color: var(--ent-text-muted);
-                                    }
-                                    .sc-badge {
-                                        font-size: 0.75rem;
-                                        padding: 4px 10px;
-                                        border-radius: 6px;
-                                        font-weight: 600;
-                                        text-transform: uppercase;
-                                        letter-spacing: 0.05em;
-                                    }
-                                    .bg-open { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-                                    .bg-pending { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
-                                    .bg-resolved { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
-                                    .bg-closed { background: rgba(107, 114, 128, 0.1); color: #6b7280; border: 1px solid rgba(107, 114, 128, 0.2); }
-                                </style>
-    <style>
-        
-         /* Darker background for outside */
-        
-        
-        
-        .chat-box { background: transparent; display: flex; flex-direction: column; flex: 1; height: 100%; overflow: hidden; border-radius: 0 16px 16px 0; }
-        
-        .chat-header { background: #008069; color: #ffffff; padding: 0.8rem 1.2rem; display: flex; justify-content: space-between; align-items: center; z-index: 10; flex-shrink: 0; }
-        
-        /* The chat background pattern */
-        .chat-body { 
-            padding: 2rem; 
-            flex: 1; 
-            overflow-y: auto; 
-            background-color: #efeae2;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23d8d3cc' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.5rem; 
-        }
-        .chat-message { display: flex; flex-direction: column; max-width: 75%; margin-bottom: 0.5rem; }
-        .chat-message.user { align-self: flex-end; align-items: flex-end; }
-        .chat-message.admin { align-self: flex-start; align-items: flex-start; }
-        
-        .msg-bubble { 
-            padding: 0.8rem 1rem; 
-            font-size: 1.3rem; 
-            line-height: 1.5; 
-            word-wrap: break-word;
-            box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
-            position: relative;
-        }
-        
-        .msg-text { white-space: pre-wrap; margin-bottom: 2px; }
-        
-        /* User (Customer) sent this (WhatsApp Green) */
-        .chat-message.user .msg-bubble { 
-            background: #d9fdd3; color: #111b21; 
-            border-radius: 8px 0 8px 8px; 
-        }
-        
-        /* Admin sent this (WhatsApp White) */
-        .chat-message.admin .msg-bubble { 
-            background: #ffffff; color: #111b21; 
-            border-radius: 0 8px 8px 8px;
-        }
+                            .ent-tab-content.active {
+                                display: block;
+                            }
 
-        /* The tiny tail on bubbles */
-        .chat-message.user .msg-bubble::before {
-            content: ''; position: absolute; top: 0; right: -8px; width: 0; height: 0; 
-            border-top: 0 solid transparent; border-left: 8px solid #d9fdd3; border-bottom: 8px solid transparent;
-        }
-        .chat-message.admin .msg-bubble::before {
-            content: ''; position: absolute; top: 0; left: -8px; width: 0; height: 0; 
-            border-top: 0 solid transparent; border-right: 8px solid #ffffff; border-bottom: 8px solid transparent;
-        }
+                            @keyframes fadeIn {
+                                from {
+                                    opacity: 0;
+                                    transform: translateY(5px);
+                                }
 
-        .msg-author-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
-        .chat-message.admin .msg-author-name { color: #008069; }
+                                to {
+                                    opacity: 1;
+                                    transform: translateY(0);
+                                }
+                            }
 
-        .msg-meta { font-size: 0.8rem; color: #667781; display: flex; align-items: center; justify-content: flex-end; margin-top: 4px; gap: 4px; float: right; margin-left: 15px; }
-        .msg-bubble::after { content: ""; display: table; clear: both; }
-        
-        .chat-footer { padding: 1rem; background: #f0f2f5; border-radius: 0 0 12px 12px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .reply-box { border-radius: 8px; border: none; padding: 0.8rem 1.2rem; width: 100%; font-size: 1rem; resize: none; outline: none; background: #ffffff; height: 50px; overflow-y: hidden; }
-        .reply-box:focus { box-shadow: 0 0 0 1px #008069; }
-        
-        .send-btn { width: 50px; height: 50px; border-radius: 50%; background: #008069; color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; }
-        .send-btn:hover { background: #016b58; }
-        
-        .sc-badge { font-size: 0.9rem; padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
-        
-        /* Custom Scrollbar */
-        .chat-body::-webkit-scrollbar { width: 6px; }
-        .chat-body::-webkit-scrollbar-track { background: transparent; }
-        .chat-body::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        .bg-open { background: #e0e7ff; color: #3730a3; }
-        .bg-pending { background: #fef3c7; color: #92400e; }
-        .bg-resolved { background: #dcfce7; color: #166534; }
-        .bg-closed { background: #f3f4f6; color: #374151; }
-    </style>
+                            /* Tickets */
+                            .sc-ticket-card {
+                                background: var(--ent-card-bg);
+                                border: 1px solid var(--ent-border);
+                                border-radius: 8px;
+                                padding: 20px;
+                                margin-bottom: 16px;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                transition: all 0.2s ease;
+                                text-decoration: none;
+                                color: inherit;
+                            }
+
+                            .sc-ticket-card:hover {
+                                border-color: var(--ent-text-muted);
+                                background: var(--ent-hover);
+                                color: inherit;
+                            }
+
+                            .sc-ticket-id {
+                                font-family: 'Inter', sans-serif;
+                                font-size: 1rem;
+                                font-weight: 600;
+                                color: var(--ent-text-main);
+                                margin-bottom: 4px;
+                            }
+
+                            .sc-ticket-subj {
+                                font-size: 0.9rem;
+                                color: var(--ent-text-muted);
+                            }
+
+                            .sc-badge {
+                                font-size: 0.75rem;
+                                padding: 4px 10px;
+                                border-radius: 6px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                            }
+
+                            .bg-open {
+                                background: rgba(59, 130, 246, 0.1);
+                                color: #3b82f6;
+                                border: 1px solid rgba(59, 130, 246, 0.2);
+                            }
+
+                            .bg-pending {
+                                background: rgba(234, 179, 8, 0.1);
+                                color: #eab308;
+                                border: 1px solid rgba(234, 179, 8, 0.2);
+                            }
+
+                            .bg-resolved {
+                                background: rgba(34, 197, 94, 0.1);
+                                color: #22c55e;
+                                border: 1px solid rgba(34, 197, 94, 0.2);
+                            }
+
+                            .bg-closed {
+                                background: rgba(107, 114, 128, 0.1);
+                                color: #6b7280;
+                                border: 1px solid rgba(107, 114, 128, 0.2);
+                            }
+                        </style>
+                        <style>
+                            /* Darker background for outside */
+
+
+
+                            .chat-box {
+                                background: transparent;
+                                display: flex;
+                                flex-direction: column;
+                                flex: 1;
+                                height: 100%;
+                                overflow: hidden;
+                                border-radius: 0 16px 16px 0;
+                            }
+
+                            .chat-header {
+                                background: #008069;
+                                color: #ffffff;
+                                padding: 0.8rem 1.2rem;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                z-index: 10;
+                                flex-shrink: 0;
+                            }
+
+                            /* The chat background pattern */
+                            .chat-body {
+                                padding: 2rem;
+                                flex: 1;
+                                overflow-y: auto;
+                                background-color: #efeae2;
+                                background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2zm0 4h20v2H20v-2z' fill='%23d8d3cc' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+                                display: flex;
+                                flex-direction: column;
+                                gap: 0.5rem;
+                            }
+
+                            .chat-message {
+                                display: flex;
+                                flex-direction: column;
+                                max-width: 75%;
+                                margin-bottom: 0.5rem;
+                            }
+
+                            .chat-message.user {
+                                align-self: flex-end;
+                                align-items: flex-end;
+                            }
+
+                            .chat-message.admin {
+                                align-self: flex-start;
+                                align-items: flex-start;
+                            }
+
+                            .msg-bubble {
+                                padding: 0.8rem 1rem;
+                                font-size: 1.3rem;
+                                line-height: 1.5;
+                                word-wrap: break-word;
+                                box-shadow: 0 1px 0.5px rgba(11, 20, 26, .13);
+                                position: relative;
+                            }
+
+                            .msg-text {
+                                white-space: pre-wrap;
+                                margin-bottom: 2px;
+                            }
+
+                            /* User (Customer) sent this (WhatsApp Green) */
+                            .chat-message.user .msg-bubble {
+                                background: #d9fdd3;
+                                color: #111b21;
+                                border-radius: 8px 0 8px 8px;
+                            }
+
+                            /* Admin sent this (WhatsApp White) */
+                            .chat-message.admin .msg-bubble {
+                                background: #ffffff;
+                                color: #111b21;
+                                border-radius: 0 8px 8px 8px;
+                            }
+
+                            /* The tiny tail on bubbles */
+                            .chat-message.user .msg-bubble::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                right: -8px;
+                                width: 0;
+                                height: 0;
+                                border-top: 0 solid transparent;
+                                border-left: 8px solid #d9fdd3;
+                                border-bottom: 8px solid transparent;
+                            }
+
+                            .chat-message.admin .msg-bubble::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: -8px;
+                                width: 0;
+                                height: 0;
+                                border-top: 0 solid transparent;
+                                border-right: 8px solid #ffffff;
+                                border-bottom: 8px solid transparent;
+                            }
+
+                            .msg-author-name {
+                                font-size: 0.9rem;
+                                font-weight: 600;
+                                margin-bottom: 2px;
+                            }
+
+                            .chat-message.admin .msg-author-name {
+                                color: #008069;
+                            }
+
+                            .msg-meta {
+                                font-size: 0.8rem;
+                                color: #667781;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                                margin-top: 4px;
+                                gap: 4px;
+                                float: right;
+                                margin-left: 15px;
+                            }
+
+                            .msg-bubble::after {
+                                content: "";
+                                display: table;
+                                clear: both;
+                            }
+
+                            .chat-footer {
+                                padding: 1rem;
+                                background: #f0f2f5;
+                                border-radius: 0 0 12px 12px;
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                flex-shrink: 0;
+                            }
+
+                            .reply-box {
+                                border-radius: 8px;
+                                border: none;
+                                padding: 0.8rem 1.2rem;
+                                width: 100%;
+                                font-size: 1rem;
+                                resize: none;
+                                outline: none;
+                                background: #ffffff;
+                                height: 50px;
+                                overflow-y: hidden;
+                            }
+
+                            .reply-box:focus {
+                                box-shadow: 0 0 0 1px #008069;
+                            }
+
+                            .send-btn {
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                background: #008069;
+                                color: white;
+                                border: none;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 1.2rem;
+                                cursor: pointer;
+                                transition: background 0.2s;
+                            }
+
+                            .chat-message.user .msg-bubble {
+                                background: #d9fdd3;
+                                color: #111b21;
+                                border-radius: 8px 0 8px 8px;
+                            }
+
+                            /* Admin sent this (WhatsApp White) */
+                            .chat-message.admin .msg-bubble {
+                                background: #ffffff;
+                                color: #111b21;
+                                border-radius: 0 8px 8px 8px;
+                            }
+
+                            /* The tiny tail on bubbles */
+                            .chat-message.user .msg-bubble::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                right: -8px;
+                                width: 0;
+                                height: 0;
+                                border-top: 0 solid transparent;
+                                border-left: 8px solid #d9fdd3;
+                                border-bottom: 8px solid transparent;
+                            }
+
+                            .chat-message.admin .msg-bubble::before {
+                                content: '';
+                                position: absolute;
+                                top: 0;
+                                left: -8px;
+                                width: 0;
+                                height: 0;
+                                border-top: 0 solid transparent;
+                                border-right: 8px solid #ffffff;
+                                border-bottom: 8px solid transparent;
+                            }
+
+                            .msg-author-name {
+                                font-size: 0.9rem;
+                                font-weight: 600;
+                                margin-bottom: 2px;
+                            }
+
+                            .chat-message.admin .msg-author-name {
+                                color: #008069;
+                            }
+
+                            .msg-meta {
+                                font-size: 0.8rem;
+                                color: #667781;
+                                display: flex;
+                                align-items: center;
+                                justify-content: flex-end;
+                                margin-top: 4px;
+                                gap: 4px;
+                                float: right;
+                                margin-left: 15px;
+                            }
+
+                            .msg-bubble::after {
+                                content: "";
+                                display: table;
+                                clear: both;
+                            }
+
+                            .chat-footer {
+                                padding: 1rem;
+                                background: #f0f2f5;
+                                border-radius: 0 0 12px 12px;
+                                display: flex;
+                                align-items: center;
+                                gap: 10px;
+                                flex-shrink: 0;
+                            }
+
+                            .reply-box {
+                                border-radius: 8px;
+                                border: none;
+                                padding: 0.8rem 1.2rem;
+                                width: 100%;
+                                font-size: 1rem;
+                                resize: none;
+                                outline: none;
+                                background: #ffffff;
+                                height: 50px;
+                                overflow-y: hidden;
+                            }
+
+                            .reply-box:focus {
+                                box-shadow: 0 0 0 1px #008069;
+                            }
+
+                            .send-btn {
+                                width: 50px;
+                                height: 50px;
+                                border-radius: 50%;
+                                background: #008069;
+                                color: white;
+                                border: none;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 1.2rem;
+                                cursor: pointer;
+                                transition: background 0.2s;
+                            }
+
+                            .send-btn:hover {
+                                background: #016b58;
+                            }
+
+                            .sc-badge {
+                                font-size: 0.9rem;
+                                padding: 0.3rem 0.6rem;
+                                border-radius: 6px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                background: rgba(255, 255, 255, 0.2);
+                                color: #fff;
+                                border: 1px solid rgba(255, 255, 255, 0.4);
+                            }
+
+                            /* Custom Scrollbar */
+                            .chat-body::-webkit-scrollbar {
+                                width: 6px;
+                            }
+
+                            .chat-body::-webkit-scrollbar-track {
+                                background: transparent;
+                            }
+
+                            .chat-body::-webkit-scrollbar-thumb {
+                                background: rgba(0, 0, 0, 0.2);
+                                border-radius: 10px;
+                            }
+
+                            .bg-open {
+                                background: #e0e7ff;
+                                color: #3730a3;
+                            }
+
+                            .bg-pending {
+                                background: #fef3c7;
+                                color: #92400e;
+                            }
+
+                            .bg-resolved {
+                                background: #dcfce7;
+                                color: #166534;
+                            }
+
+                            .bg-closed {
+                                background: #f3f4f6;
+                                color: #374151;
+                            }
+
+                            /* Attachment styles */
+                            .attach-btn {
+                                width: 40px;
+                                height: 40px;
+                                border-radius: 50%;
+                                background: transparent;
+                                color: #54656f;
+                                border: none;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                font-size: 1.3rem;
+                                cursor: pointer;
+                                transition: background 0.2s;
+                                flex-shrink: 0;
+                            }
+
+                            .attach-btn:hover {
+                                background: rgba(0, 0, 0, 0.08);
+                            }
+
+                            .reply-area-wrap {
+                                flex: 1;
+                                display: flex;
+                                flex-direction: column;
+                                gap: 4px;
+                            }
+
+                            .attachment-preview-bar {
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 6px;
+                                padding: 6px 0;
+                            }
+
+                            .att-preview-chip {
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                                background: rgba(0, 128, 105, 0.1);
+                                border: 1px solid rgba(0, 128, 105, 0.3);
+                                border-radius: 20px;
+                                padding: 4px 10px;
+                                font-size: 0.78rem;
+                                max-width: 160px;
+                            }
+
+                            .att-preview-chip span {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+
+                            .att-preview-chip .remove-att {
+                                cursor: pointer;
+                                color: #666;
+                            }
+
+                            .msg-attachments {
+                                display: flex;
+                                flex-direction: column;
+                                gap: 6px;
+                                margin-bottom: 4px;
+                            }
+
+                            .msg-attachment-img {
+                                max-width: 220px;
+                                max-height: 220px;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                object-fit: cover;
+                                display: block;
+                            }
+
+                            .msg-attachment-video {
+                                max-width: 280px;
+                                border-radius: 8px;
+                                display: block;
+                            }
+
+                            .msg-attachment-pdf {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                                text-decoration: none;
+                                color: #333;
+                                background: rgba(0, 0, 0, 0.05);
+                                border-radius: 8px;
+                                padding: 8px 12px;
+                            }
+
+                            .msg-attachment-pdf:hover {
+                                background: rgba(0, 0, 0, 0.1);
+                            }
+                        </style>
 </head>
+
 <body>
     <%- include('../partials/navbar-new') %>
 
-    <div class="glass-page-bg">
-        <div class="glass-container">
-            <div class="ent-layout">
-                <!-- Sidebar Navigation -->
-                <aside class="ent-sidebar">
-            <nav>
-                <div class="ent-sidebar-heading" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">Personal</div>
-                <a href="/profile?tab=account" class="ent-nav-link">
-                    <i class="bi bi-person" style="font-size: 1.25rem;"></i> Account
-                </a>
-                <a href="/profile?tab=tickets" class="ent-nav-link active">
-                    <i class="bi bi-headset" style="font-size: 1.25rem;"></i> Support Tickets
-                </a>
-                
-                <div class="ent-sidebar-heading" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 24px; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">Billing</div>
-                <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
-                    <i class="bi bi-receipt" style="font-size: 1.25rem;"></i> Invoices
-                </a>
-                <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
-                    <i class="bi bi-credit-card" style="font-size: 1.25rem;"></i> Payment Methods
-                </a>
-                
-                <div style="margin-top: 24px; border-top: 1px solid var(--ent-border); padding-top: 16px;" class="ent-sidebar-heading">
-                    <a href="/logout" class="ent-nav-link" style="color: #ff4545 !important;">
-                        <i class="bi bi-box-arrow-right" style="font-size: 1.25rem; color: #ff4545;"></i> Log out
-                    </a>
-                </div>
-            </nav>
-        </aside>
+        <div class="glass-page-bg">
+            <div class="glass-container">
+                <div class="ent-layout">
+                    <!-- Sidebar Navigation -->
+                    <aside class="ent-sidebar">
+                        <nav>
+                            <div class="ent-sidebar-heading"
+                                style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">
+                                Personal</div>
+                            <a href="/profile?tab=account" class="ent-nav-link">
+                                <i class="bi bi-person" style="font-size: 1.25rem;"></i> Account
+                            </a>
+                            <a href="/profile?tab=tickets" class="ent-nav-link active">
+                                <i class="bi bi-headset" style="font-size: 1.25rem;"></i> Support Tickets
+                            </a>
 
-                <!-- Main Content (Chat) -->
-                <main class="ent-content" style="padding: 0; display: flex; flex-direction: column; height: calc(100vh - 250px); min-height: 600px; background: #efeae2;">
-                    <% if (locals.success && locals.success.length > 0) { %>
-                        <div class="alert alert-success alert-dismissible fade show m-0 rounded-0 flex-shrink-0" role="alert" style="z-index: 100;">
-                            <%= locals.success %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <% } %>
-                    <% if (locals.error && locals.error.length > 0) { %>
-                        <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 flex-shrink-0" role="alert" style="z-index: 100;">
-                            <%= locals.error %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    <% } %>
-                    
-                    <div class="chat-box">
-            <!-- WhatsApp style header -->
-            <div class="chat-header px-2 px-sm-4 py-2">
-                <div class="d-flex align-items-center gap-2" style="min-width: 0; flex: 1 1 auto;">
-                    <a href="/tickets" class="text-white text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0" style="font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                        <i class="bi bi-arrow-left"></i> <span class="ms-1 d-none d-sm-inline-block" style="font-size: 1rem; font-weight: 500;">Back</span>
-                    </a>
-                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center d-none d-sm-flex" style="width: 40px; height: 40px; font-size: 1.2rem; flex-shrink: 0;">
-                        <i class="bi bi-headset"></i>
-                    </div>
-                    <div style="min-width: 0; flex-shrink: 1;">
-                        <h5 class="mb-0 fw-bold text-truncate" style="font-family:'Inter', sans-serif; font-size: 1.1rem;"><%= ticket.ticketNumber %></h5>
-                        <div class="text-truncate" style="font-size: 0.8rem; opacity: 0.9; max-width: 200px;"><%= ticket.subject %></div>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-1 gap-sm-2 flex-shrink-0">
-                    <span class="sc-badge"><%= ticket.status %></span>
-                    <% if(ticket.productId) { %>
-                        <a href="/<%= ticket.productType === 'tech' ? 'tech-packages' : ticket.productType + '-products' %>/<%= ticket.productId %>" class="btn btn-sm bg-white text-success rounded-2 px-2 px-sm-3 py-1 shadow-sm text-nowrap" style="font-size: 0.75rem; font-weight: 600;">View Product</a>
-                    <% } %>
-                </div>
-            </div>
-                    
-                    <!-- Chat Body -->
-                    <div class="chat-body" id="chatBody">
-                        <div class="text-center mb-3">
-                            <span class="badge" style="background: #e1f3fb; color: #435a64; font-weight: normal; padding: 6px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); font-size: 0.75rem;">
-                                Ticket Created on <%= new Date(ticket.createdAt).toLocaleDateString([], { dateStyle: 'long' }) %>
-                            </span>
-                        </div>
+                            <div class="ent-sidebar-heading"
+                                style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 24px; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">
+                                Billing</div>
+                            <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
+                                <i class="bi bi-receipt" style="font-size: 1.25rem;"></i> Invoices
+                            </a>
+                            <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
+                                <i class="bi bi-credit-card" style="font-size: 1.25rem;"></i> Payment Methods
+                            </a>
 
-                        <!-- Initial Message (User) -->
-                        <div class="chat-message user">
-                            <div class="msg-bubble">
-                                <div class="msg-text"><%= ticket.description %></div>
-                                <div class="msg-meta">
-                                    <%= new Date(ticket.createdAt).toLocaleTimeString([], { timeStyle: 'short' }) %> <i class="bi bi-check-all text-primary ms-1" style="font-size: 1rem;"></i>
-                                </div>
+                            <div style="margin-top: 24px; border-top: 1px solid var(--ent-border); padding-top: 16px;"
+                                class="ent-sidebar-heading">
+                                <a href="/logout" class="ent-nav-link" style="color: #ff4545 !important;">
+                                    <i class="bi bi-box-arrow-right" style="font-size: 1.25rem; color: #ff4545;"></i>
+                                    Log out
+                                </a>
                             </div>
-                        </div>
+                        </nav>
+                    </aside>
 
-                        <% ticket.messages.forEach(msg => { %>
-                            <div class="chat-message <%= msg.sender === 'user' ? 'user' : 'admin' %>">
-                                <div class="msg-bubble">
-                                    <% if (msg.sender === 'admin') { %>
-                                        <div class="msg-author-name">Support Team</div>
-                                    <% } %>
-                                    <div class="msg-text"><%= msg.message %></div>
-                                    <div class="msg-meta">
-                                        <% if(msg.isEmailSync) { %><i class="bi bi-envelope"></i><% } %>
-                                        <%= new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' }) %>
-                                        <% if (msg.sender === 'user') { %><i class="bi bi-check-all text-primary ms-1" style="font-size: 1rem;"></i><% } %>
+                    <!-- Main Content (Chat) -->
+                    <main class="ent-content"
+                        style="padding: 0; display: flex; flex-direction: column; height: calc(100vh - 250px); min-height: 600px; background: #efeae2;">
+                        <% if (locals.success && locals.success.length> 0) { %>
+                            <div class="alert alert-success alert-dismissible fade show m-0 rounded-0 flex-shrink-0"
+                                role="alert" style="z-index: 100;">
+                                <%= locals.success %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+                            <% } %>
+                                <% if (locals.error && locals.error.length> 0) { %>
+                                    <div class="alert alert-danger alert-dismissible fade show m-0 rounded-0 flex-shrink-0"
+                                        role="alert" style="z-index: 100;">
+                                        <%= locals.error %>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close"></button>
                                     </div>
-                                </div>
-                            </div>
-                        <% }) %>
-                        
-                        <!-- Typing Indicator -->
-                        <div id="typingIndicator" class="chat-message admin" style="display: none;">
-                            <div class="msg-bubble text-muted fst-italic" style="padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.8); font-size: 0.8rem;">
-                                Support Team is typing...
-                            </div>
-                        </div>
-                    </div>
+                                    <% } %>
 
-                    <!-- Chat Footer -->
-                    <% if (ticket.status !== 'closed') { %>
-                        <form id="replyForm" action="/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="chat-footer">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                            <textarea id="messageInput" name="message" class="reply-box" placeholder="Type a message" required></textarea>
-                            <button type="submit" class="send-btn">
-                                <i class="bi bi-send-fill" style="margin-right: 2px; margin-top: 2px;"></i>
-                            </button>
-                        </form>
-                    <% } else { %>
-                        <div class="chat-footer justify-content-center py-3">
-                            <span class="text-muted small"><i class="bi bi-lock-fill me-1"></i> You cannot reply to a closed ticket.</span>
-                        </div>
-                    <% } %>
+                                        <div class="chat-box">
+                                            <!-- WhatsApp style header -->
+                                            <div class="chat-header px-2 px-sm-4 py-2">
+                                                <div class="d-flex align-items-center gap-2"
+                                                    style="min-width: 0; flex: 1 1 auto;">
+                                                    <a href="/tickets"
+                                                        class="text-white text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0"
+                                                        style="font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;"
+                                                        onmouseover="this.style.opacity='0.8'"
+                                                        onmouseout="this.style.opacity='1'">
+                                                        <i class="bi bi-arrow-left"></i> <span
+                                                            class="ms-1 d-none d-sm-inline-block"
+                                                            style="font-size: 1rem; font-weight: 500;">Back</span>
+                                                    </a>
+                                                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center d-none d-sm-flex"
+                                                        style="width: 40px; height: 40px; font-size: 1.2rem; flex-shrink: 0;">
+                                                        <i class="bi bi-headset"></i>
+                                                    </div>
+                                                    <div style="min-width: 0; flex-shrink: 1;">
+                                                        <h5 class="mb-0 fw-bold text-truncate"
+                                                            style="font-family:'Inter', sans-serif; font-size: 1.1rem;">
+                                                            <%= ticket.ticketNumber %>
+                                                        </h5>
+                                                        <div class="text-truncate"
+                                                            style="font-size: 0.8rem; opacity: 0.9; max-width: 200px;">
+                                                            <%= ticket.subject %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1 gap-sm-2 flex-shrink-0">
+                                                    <span class="sc-badge">
+                                                        <%= ticket.status %>
+                                                    </span>
+                                                    <% if(ticket.productId) { %>
+                                                        <a href="/<%= ticket.productType === 'tech' ? 'tech-packages' : ticket.productType + '-products' %>/<%= ticket.productId %>"
+                                                            class="btn btn-sm bg-white text-success rounded-2 px-2 px-sm-3 py-1 shadow-sm text-nowrap"
+                                                            style="font-size: 0.75rem; font-weight: 600;">View
+                                                            Product</a>
+                                                        <% } %>
+                                                </div>
+                                            </div>
+
+                                            <!-- Chat Body -->
+                                            <div class="chat-body" id="chatBody">
+                                                <div class="text-center mb-3">
+                                                    <span class="badge"
+                                                        style="background: #e1f3fb; color: #435a64; font-weight: normal; padding: 6px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); font-size: 0.75rem;">
+                                                        Ticket Created on <%= new
+                                                            Date(ticket.createdAt).toLocaleDateString([], {
+                                                            dateStyle: 'long' }) %>
+                                                    </span>
+                                                </div>
+
+                                                <!-- Initial Message (User) -->
+                                                <div class="chat-message user">
+                                                    <div class="msg-bubble">
+                                                        <div class="msg-text">
+                                                            <%= ticket.description %>
+                                                        </div>
+                                                        <div class="msg-meta">
+                                                            <div class="chat-box">
+                                                                <!-- WhatsApp style header -->
+                                                                <div class="chat-header px-2 px-sm-4 py-2">
+                                                                    <div class="d-flex align-items-center gap-2"
+                                                                        style="min-width: 0; flex: 1 1 auto;">
+                                                                        <a href="/tickets"
+                                                                            class="text-white text-decoration-none d-flex align-items-center justify-content-center flex-shrink-0"
+                                                                            style="font-size: 1.2rem; cursor: pointer; transition: opacity 0.2s;"
+                                                                            onmouseover="this.style.opacity='0.8'"
+                                                                            onmouseout="this.style.opacity='1'">
+                                                                            <i class="bi bi-arrow-left"></i> <span
+                                                                                class="ms-1 d-none d-sm-inline-block"
+                                                                                style="font-size: 1rem; font-weight: 500;">Back</span>
+                                                                        </a>
+                                                                        <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center d-none d-sm-flex"
+                                                                            style="width: 40px; height: 40px; font-size: 1.2rem; flex-shrink: 0;">
+                                                                            <i class="bi bi-headset"></i>
+                                                                        </div>
+                                                                        <div style="min-width: 0; flex-shrink: 1;">
+                                                                            <h5 class="mb-0 fw-bold text-truncate"
+                                                                                style="font-family:'Inter', sans-serif; font-size: 1.1rem;">
+                                                                                <%= ticket.ticketNumber %>
+                                                                            </h5>
+                                                                            <div class="text-truncate"
+                                                                                style="font-size: 0.8rem; opacity: 0.9; max-width: 200px;">
+                                                                                <%= ticket.subject %>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div
+                                                                        class="d-flex align-items-center gap-1 gap-sm-2 flex-shrink-0">
+                                                                        <span class="sc-badge">
+                                                                            <%= ticket.status %>
+                                                                        </span>
+                                                                        <% if(ticket.productId) { %>
+                                                                            <a href="/<%= ticket.productType === 'tech' ? 'tech-packages' : ticket.productType + '-products' %>/<%= ticket.productId %>"
+                                                                                class="btn btn-sm bg-white text-success rounded-2 px-2 px-sm-3 py-1 shadow-sm text-nowrap"
+                                                                                style="font-size: 0.75rem; font-weight: 600;">View
+                                                                                Product</a>
+                                                                            <% } %>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Chat Body -->
+                                                                <div class="chat-body" id="chatBody">
+                                                                    <div class="text-center mb-3">
+                                                                        <span class="badge"
+                                                                            style="background: #e1f3fb; color: #435a64; font-weight: normal; padding: 6px 12px; box-shadow: 0 1px 1px rgba(0,0,0,0.05); font-size: 0.75rem;">
+                                                                            Ticket Created on <%= new
+                                                                                Date(ticket.createdAt).toLocaleDateString([],
+                                                                                { dateStyle: 'long' }) %>
+                                                                        </span>
+                                                                    </div>
+
+                                                                    <!-- Initial Message (User) -->
+                                                                    <div class="chat-message user">
+                                                                        <div class="msg-bubble">
+                                                                            <div class="msg-text">
+                                                                                <%= ticket.description %>
+                                                                            </div>
+                                                                            <div class="msg-meta">
+                                                                                <%= new
+                                                                                    Date(ticket.createdAt).toLocaleTimeString([],
+                                                                                    { timeStyle: 'short' }) %> <i
+                                                                                        class="bi bi-check-all text-primary ms-1"
+                                                                                        style="font-size: 1rem;"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <% ticket.messages.forEach(msg=> { %>
+                                                                        <div
+                                                                            class="chat-message <%= msg.sender === 'user' ? 'user' : 'admin' %>">
+                                                                            <div class="msg-bubble">
+                                                                                <% if (msg.sender==='admin' ) { %>
+                                                                                    <div class="msg-author-name">Support
+                                                                                        Team</div>
+                                                                                    <% } %>
+                                                                                        <% if (msg.message) { %>
+                                                                                            <div class="msg-text">
+                                                                                                <%= msg.message %>
+                                                                                            </div>
+                                                                                            <% } %>
+                                                                                                <% if (msg.attachments
+                                                                                                    &&
+                                                                                                    msg.attachments.length>
+                                                                                                    0) { %>
+                                                                                                    <div
+                                                                                                        class="msg-attachments">
+                                                                                                        <%
+                                                                                                            msg.attachments.forEach(att=>
+                                                                                                            { %>
+                                                                                                            <% if
+                                                                                                                (att.fileType==='image'
+                                                                                                                ) { %>
+                                                                                                                <a href="<%= att.url %>"
+                                                                                                                    target="_blank"
+                                                                                                                    rel="noopener noreferrer">
+                                                                                                                    <img src="<%= att.url %>"
+                                                                                                                        alt="<%= att.filename %>"
+                                                                                                                        class="msg-attachment-img"
+                                                                                                                        loading="lazy">
+                                                                                                                </a>
+                                                                                                                <% } else
+                                                                                                                    if
+                                                                                                                    (att.fileType==='video'
+                                                                                                                    ) {
+                                                                                                                    %>
+                                                                                                                    <video
+                                                                                                                        class="msg-attachment-video"
+                                                                                                                        controls
+                                                                                                                        preload="metadata">
+                                                                                                                        <source
+                                                                                                                            src="<%= att.url %>">
+                                                                                                                        Your
+                                                                                                                        browser
+                                                                                                                        does
+                                                                                                                        not
+                                                                                                                        support
+                                                                                                                        the
+                                                                                                                        video
+                                                                                                                        tag.
+                                                                                                                    </video>
+                                                                                                                    <% } else
+                                                                                                                        if
+                                                                                                                        (att.fileType==='pdf'
+                                                                                                                        )
+                                                                                                                        {
+                                                                                                                        %>
+                                                                                                                        <a href="https://docs.google.com/viewer?url=<%= encodeURIComponent(att.url) %>"
+                                                                                                                            target="_blank"
+                                                                                                                            rel="noopener noreferrer"
+                                                                                                                            class="msg-attachment-pdf">
+                                                                                                                            <i
+                                                                                                                                class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i>
+                                                                                                                            <span>
+                                                                                                                                <%= att.filename
+                                                                                                                                    || 'document.pdf'
+                                                                                                                                    %>
+                                                                                                                            </span>
+                                                                                                                        </a>
+                                                                                                                        <% }
+                                                                                                                            %>
+                                                                                                                            <% })
+                                                                                                                                %>
+                                                                                                    </div>
+                                                                                                    <% } %>
+                                                                                                        <div
+                                                                                                            class="msg-meta">
+                                                                                                            <% if(msg.isEmailSync)
+                                                                                                                { %><i
+                                                                                                                    class="bi bi-envelope"></i>
+                                                                                                                <% } %>
+                                                                                                                    <%= new
+                                                                                                                        Date(msg.createdAt).toLocaleTimeString([],
+                                                                                                                        {
+                                                                                                                        timeStyle: 'short'
+                                                                                                                        })
+                                                                                                                        %>
+                                                                                                                        <% if
+                                                                                                                            (msg.sender==='user'
+                                                                                                                            )
+                                                                                                                            {
+                                                                                                                            %>
+                                                                                                                            <i class="bi bi-check-all text-primary ms-1"
+                                                                                                                                style="font-size: 1rem;"></i>
+                                                                                                                            <% }
+                                                                                                                                %>
+                                                                                                        </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <% }) %>
+
+                                                                            <!-- Typing Indicator -->
+                                                                            <div id="typingIndicator"
+                                                                                class="chat-message admin"
+                                                                                style="display: none;">
+                                                                                <div class="msg-bubble text-muted fst-italic"
+                                                                                    style="padding: 0.4rem 0.8rem; background: rgba(255,255,255,0.8); font-size: 0.8rem;">
+                                                                                    Support Team is typing...
+                                                                                </div>
+                                                                            </div>
+                                                                </div>
+
+                                                                <!-- Chat Footer -->
+                                                                <% if (ticket.status !=='closed' ) { %>
+                                                                    <form id="replyForm"
+                                                                        action="/tickets/<%= ticket.ticketNumber %>/reply"
+                                                                        method="POST" class="chat-footer"
+                                                                        enctype="multipart/form-data">
+                                                                        <input type="hidden" name="_csrf"
+                                                                            value="<%= csrfToken %>">
+                                                                        <input type="file" id="attachmentInput"
+                                                                            name="attachments" multiple
+                                                                            accept="image/*,video/*,application/pdf"
+                                                                            style="display:none;">
+                                                                        <button type="button" id="attachBtn"
+                                                                            class="attach-btn" title="Attach file">
+                                                                            <i class="bi bi-paperclip"></i>
+                                                                        </button>
+                                                                        <div class="reply-area-wrap">
+                                                                            <textarea id="messageInput" name="message"
+                                                                                class="reply-box"
+                                                                                placeholder="Type a message"></textarea>
+                                                                            <div id="attachmentPreview"
+                                                                                class="attachment-preview-bar"
+                                                                                style="display:none;"></div>
+                                                                        </div>
+                                                                        <button type="submit" class="send-btn">
+                                                                            <i class="bi bi-send-fill"
+                                                                                style="margin-right: 2px; margin-top: 2px;"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                    <% } else { %>
+                                                                        <div
+                                                                            class="chat-footer justify-content-center py-3">
+                                                                            <span class="text-muted small"><i
+                                                                                    class="bi bi-lock-fill me-1"></i>
+                                                                                You cannot reply to a closed
+                                                                                ticket.</span>
+                                                                        </div>
+                                                                        <% } %>
+                                                            </div>
+                    </main>
                 </div>
-                </main>
             </div>
         </div>
-    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const ticketNumber = '<%= ticket.ticketNumber %>';
-    const chatBody = document.getElementById('chatBody');
-    const replyForm = document.getElementById('replyForm');
-    const messageInput = document.getElementById('messageInput');
-    const typingIndicator = document.getElementById('typingIndicator');
-    
-    // Auto-scroll chat to bottom
-    const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
-    scrollToBottom();
-    
-    // Socket.io Integration
-    const socket = io();
-    socket.emit('joinTicket', ticketNumber);
-    
-    // Handle incoming messages
-    socket.on('newMessage', (msg) => {
-        const isUser = msg.sender === 'user';
-        const timeStr = new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' });
-        
-        let html = `
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const ticketNumber = '<%= ticket.ticketNumber %>';
+            const chatBody = document.getElementById('chatBody');
+            const replyForm = document.getElementById('replyForm');
+            const messageInput = document.getElementById('messageInput');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const attachBtn = document.getElementById('attachBtn');
+            const attachmentInput = document.getElementById('attachmentInput');
+            const attachmentPreview = document.getElementById('attachmentPreview');
+
+            // Auto-scroll chat to bottom
+            const scrollToBottom = () => chatBody.scrollTop = chatBody.scrollHeight;
+            scrollToBottom();
+
+            // Socket.io Integration
+            const socket = io();
+            socket.emit('joinTicket', ticketNumber);
+
+            // Render attachments HTML from socket message
+            const renderAttachments = (attachments) => {
+                if (!attachments || attachments.length === 0) return '';
+                return `<div class="msg-attachments">${attachments.map(att => {
+                    if (att.fileType === 'image') {
+                        return `<a href="${att.url}" target="_blank" rel="noopener noreferrer"><img src="${att.url}" alt="${att.filename}" class="msg-attachment-img" loading="lazy"></a>`;
+                    } else if (att.fileType === 'video') {
+                        return `<video class="msg-attachment-video" controls preload="metadata"><source src="${att.url}">Your browser does not support the video tag.</video>`;
+                    } else if (att.fileType === 'pdf') {
+                        return `<a href="https://docs.google.com/viewer?url=${encodeURIComponent(att.url)}" target="_blank" rel="noopener noreferrer" class="msg-attachment-pdf"><i class="bi bi-file-earmark-pdf-fill text-danger fs-4"></i><span>${att.filename || 'document.pdf'}</span></a>`;
+                    }
+                    return '';
+                }).join('')}</div>`;
+            };
+
+            // Handle incoming messages
+            socket.on('newMessage', (msg) => {
+                const isUser = msg.sender === 'user';
+                const timeStr = new Date(msg.createdAt).toLocaleTimeString([], { timeStyle: 'short' });
+
+                let html = `
             <div class="chat-message ${isUser ? 'user' : 'admin'}">
                 <div class="msg-bubble">
                     ${!isUser ? '<div class="msg-author-name">Support Team</div>' : ''}
-                    <div class="msg-text">${msg.message}</div>
+                    ${msg.message ? `<div class="msg-text">${msg.message}</div>` : ''}
+                    ${renderAttachments(msg.attachments)}
                     <div class="msg-meta">
                         ${msg.isEmailSync ? '<i class="bi bi-envelope"></i>' : ''}
                         ${timeStr}
@@ -724,67 +1373,122 @@
                 </div>
             </div>
         `;
-        
-        typingIndicator.insertAdjacentHTML('beforebegin', html);
-        scrollToBottom();
-    });
-    
-    // Handle typing indicator
-    socket.on('typing', (data) => {
-        if (data.sender === 'admin') {
-            typingIndicator.style.display = 'flex';
-            scrollToBottom();
-        }
-    });
-    
-    socket.on('stopTyping', (data) => {
-        if (data.sender === 'admin') {
-            typingIndicator.style.display = 'none';
-        }
-    });
-    
-    if (replyForm) {
-        let typingTimer;
-        messageInput.addEventListener('input', () => {
-            socket.emit('typing', { ticketNumber, sender: 'user' });
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                socket.emit('stopTyping', { ticketNumber, sender: 'user' });
-            }, 2000);
-        });
-        
-        replyForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const text = messageInput.value.trim();
-            if(!text) return;
-            
-            messageInput.value = '';
-            socket.emit('stopTyping', { ticketNumber, sender: 'user' });
-            
-            try {
-                await fetch('/tickets/' + ticketNumber + '/reply', {
-                    method: 'POST',
-                    credentials: 'same-origin',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    , 'x-csrf-token': '<%= csrfToken %>' },
-                    body: JSON.stringify({ message: text })
+
+                typingIndicator.insertAdjacentHTML('beforebegin', html);
+                scrollToBottom();
+            });
+
+            // Handle typing indicator
+            socket.on('typing', (data) => {
+                if (data.sender === 'admin') {
+                    typingIndicator.style.display = 'flex';
+                    scrollToBottom();
+                }
+            });
+
+            socket.on('stopTyping', (data) => {
+                if (data.sender === 'admin') {
+                    typingIndicator.style.display = 'none';
+                }
+            });
+
+            // Attachment file picker
+            if (attachBtn && attachmentInput) {
+                attachBtn.addEventListener('click', () => attachmentInput.click());
+
+                attachmentInput.addEventListener('change', () => {
+                    const files = Array.from(attachmentInput.files);
+                    if (files.length > 5) {
+                        alert('You can attach a maximum of 5 files at once.');
+                        attachmentInput.value = '';
+                        return;
+                    }
+                    const oversized = files.filter(f => f.size > 25 * 1024 * 1024);
+                    if (oversized.length > 0) {
+                        alert(`File(s) too large: ${oversized.map(f => f.name).join(', ')}. Max size is 25MB per file.`);
+                        attachmentInput.value = '';
+                        return;
+                    }
+
+                    attachmentPreview.innerHTML = files.map((f, i) => `
+                <div class="att-preview-chip" data-index="${i}">
+                    <i class="bi ${f.type.startsWith('image/') ? 'bi-image' : f.type.startsWith('video/') ? 'bi-camera-video' : 'bi-file-earmark-pdf'}"></i>
+                    <span title="${f.name}">${f.name}</span>
+                    <span class="remove-att" data-index="${i}">✕</span>
+                </div>
+            `).join('');
+                    attachmentPreview.style.display = files.length > 0 ? 'flex' : 'none';
+
+                    attachmentPreview.querySelectorAll('.remove-att').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            attachmentInput.value = '';
+                            attachmentPreview.innerHTML = '';
+                            attachmentPreview.style.display = 'none';
+                        });
+                    });
                 });
-            } catch (err) {
-                console.error('Failed to send message:', err);
-                alert('Failed to send message. Please try again.');
             }
-        });
-        
-        // Enter to send (Shift+Enter for newline)
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                replyForm.dispatchEvent(new Event('submit'));
+
+            if (replyForm) {
+                let typingTimer;
+                messageInput.addEventListener('input', () => {
+                    socket.emit('typing', { ticketNumber, sender: 'user' });
+                    clearTimeout(typingTimer);
+                    typingTimer = setTimeout(() => {
+                        socket.emit('stopTyping', { ticketNumber, sender: 'user' });
+                    }, 2000);
+                });
+
+                replyForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const text = messageInput.value.trim();
+                    const files = attachmentInput ? attachmentInput.files : [];
+                    if (!text && (!files || files.length === 0)) return;
+
+                    messageInput.value = '';
+                    if (attachmentPreview) { attachmentPreview.innerHTML = ''; attachmentPreview.style.display = 'none'; }
+                    socket.emit('stopTyping', { ticketNumber, sender: 'user' });
+
+                    const sendBtn = replyForm.querySelector('.send-btn');
+                    if (sendBtn) { sendBtn.disabled = true; sendBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>'; }
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('_csrf', '<%= csrfToken %>');
+                        if (text) formData.append('message', text);
+                        if (files && files.length > 0) {
+                            Array.from(files).forEach(f => formData.append('attachments', f));
+                        }
+                        const response = await fetch('/tickets/' + ticketNumber + '/reply', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json',
+                                'x-csrf-token': '<%= csrfToken %>'
+                            },
+                            body: formData
+                        });
+                        if (!response.ok) {
+                            throw new Error('Failed to send message: ' + response.statusText);
+                        }
+                        if (attachmentInput) attachmentInput.value = '';
+                    } catch (err) {
+                        console.error('Failed to send message:', err);
+                        alert('Failed to send message. Please try again.');
+                    } finally {
+                        if (sendBtn) { sendBtn.disabled = false; sendBtn.innerHTML = '<i class="bi bi-send-fill" style="margin-right: 2px; margin-top: 2px;"></i>'; }
+                    }
+                });
+
+                // Enter to send (Shift+Enter for newline)
+                messageInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        replyForm.dispatchEvent(new Event('submit'));
+                    }
+                });
             }
-        });
-    }
-</script>
+        </script>
 </body>
+
 </html>

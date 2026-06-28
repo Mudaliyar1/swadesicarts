@@ -39,7 +39,11 @@ const mediaSchema = new mongoose.Schema(
 
     usageLocations: { type: [usageLocationSchema], default: [] },
     isUsed: { type: Boolean, default: false, index: true },
-    lastSyncedAt: { type: Date, default: Date.now }
+    lastSyncedAt: { type: Date, default: Date.now },
+
+    // Who uploaded this media
+    uploadedByModel: { type: String, enum: ['User', 'Admin', 'System', 'EmailSync'], default: 'System', index: true },
+    uploadedById:    { type: String, default: '' }
   },
   { timestamps: true }
 );

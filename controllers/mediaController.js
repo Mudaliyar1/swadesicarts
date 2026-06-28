@@ -202,9 +202,13 @@ const applyFilters = async (filters) => {
   }
 
   if (filters.owner === 'user') {
-    query['usageLocations.relatedModel'] = 'User';
+    query.uploadedByModel = 'User';
   } else if (filters.owner === 'admin') {
-    query['usageLocations.relatedModel'] = { $ne: 'User' };
+    query.uploadedByModel = 'Admin';
+  } else if (filters.owner === 'email') {
+    query.uploadedByModel = 'EmailSync';
+  } else if (filters.owner === 'ticket') {
+    query.relatedModel = 'Ticket';
   }
 
   if (filters.search) {
