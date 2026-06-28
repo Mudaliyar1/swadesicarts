@@ -784,8 +784,10 @@
                         }
 
                         if (!result.success) {
-                            detailUsageWarning.classList.remove('d-none');
-                            detailUsageWarning.textContent = result.message || 'Unable to delete media';
+                            if(detailUsageWarning) {
+                                detailUsageWarning.classList.remove('d-none');
+                                detailUsageWarning.textContent = result.message || 'Unable to delete media';
+                            }
                             return;
                         }
 
@@ -793,7 +795,9 @@
                     };
                 }
 
-                detailUsageWarning.classList.add('d-none');
+                if(detailUsageWarning) {
+                    detailUsageWarning.classList.add('d-none');
+                }
                 mediaDetailModal.show();
             } catch (err) {
                 console.error("Error opening details modal:", err);

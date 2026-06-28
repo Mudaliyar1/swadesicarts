@@ -42,13 +42,13 @@ if (process.env.NODE_ENV === 'production') {
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
-      imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://flagcdn.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
-      mediaSrc: ["'self'", "blob:", "https://res.cloudinary.com"],
-      connectSrc: ["'self'", "https://d1zv2aa70wpiur.cloudfront.net", "https://s3.amazonaws.com", "https://storage.googleapis.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "blob:", "data:"]
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+      "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
+      "img-src": ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://flagcdn.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      "media-src": ["'self'", "blob:", "https://res.cloudinary.com"],
+      "connect-src": ["'self'", "https://d1zv2aa70wpiur.cloudfront.net", "https://s3.amazonaws.com", "https://storage.googleapis.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "blob:", "data:"]
     },
   },
   crossOriginEmbedderPolicy: false // Prevent breaking external cloudinary/flagcdn images

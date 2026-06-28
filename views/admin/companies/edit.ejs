@@ -32,6 +32,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                     <form action="/admin/companies/edit/<%= company._id %>" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Company Name *</label>

@@ -988,6 +988,7 @@
                     try {
                         const response = await fetch('/profile/email/request-otp', { 
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: { 'x-csrf-token': '<%= csrfToken %>' }
                         });
                         const data = await response.json();
@@ -1031,6 +1032,7 @@
                     try {
                         const response = await fetch('/profile/email/verify-otp', {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: { 
                                 'Content-Type': 'application/json',
                                 'x-csrf-token': '<%= csrfToken %>' 
@@ -1075,6 +1077,7 @@
                     try {
                         const response = await fetch('/profile/email/update', {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: { 
                                 'Content-Type': 'application/json',
                                 'x-csrf-token': '<%= csrfToken %>' 
@@ -1169,6 +1172,7 @@
 
                         const response = await fetch('/profile/avatar', {
                             method: 'POST',
+                            credentials: 'same-origin',
                             headers: {
                                 'x-csrf-token': '<%= csrfToken %>'
                             },

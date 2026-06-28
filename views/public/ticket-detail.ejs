@@ -178,6 +178,7 @@
                     <!-- Chat Footer -->
                     <% if (ticket.status !== 'closed') { %>
                         <form id="replyForm" action="/tickets/<%= ticket.ticketNumber %>/reply" method="POST" class="chat-footer">
+                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                             <textarea id="messageInput" name="message" class="reply-box" placeholder="Type a message" required></textarea>
                             <button type="submit" class="send-btn">
                                 <i class="bi bi-send-fill" style="margin-right: 2px; margin-top: 2px;"></i>
@@ -268,9 +269,11 @@
             try {
                 await fetch('/tickets/' + ticketNumber + '/reply', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'x-csrf-token': '<%= csrfToken %>'
                     },
                     body: JSON.stringify({ message: text })
                 });

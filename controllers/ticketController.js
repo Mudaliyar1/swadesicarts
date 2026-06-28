@@ -25,7 +25,11 @@ exports.getTicket = async (req, res) => {
       return res.redirect('/tickets');
     }
 
-    res.render('public/ticket-detail', {
+    const userAgent = req.headers['user-agent'] || '';
+    const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
+    const viewFile = isMobile ? 'public/ticket-detail' : 'public/ticket-detail-desktop';
+
+    res.render(viewFile, {
       title: `Ticket ${ticket.ticketNumber} - Swadesi Carts`,
       ticket,
       currentPage: 'profile'

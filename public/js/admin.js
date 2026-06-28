@@ -1,5 +1,19 @@
 // Admin Dashboard JavaScript
 
+// Global fetch interceptor for CSRF tokens
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    let [resource, config] = arguments;
+    if (config && config.method && config.method.toUpperCase() !== 'GET') {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (csrfToken) {
+            config.headers = config.headers || {};
+            config.headers['x-csrf-token'] = csrfToken;
+        }
+    }
+    return originalFetch.apply(this, [resource, config]);
+};
+
 // Sidebar toggle functionality
 const sidebar = document.getElementById('sidebarDesktop');
 const sidebarToggle = document.getElementById('sidebarToggle');

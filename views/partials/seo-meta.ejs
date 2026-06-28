@@ -1,3 +1,6 @@
+<!-- CSRF Token for external JS scripts -->
+<meta name="csrf-token" content="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
 <%
   const seoData = seo || {};
   const pageTitle = seoData.title || title || 'Swadesi Carts';
