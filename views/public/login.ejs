@@ -50,6 +50,7 @@
                             <% } %>
 
                             <form action="/login" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <div class="mb-4">
                                     <label class="form-label fw-medium text-muted small ms-1 mb-1">Email Address *</label>
                                     <input type="email" class="form-control form-control-lg" name="email" placeholder="name@example.com" required autofocus style="border-radius: 12px; font-size: 1rem;">

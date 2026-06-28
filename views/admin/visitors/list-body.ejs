@@ -41,7 +41,8 @@
                                         <% } %>
                                     </td>
                                     <td>
-                                        <form method="POST" action="/admin/visitors/<%= visitor._id %>?_method=DELETE" style="display: inline;">
+                                        <form method="POST" action="/admin/visitors/<%= visitor._id %>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">?_method=DELETE" style="display: inline;">
                                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this visitor record?')">
                                                 <i class="fas fa-trash"></i> Delete
                                             </button>

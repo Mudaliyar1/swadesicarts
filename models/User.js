@@ -7,6 +7,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  profileImage: {
+    type: String,
+    default: '/images/default-avatar.png'
+  },
   email: {
     type: String,
     required: true,
@@ -22,7 +26,9 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6
+    minlength: 6,
+    maxlength: 128,
+    select: false // Secure by default
   },
   isVerified: {
     type: Boolean,
@@ -47,6 +53,14 @@ const userSchema = new mongoose.Schema({
   lastLoginUserAgent: {
     type: String,
     default: null
+  },
+  loginAttempts: {
+    type: Number,
+    required: true,
+    default: 0
+  },
+  lockUntil: {
+    type: Date
   }
 }, {
   timestamps: true
@@ -56,7 +70,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function() {
   if (!this.isModified('password')) return;
   
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(12); // Cost factor 12 for enterprise security
   this.password = await bcrypt.hash(this.password, salt);
 });
 

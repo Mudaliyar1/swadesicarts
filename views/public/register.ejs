@@ -43,6 +43,7 @@
                             <% } %>
 
                             <form action="/register" method="POST" id="registerForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <div class="mb-4">
                                     <label class="form-label fw-medium text-muted small ms-1 mb-1">Full Name *</label>
                                     <input type="text" class="form-control form-control-lg" name="name" placeholder="John Doe" required autofocus style="border-radius: 12px; font-size: 1rem;">

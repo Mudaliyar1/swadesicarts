@@ -13,6 +13,7 @@ const parseMediaQuery = (req, res, next) => {
     section: (req.query.section || '').trim(),
     dateFrom: req.query.dateFrom || '',
     dateTo: req.query.dateTo || '',
+    owner: req.query.owner || 'all',
     page: Math.max(1, toNumber(req.query.page, 1)),
     limit: Math.min(100, Math.max(12, toNumber(req.query.limit, 24)))
   };

@@ -5,6 +5,7 @@ const Story = require('../models/Story');
 const SeasonalProduct = require('../models/SeasonalProduct');
 const OrganicProduct = require('../models/OrganicProduct');
 const TechPackage = require('../models/TechPackage');
+const User = require('../models/User');
 const { getCloudinaryUsage, getAllCloudinaryAssets, deleteCloudinaryAsset, inferFileType } = require('../helpers/cloudinaryHelper');
 
 const formatBytes = (bytes = 0) => {
@@ -33,7 +34,7 @@ const getCloudinaryUsageCached = async () => {
   return cachedCloudinaryUsage;
 };
 
-const buildUsageLocations = (asset, settings, companies, stories, seasonalProducts, organicProducts, techPackages) => {
+const buildUsageLocations = (asset, settings, companies, stories, seasonalProducts, organicProducts, techPackages, users) => {
   const locations = [];
   const publicUrl = asset.secureUrl || '';
   const publicId = asset.publicId || '';
@@ -124,6 +125,12 @@ const buildUsageLocations = (asset, settings, companies, stories, seasonalProduc
     }
   });
 
+  users.forEach((user) => {
+    if (user.profileImage && (user.profileImage === publicUrl || user.profileImage.includes(publicId))) {
+      pushLocation('User', user._id, user.name || user.email, 'User Profile Avatar');
+    }
+  });
+
   return locations;
 };
 
@@ -133,17 +140,18 @@ const syncMediaLibrary = async (force = false) => {
   try {
     const assets = await getAllCloudinaryAssets();
     
-    const [settings, companies, stories, seasonalProducts, organicProducts, techPackages] = await Promise.all([
+    const [settings, companies, stories, seasonalProducts, organicProducts, techPackages, users] = await Promise.all([
       WebsiteSetting.findOne().lean(),
       Company.find({}).lean(),
       Story.find({}).lean(),
       SeasonalProduct.find({}).lean(),
       OrganicProduct.find({}).lean(),
-      TechPackage.find({}).lean()
+      TechPackage.find({}).lean(),
+      User.find({}).lean()
     ]);
 
     const syncPromises = assets.map(async (asset) => {
-      const usageLocations = buildUsageLocations(asset, settings, companies, stories, seasonalProducts, organicProducts, techPackages);
+      const usageLocations = buildUsageLocations(asset, settings, companies, stories, seasonalProducts, organicProducts, techPackages, users);
       const primaryUsage = usageLocations[0] || {};
 
       const payload = {
@@ -193,6 +201,12 @@ const applyFilters = async (filters) => {
     query.isUsed = false;
   }
 
+  if (filters.owner === 'user') {
+    query['usageLocations.relatedModel'] = 'User';
+  } else if (filters.owner === 'admin') {
+    query['usageLocations.relatedModel'] = { $ne: 'User' };
+  }
+
   if (filters.search) {
     const escaped = filters.search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const regex = new RegExp(escaped, 'i');
@@ -230,6 +244,7 @@ const applyFilters = async (filters) => {
     Media.find(query).sort(sort).skip(skip).limit(filters.limit).lean(),
     Media.countDocuments(query),
     Media.aggregate([
+      { $match: query },
       {
         $group: {
           _id: null,
@@ -325,7 +340,9 @@ exports.index = async (req, res) => {
         pdfCount: countsByType.pdf?.count || 0,
         documentCount: countsByType.document?.count || 0,
         usedCount: usageSummary.usedCount || 0,
-        unusedCount: analytics.unusedCount || 0
+        unusedCount: analytics.unusedCount || 0,
+        filteredStorageBytes: usageSummary.totalBytes || 0,
+        filteredCount: total
       },
       analytics: {
         mostUsed: analytics.mostUsed,

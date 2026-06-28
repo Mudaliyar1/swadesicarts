@@ -117,6 +117,7 @@
                                 <i class="bi bi-chat-dots text-swadesi"></i> Submit Inquiry
                             </h5>
                             <form action="/seasonal-products/inquiry" method="POST" id="inquiryForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <input type="hidden" name="productId" value="<%= product._id %>">
 
                                 <div class="mb-3">

@@ -4,16 +4,10 @@ const sendEmail = require('../helpers/email');
 // Get all tickets for logged in user
 exports.getUserTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find({ user: req.session.userId }).sort({ updatedAt: -1 });
-    
-    res.render('public/tickets', {
-      title: 'My Tickets - Swadesi Carts',
-      tickets,
-      currentPage: 'profile'
-    });
+    // Redirect to the profile page where the tickets tab is located
+    res.redirect('/profile?tab=tickets');
   } catch (error) {
-    console.error('Error fetching tickets:', error);
-    req.flash('error', 'Could not load your tickets');
+    console.error('Error redirecting to profile tickets:', error);
     res.redirect('/profile');
   }
 };

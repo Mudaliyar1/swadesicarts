@@ -64,6 +64,7 @@
                 </div>
                 <% if (stats.totalMissing > 0) { %>
                     <form action="/admin/geo/bulk-generate" method="POST" onsubmit="return confirm('This will dynamically build GEO / AI fields for all products and packages where they are currently blank. Proceed?');">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <button type="submit" class="btn btn-success fw-semibold shadow-sm">
                             <i class="bi bi-magic me-1"></i> Auto-Fill <%= stats.totalMissing %> Missing Products
                         </button>

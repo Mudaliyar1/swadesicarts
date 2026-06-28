@@ -192,10 +192,16 @@ exports.login = async (req, res) => {
       return res.redirect('/login');
     }
 
-    const user = await User.findOne({ email, isActive: true });
+    const user = await User.findOne({ email, isActive: true }).select('+password +loginAttempts +lockUntil');
 
     if (!user) {
       req.flash('error', 'Invalid credentials');
+      return res.redirect('/login');
+    }
+
+    // Check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      req.flash('error', 'Account locked due to too many failed attempts. Try again later.');
       return res.redirect('/login');
     }
 
@@ -207,32 +213,51 @@ exports.login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
+      // Increment login attempts
+      user.loginAttempts += 1;
+      if (user.loginAttempts >= 5) {
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // Lock for 15 minutes
+      }
+      await user.save();
+
       req.flash('error', 'Invalid credentials');
       return res.redirect('/login');
     }
 
-    // Set session
-    req.session.userId = user._id;
-    req.session.userName = user.name;
-    req.session.userEmail = user.email;
-
-    // Check for linked Admin account and sync session
-    const linkedAdmin = await Admin.findOne({ email: user.email, isActive: true });
-    if (linkedAdmin) {
-      req.session.adminId = linkedAdmin._id;
-      req.session.adminName = linkedAdmin.name;
-      req.session.adminEmail = linkedAdmin.email;
-    }
-
-    // Track security details
+    // Reset login attempts and track security details on success
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
     user.lastLoginIp = req.ip || req.connection.remoteAddress;
     user.lastLoginUserAgent = req.headers['user-agent'] || 'Unknown Device';
     await user.save();
 
-    req.session.save((err) => {
-        if (err) console.error('Session save error:', err);
-        req.flash('success', 'Login successful');
-        res.redirect('/');
+    // Check for linked Admin account and sync session
+    const linkedAdmin = await Admin.findOne({ email: user.email, isActive: true });
+    
+    // Rotate session ID to prevent Session Fixation
+    req.session.regenerate(async (err) => {
+      if (err) {
+        console.error('Session regeneration error:', err);
+        req.flash('error', 'An error occurred during login');
+        return res.redirect('/login');
+      }
+
+      // Set session
+      req.session.userId = user._id;
+      req.session.userName = user.name;
+      req.session.userEmail = user.email;
+
+      if (linkedAdmin) {
+        req.session.adminId = linkedAdmin._id;
+        req.session.adminName = linkedAdmin.name;
+        req.session.adminEmail = linkedAdmin.email;
+      }
+
+      req.session.save((saveErr) => {
+          if (saveErr) console.error('Session save error:', saveErr);
+          req.flash('success', 'Login successful');
+          res.redirect('/');
+      });
     });
   } catch (error) {
     console.error('Login error:', error);

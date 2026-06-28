@@ -51,6 +51,7 @@
                             <% } %>
 
                             <form action="/verify-otp" method="POST" id="verifyForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <input type="hidden" name="email" value="<%= email %>">
                                 
                                 <div class="mb-4">

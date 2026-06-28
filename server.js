@@ -11,12 +11,51 @@ const seoMiddleware = require('./middleware/seoMiddleware');
 const geoMiddleware = require('./middleware/geoMiddleware');
 const startEmailSync = require('./services/emailSync');
 const { Server } = require('socket.io');
+const mongoSanitize = require('express-mongo-sanitize');
+const securityValidation = require('./middleware/securityValidation');
+const helmet = require('helmet');
+const hpp = require('hpp');
+const cors = require('cors');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+const { csrfMiddleware } = require('./middleware/csrfProtection');
+const { globalLimiter } = require('./middleware/rateLimiters');
+const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Trust proxies to get correct internet IPs
-app.set('trust proxy', true);
+// Remove Express fingerprinting
+app.disable('x-powered-by');
+
+// Trust proxies to get correct internet IPs (for Cloudflare/Nginx)
+app.set('trust proxy', 1);
+
+// Production Logging
+if (process.env.NODE_ENV === 'production') {
+    app.use(morgan('combined'));
+} else {
+    app.use(morgan('dev'));
+}
+
+// Helmet Security Headers (Strict CSP)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
+      imgSrc: ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://flagcdn.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+      mediaSrc: ["'self'", "blob:", "https://res.cloudinary.com"],
+      connectSrc: ["'self'", "https://d1zv2aa70wpiur.cloudfront.net", "https://s3.amazonaws.com", "https://storage.googleapis.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "blob:", "data:"]
+    },
+  },
+  crossOriginEmbedderPolicy: false // Prevent breaking external cloudinary/flagcdn images
+}));
+
+// Cross-Origin Resource Sharing
+app.use(cors());
 
 // Connect to MongoDB
 connectDB();
@@ -26,8 +65,14 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Middleware - Increase body size limits for large file uploads
-app.use(express.json({ limit: '500mb' }));
-app.use(express.urlencoded({ extended: true, limit: '500mb' }));
+app.use(express.json({ limit: '10mb' })); // Reduced JSON size for DOS protection
+app.use(express.urlencoded({ extended: true, limit: '10mb' })); // Reduced URL Encoded size for DOS protection
+
+// HTTP Parameter Pollution Protection
+app.use(hpp());
+
+
+
 app.get('/favicon.ico', (req, res) => res.redirect(301, '/favicon.svg'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(methodOverride('_method'));
@@ -41,19 +86,27 @@ app.use((req, res, next) => {
 
 // Session configuration
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'swadesi-carts-secret-key',
+  name: 'swadesi.sid', // Mask default connect.sid
+  secret: process.env.SESSION_SECRET || 'swadesi-carts-secret-key-super-secure',
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: false, // Don't save empty sessions
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     touchAfter: 24 * 3600 // Lazy session update
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production'
+    httpOnly: true, // Prevent XSS stealing cookies
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in prod
+    sameSite: 'lax' // CSRF mitigation
   }
 }));
+
+// Cookie Parser (required for CSRF)
+app.use(cookieParser(process.env.SESSION_SECRET || 'swadesi-carts-secret-key-super-secure'));
+
+// Apply CSRF Protection to all routes
+app.use(csrfMiddleware);
 
 app.use(flash());
 
@@ -77,6 +130,15 @@ app.use((req, res, next) => {
   res.locals.userName = req.session ? req.session.userName : '';
   next();
 });
+
+// Apply Global Rate Limiter
+app.use(globalLimiter);
+
+// Global Security Middleware
+app.use(mongoSanitize({
+  replaceWith: '_' // Replaces prohibited characters ($, .) with an underscore
+}));
+app.use(securityValidation);
 
 // Routes
 const publicRoutes = require('./routes/public');
@@ -110,41 +172,7 @@ app.use((req, res) => {
 });
 
 // Error Handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  
-  // Handle Multer errors
-  if (err.name === 'MulterError') {
-    console.log('Multer Error Details:', err.code, err.field);
-    let errorMessage = 'File upload error';
-    
-    switch(err.code) {
-      case 'LIMIT_FILE_SIZE':
-        errorMessage = 'File size is too large. Maximum size is 2GB per file.';
-        break;
-      case 'LIMIT_FILE_COUNT':
-        errorMessage = 'Too many files uploaded.';
-        break;
-      case 'LIMIT_UNEXPECTED_FILE':
-        errorMessage = `Unexpected file field "${err.field}". Please make sure you are uploading files in the correct fields (Featured Image and Gallery).`;
-        break;
-      case 'LIMIT_FIELD_COUNT':
-        errorMessage = 'Too many form fields.';
-        break;
-      default:
-        errorMessage = 'File upload error: ' + err.message;
-    }
-    
-    req.flash('error', errorMessage);
-    return res.redirect('back');
-  }
-  
-  res.status(500).render('public/500', {
-    title: 'Server Error',
-    currentPage: '',
-    error: process.env.NODE_ENV === 'development' ? err : {}
-  });
-});
+app.use(errorHandler);
 
 // Start server
 const server = app.listen(PORT, () => {

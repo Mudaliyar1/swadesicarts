@@ -14,11 +14,12 @@ const visitorController = require('../controllers/admin/visitorController');
 const adminUserController = require('../controllers/admin/userController');
 const ticketController = require('../controllers/ticketController');
 const { isAuthenticated, isGuest } = require('../middleware/auth');
+const { loginLimiter } = require('../middleware/rateLimiters');
 const upload = require('../config/multer');
 
 // Auth routes
 router.get('/login', isGuest, authController.showLogin);
-router.post('/login', isGuest, authController.login);
+router.post('/login', isGuest, loginLimiter, authController.login);
 router.get('/logout', authController.logout);
 
 // Dashboard

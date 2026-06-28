@@ -1,7 +1,23 @@
 const User = require('../models/User');
 const Admin = require('../models/Admin');
+const Ticket = require('../models/Ticket');
 const bcrypt = require('bcryptjs');
 const sendEmail = require('../helpers/email');
+const cloudinary = require('../config/cloudinary');
+
+// Helper function to upload buffer to Cloudinary
+const uploadToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: folder, resource_type: 'image' },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 // Show Profile Page
 exports.showProfile = async (req, res) => {
@@ -12,9 +28,12 @@ exports.showProfile = async (req, res) => {
             return res.redirect('/login');
         }
 
+        const tickets = await Ticket.find({ user: req.session.userId }).sort({ updatedAt: -1 });
+
         res.render('public/profile', {
             title: 'My Profile | Swadesi Carts',
             user,
+            tickets,
             error: req.flash('error'),
             success: req.flash('success')
         });
@@ -225,5 +244,33 @@ exports.updateEmail = async (req, res) => {
     } catch (error) {
         console.error('Error updating email:', error);
         res.status(500).json({ success: false, message: 'Failed to update email.' });
+    }
+};
+
+// Upload Avatar
+exports.uploadAvatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: 'No image uploaded.' });
+        }
+
+        const user = await User.findById(req.session.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        // Upload to cloudinary
+        const result = await uploadToCloudinary(req.file.buffer, 'swadesi-carts/avatars');
+
+        // Optional: If you want to delete the old avatar from Cloudinary, you can do it here
+        // if (user.profileImage && user.profileImage.includes('cloudinary')) { ... }
+
+        user.profileImage = result.secure_url;
+        await user.save();
+
+        res.json({ success: true, message: 'Profile picture updated successfully!', url: result.secure_url });
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        res.status(500).json({ success: false, message: 'Server error while uploading image.' });
     }
 };

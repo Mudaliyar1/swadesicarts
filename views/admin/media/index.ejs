@@ -299,7 +299,16 @@
                             <div class="media-stat-icon"><i class="bi bi-hdd"></i></div>
                             <div>
                                 <div class="text-muted small">Used Storage</div>
-                                <div class="fw-bold"><%= stats.totalStorageBytes ? Math.round((stats.totalStorageBytes / (1024 * 1024)) * 10) / 10 : 0 %> MB</div>
+                                <div class="fw-bold">
+                                    <% 
+                                    const isFiltered = filters.search || filters.type !== 'all' || filters.usage !== 'all' || filters.section || filters.dateFrom || filters.dateTo || filters.owner !== 'all';
+                                    if (isFiltered) { 
+                                    %>
+                                        <span class="text-swadesi"><%= formatBytes(stats.filteredStorageBytes) %></span> <span class="fw-normal text-muted fs-6">/ <%= formatBytes(stats.totalStorageBytes) %></span>
+                                    <% } else { %>
+                                        <%= formatBytes(stats.totalStorageBytes) %>
+                                    <% } %>
+                                </div>
                             </div>
                         </div>
                         <div class="progress mt-3" style="height: 8px;">
@@ -317,7 +326,13 @@
                             <div class="media-stat-icon"><i class="bi bi-folder2"></i></div>
                             <div>
                                 <div class="text-muted small">Total Assets</div>
-                                <div class="fw-bold"><%= stats.totalAssets %></div>
+                                <div class="fw-bold">
+                                    <% if (isFiltered) { %>
+                                        <span class="text-swadesi"><%= stats.filteredCount %></span> <span class="fw-normal text-muted fs-6">/ <%= stats.totalAssets %></span>
+                                    <% } else { %>
+                                        <%= stats.totalAssets %>
+                                    <% } %>
+                                </div>
                             </div>
                         </div>
                         <div class="small text-muted mt-3">Used: <%= stats.usedCount %> | Unused: <%= stats.unusedCount %></div>
@@ -387,6 +402,14 @@
                             <input type="text" class="form-control" name="search" value="<%= filters.search %>" placeholder="File name, public ID, page">
                         </div>
                         <div class="col-6 col-md-3 col-lg-2">
+                            <label class="form-label">Uploader</label>
+                            <select class="form-select" name="owner">
+                                <option value="all" <%= filters.owner === 'all' ? 'selected' : '' %>>All</option>
+                                <option value="admin" <%= filters.owner === 'admin' ? 'selected' : '' %>>Admin</option>
+                                <option value="user" <%= filters.owner === 'user' ? 'selected' : '' %>>User</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2">
                             <label class="form-label">Type</label>
                             <select class="form-select" name="type">
                                 <option value="all" <%= filters.type === 'all' ? 'selected' : '' %>>All</option>
@@ -406,7 +429,18 @@
                         </div>
                         <div class="col-12 col-md-4 col-lg-2">
                             <label class="form-label">Section</label>
-                            <input type="text" class="form-control" name="section" value="<%= filters.section %>" placeholder="Homepage, Company...">
+                            <input type="text" class="form-control" name="section" value="<%= filters.section %>" placeholder="Homepage, Company..." list="sectionOptions">
+                            <datalist id="sectionOptions">
+                                <option value="Site Logo"></option>
+                                <option value="Homepage Carousel"></option>
+                                <option value="About Page"></option>
+                                <option value="Company Logo"></option>
+                                <option value="Story Media"></option>
+                                <option value="Featured Image"></option>
+                                <option value="Gallery Item"></option>
+                                <option value="User Profile Avatar"></option>
+                                <option value="User"></option>
+                            </datalist>
                         </div>
                         <div class="col-6 col-md-3 col-lg-1">
                             <label class="form-label">From</label>
@@ -421,8 +455,8 @@
                         </div>
                     </form>
                     <div class="d-flex flex-wrap gap-2 mt-3">
-                        <a class="btn btn-sm <%= filters.view === 'grid' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=grid&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-grid-3x3-gap"></i> Grid</a>
-                        <a class="btn btn-sm <%= filters.view === 'table' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=table&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-list"></i> Table</a>
+                        <a class="btn btn-sm <%= filters.view === 'grid' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=grid&owner=<%= filters.owner %>&search=<%= encodeURIComponent(filters.search) %>&owner=<%= filters.owner %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-grid-3x3-gap"></i> Grid</a>
+                        <a class="btn btn-sm <%= filters.view === 'table' ? 'btn-swadesi' : 'btn-outline-secondary' %>" href="?view=table&owner=<%= filters.owner %>&search=<%= encodeURIComponent(filters.search) %>&owner=<%= filters.owner %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>"><i class="bi bi-list"></i> Table</a>
                         <div class="ms-auto small text-muted align-self-center">Page <%= pagination.page %> of <%= pagination.totalPages %></div>
                     </div>
                 </div>
@@ -569,14 +603,14 @@
             <nav class="mt-4">
                 <ul class="pagination justify-content-center">
                     <li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-                        <a class="page-link" href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
+                        <a class="page-link" href="?page=<%= pagination.page - 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&owner=<%= filters.owner %>&search=<%= encodeURIComponent(filters.search) %>&owner=<%= filters.owner %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
                             <span class="d-none d-sm-inline">Previous</span>
                             <span class="d-inline d-sm-none">&laquo;</span>
                         </a>
                     </li>
                     <li class="page-item disabled"><span class="page-link">Page <%= pagination.page %> / <%= pagination.totalPages %></span></li>
                     <li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-                        <a class="page-link" href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&search=<%= encodeURIComponent(filters.search) %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
+                        <a class="page-link" href="?page=<%= pagination.page + 1 %>&limit=<%= pagination.limit %>&view=<%= filters.view %>&owner=<%= filters.owner %>&search=<%= encodeURIComponent(filters.search) %>&owner=<%= filters.owner %>&type=<%= filters.type %>&usage=<%= filters.usage %>&section=<%= encodeURIComponent(filters.section) %>&dateFrom=<%= filters.dateFrom %>&dateTo=<%= filters.dateTo %>">
                             <span class="d-none d-sm-inline">Next</span>
                             <span class="d-inline d-sm-none">&raquo;</span>
                         </a>
@@ -618,7 +652,7 @@
                                 <a id="detailDownloadBtn" href="#" target="_blank" rel="noopener" class="btn btn-swadesi"><i class="bi bi-download"></i> Download</a>
                                 <button type="button" id="detailDeleteBtn" class="btn btn-outline-danger"><i class="bi bi-trash"></i> Delete</button>
                             </div>
-                            <div class="alert alert-warning mt-3 d-none" id="detailUsageWarning"></div>
+                            <div class="alert alert-warning mt-3 d-none alert-permanent" id="detailUsageWarning"></div>
                         </div>
                     </div>
                 </div>

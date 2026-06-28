@@ -143,6 +143,7 @@
                                 <i class="bi bi-chat-dots text-swadesi"></i> Request Quote
                             </h5>
                             <form action="/tech-packages/inquiry" method="POST" id="inquiryForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <input type="hidden" name="productId" value="<%= package._id %>">
 
                                 <div class="mb-3">

@@ -1,54 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title %>
+    </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/css/intlTelInput.css">
     <link rel="stylesheet" href="/css/style-new.css">
+    <style>
+        /* Fix intl-tel-input to match our glassy theme */
+        .iti { width: 100%; display: block; }
+        .iti__flag-container { z-index: 5; }
+        .iti__selected-flag { border-radius: 8px 0 0 8px; }
+        .iti__country-list { z-index: 9999 !important; border-radius: 8px !important; border: 1px solid var(--ent-border) !important; background: var(--ent-bg-card) !important; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2) !important; padding: 8px !important; margin-top: 4px !important; }
+        .iti__country { color: var(--ent-text-main) !important; border-radius: 4px !important; padding: 8px 12px !important; }
+        .iti__country.iti__highlight { background-color: var(--ent-bg-body) !important; }
+        .iti__search-input { width: 100% !important; padding: 8px 12px !important; border: 1px solid var(--ent-border) !important; border-radius: 6px !important; background: var(--ent-bg-body) !important; color: var(--ent-text-main) !important; margin-bottom: 8px !important; outline: none !important; box-shadow: none !important; }
+        .iti__search-input:focus { border-color: var(--ent-brand) !important; }
+        #phoneInput { padding-left: 105px !important; }
+    </style>
     <%- include('../partials/dynamic-styles') %>
-    <% if (typeof seo !== 'undefined') { %>
-        <%- include('../partials/seo-meta') %>
-    <% } %>
+        <% if (typeof seo !=='undefined' ) { %>
+            <%- include('../partials/seo-meta') %>
+                <% } %>
 
-    <%
+<% 
     let isDarkTheme = false; 
-    let btnTextColor = '#111111'; // Default dark text for bright buttons (like yellow)
-    if (typeof siteSettings !== 'undefined' && siteSettings.colors) {
-        // Method 1: Check background color explicitly
-        let bgValue = siteSettings.colors.bodyBackgroundColor || siteSettings.colors.background || '';
-        bgValue = bgValue.trim();
+    let btnTextColor = '#111111'; 
+    
+    if (typeof siteSettings !== 'undefined' && siteSettings.colors) { 
+        let bgValue = siteSettings.colors.bodyBackgroundColor || siteSettings.colors.background || ''; 
+        bgValue = bgValue.trim(); 
         
-        // Method 2: Check text color (if text is bright, theme is dark)
-        let textValue = siteSettings.colors.bodyText || '#000000';
-        textValue = textValue.trim();
-
-        // Calculate body background brightness
-        if (bgValue.startsWith('#')) {
-            let hex = bgValue.replace('#', '');
+        let textValue = siteSettings.colors.bodyText || '#000000'; 
+        textValue = textValue.trim(); 
+        
+        if (bgValue.startsWith('#')) { 
+            let hex = bgValue.replace('#', ''); 
             if (hex.length === 3) hex = hex.split('').map(char => char + char).join('');
             if (hex.length === 6) {
                 const r = parseInt(hex.substr(0, 2), 16);
                 const g = parseInt(hex.substr(2, 2), 16);
                 const b = parseInt(hex.substr(4, 2), 16);
                 const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-                isDarkTheme = brightness < 128;
-            }
-        } else if (textValue.startsWith('#')) {
-            let hex = textValue.replace('#', '');
+                isDarkTheme = brightness < 128; 
+            } 
+        } else if (textValue.startsWith('#')) { 
+            let hex = textValue.replace('#', ''); 
             if (hex.length === 3) hex = hex.split('').map(char => char + char).join('');
             if (hex.length === 6) {
                 const r = parseInt(hex.substr(0, 2), 16);
                 const g = parseInt(hex.substr(2, 2), 16);
                 const b = parseInt(hex.substr(4, 2), 16);
                 const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-                isDarkTheme = brightness > 128; // Bright text means dark theme
+                isDarkTheme = brightness > 128; 
             }
         }
 
-        // Calculate accent color brightness for button text contrast
         let accentValue = siteSettings.colors.accent || '#FFD700';
         accentValue = accentValue.trim();
         if (accentValue.startsWith('#')) {
@@ -59,479 +73,1129 @@
                 const g = parseInt(hex.substr(2, 2), 16);
                 const b = parseInt(hex.substr(4, 2), 16);
                 const brightness = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-                if (brightness < 128) {
-                    btnTextColor = '#ffffff'; // Dark button needs white text
-                }
-            }
-        }
-    }
-    %>
+                if (brightness < 128) { 
+                    btnTextColor = '#ffffff'; 
+                } 
+            } 
+        } 
+    } 
+%>
 
-    <style>
-        :root {
-            --profile-card-bg: <%= isDarkTheme ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 1)' %>;
-            --profile-card-border: <%= isDarkTheme ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)' %>;
-            --profile-input-bg: <%= isDarkTheme ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.02)' %>;
-            --profile-input-border: <%= isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)' %>;
-            --profile-shadow: <%= isDarkTheme ? '0 10px 40px rgba(0, 0, 0, 0.2)' : '0 10px 40px rgba(0, 0, 0, 0.05)' %>;
-            --profile-hover-bg: <%= isDarkTheme ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)' %>;
-            --profile-divider: <%= isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)' %>;
-            
-            /* Fallback accent if siteSettings doesn't have one */
-            --accent-color: <%= (typeof siteSettings !== 'undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent : '#FFD700' %>;
-            --btn-text-color: <%= btnTextColor %>;
-        }
+                                <style>
+                                    :root {
+                                        --ent-bg: #f8f9fa;
+                                        --ent-card-bg: #ffffff;
+                                        --ent-border: rgba(0,0,0,0.1);
+                                        --ent-text-main: #000000;
+                                        --ent-text-muted: #334155;
+                                        --ent-input-bg: #ffffff;
+                                        --ent-input-border: rgba(0,0,0,0.15);
+                                        --ent-hover: rgba(0,0,0,0.03);
+                                        --accent-color: <%=(typeof siteSettings !=='undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent: '#0070f3' %>;
+                                        --btn-text-color: <%=btnTextColor %>;
+                                    }
 
-        .profile-container {
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 40px 15px;
-            color: #ffffff !important; /* Force white text for the profile section */
-        }
+                                    body {
+                                        background-color: var(--ent-bg);
+                                        color: var(--ent-text-main) !important;
+                                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                    }
 
-        .profile-container h1, 
-        .profile-container h2, 
-        .profile-container h3, 
-        .profile-container h4, 
-        .profile-container h5, 
-        .profile-container h6,
-        .profile-container p,
-        .profile-container span,
-        .profile-container div {
-            color: #ffffff !important;
-        }
+                                    .ent-layout h1, 
+                                    .ent-layout h2, 
+                                    .ent-layout h3, 
+                                    .ent-layout h4, 
+                                    .ent-layout h5, 
+                                    .ent-layout h6, 
+                                    .ent-layout p, 
+                                    .ent-layout span, 
+                                    .ent-layout label,
+                                    .ent-layout div,
+                                    .ent-page-title,
+                                    .ent-card-title,
+                                    .ent-label-title {
+                                        color: #000000 !important;
+                                    }
+                                    
+                                    .text-muted-custom,
+                                    .ent-label-desc,
+                                    .ent-card-desc,
+                                    .ent-nav-link,
+                                    .ent-sidebar-heading {
+                                        color: #334155 !important;
+                                    }
 
-        .profile-card {
-            background: var(--profile-card-bg);
-            border: 1px solid var(--profile-card-border);
-            border-radius: 20px;
-            box-shadow: var(--profile-shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            overflow: hidden;
-        }
+                                    .text-muted-custom {
+                                        font-size: 1.05rem;
+                                    }
 
-        .avatar-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: var(--accent-color);
-            color: var(--btn-text-color); /* Dynamically use white or black depending on accent brightness */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: 800;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
+                                    /* Desktop Glassmorphism Page Wrapper */
+                                    .glass-page-bg {
+                                        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+                                        min-height: calc(100vh - var(--navbar-offset, 0px));
+                                        padding: 60px 24px;
+                                    }
+                                    .glass-container {
+                                        max-width: 1600px;
+                                        width: 95%;
+                                        margin: 0 auto;
+                                        background: rgba(255, 255, 255, 0.4);
+                                        backdrop-filter: blur(20px);
+                                        -webkit-backdrop-filter: blur(20px);
+                                        border: 1px solid rgba(255, 255, 255, 0.7);
+                                        border-radius: 24px;
+                                        padding: 16px;
+                                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+                                    }
 
-        .profile-nav {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+                                    /* Enterprise Layout */
+                                    .ent-layout {
+                                        display: flex;
+                                        background: rgba(255, 255, 255, 0.95);
+                                        border-radius: 16px;
+                                        min-height: 700px;
+                                        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 1);
+                                        overflow: hidden;
+                                        margin: 0;
+                                        padding: 0;
+                                        gap: 0;
+                                    }
 
-        .profile-nav .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 0.85rem 1.2rem;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            margin-bottom: 0.3rem;
-            color: #ffffff !important; /* Force white text for normal links */
-            /* opacity removed for max visibility */
-        }
+                                    /* Sidebar */
+                                    .ent-sidebar {
+                                        width: 280px;
+                                        flex-shrink: 0;
+                                        position: sticky;
+                                        top: 100px;
+                                        background: #f8fafc;
+                                        padding: 32px 24px;
+                                        border-right: 1px solid rgba(0, 0, 0, 0.03);
+                                    }
 
-        .profile-nav .nav-link:hover, 
-        .profile-nav .nav-link.active {
-            background: var(--profile-hover-bg);
-            color: #ffffff !important; /* Keep text white for maximum visibility */
-            transform: translateX(4px);
-        }
+                                    .ent-nav-link {
+                                        display: flex;
+                                        align-items: center;
+                                        padding: 12px 16px;
+                                        margin-bottom: 8px;
+                                        border-radius: 12px;
+                                        font-size: 1.05rem;
+                                        font-weight: 500;
+                                        color: #64748b !important;
+                                        text-decoration: none;
+                                        transition: all 0.3s ease;
+                                    }
 
-        .profile-nav .nav-link:hover i,
-        .profile-nav .nav-link.active i {
-            color: #ffffff !important;
-        }
+                                    .ent-nav-link i {
+                                        margin-right: 12px;
+                                        font-size: 1.3rem;
+                                    }
 
-        .profile-nav .nav-link::after,
-        .profile-nav .nav-link::before {
-            display: none !important; /* Prevent global navbar underlines from appearing here */
-        }
+                                    .ent-nav-link:hover {
+                                        background: #ffffff;
+                                        color: #3b82f6 !important;
+                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                                    }
 
-        .profile-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 0.5rem;
-            /* opacity removed for max visibility */
-        }
+                                    .ent-nav-link.active {
+                                        background: #ffffff;
+                                        color: #3b82f6 !important;
+                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                                        font-weight: 600;
+                                    }
+                                    .ent-nav-link.active i {
+                                        color: #3b82f6 !important;
+                                    }
 
-        .profile-input {
-            background: var(--profile-input-bg) !important;
-            border: 1.5px solid var(--profile-input-border) !important;
-            border-radius: 12px !important;
-            padding: 0.85rem 1.2rem !important;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: none !important;
-            color: #ffffff !important; /* Force white text in inputs */
-        }
+                                    /* Main Content */
+                                    .ent-content {
+                                        flex: 1;
+                                        max-width: 100%;
+                                        padding: 40px;
+                                    }
+                                    
+                                    .ent-page-header {
+                                        margin-bottom: 32px;
+                                        padding-bottom: 24px;
+                                        border-bottom: 1px solid rgba(0,0,0,0.03);
+                                    }
 
-        .profile-input:focus {
-            border-color: var(--accent-color) !important;
-            box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.1) !important;
-            background: var(--profile-card-bg) !important;
-        }
+                                    .ent-page-title {
+                                        font-size: 2.25rem;
+                                        font-weight: 600;
+                                        letter-spacing: -0.02em;
+                                        margin-bottom: 8px;
+                                    }
 
-        .profile-input::placeholder {
-            color: rgba(255, 255, 255, 0.6) !important; /* White placeholder */
-            opacity: 1; /* Reset opacity since color has alpha */
-        }
+                                    /* Enterprise Card */
+                                    .ent-card {
+                                        border: none;
+                                        border-radius: 16px;
+                                        background: #ffffff;
+                                        overflow: hidden;
+                                        margin-bottom: 32px;
+                                        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+                                    }
 
-        .profile-btn {
-            background: var(--accent-color);
-            color: var(--btn-text-color) !important; /* Dynamically set based on button contrast */
-            border: none;
-            border-radius: 12px;
-            padding: 0.85rem 1.8rem;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+                                    .ent-card-header {
+                                        padding: 24px;
+                                        border-bottom: 1px solid rgba(0,0,0,0.03);
+                                    }
 
-        .profile-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            filter: brightness(1.05);
-        }
+                                    .ent-card-title {
+                                        font-size: 1.25rem;
+                                        font-weight: 600;
+                                        margin-bottom: 4px;
+                                    }
+                                    
+                                    .ent-card-desc {
+                                        font-size: 0.95rem;
+                                        color: var(--ent-text-muted) !important;
+                                        margin: 0;
+                                    }
 
-        .section-header {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--profile-divider);
-        }
+                                    .ent-card-body {
+                                        padding: 24px;
+                                    }
+                                    
+                                    .ent-card-footer {
+                                        padding: 16px 24px;
+                                        background: #f8fafc;
+                                        border-top: 1px solid rgba(0,0,0,0.03);
+                                        display: flex;
+                                        justify-content: flex-end;
+                                        align-items: center;
+                                    }
 
-        .theme-alert {
-            border-radius: 16px;
-            border: 1px solid var(--profile-card-border);
-            backdrop-filter: blur(8px);
-        }
-    </style>
+                                    /* Split Form Layout inside Card */
+                                    .ent-form-row {
+                                        display: flex;
+                                        padding: 24px 0;
+                                        border-bottom: 1px solid rgba(0,0,0,0.03);
+                                    }
+                                    
+                                    .ent-form-row:first-child {
+                                        padding-top: 0;
+                                    }
+                                    
+                                    .ent-form-row:last-child {
+                                        padding-bottom: 0;
+                                        border-bottom: none;
+                                    }
+
+                                    .ent-form-label-col {
+                                        width: 35%;
+                                        padding-right: 32px;
+                                    }
+
+                                    .ent-form-input-col {
+                                        width: 65%;
+                                    }
+
+                                    .ent-label-title {
+                                        display: block;
+                                        font-size: 1rem;
+                                        font-weight: 600;
+                                        margin-bottom: 4px;
+                                    }
+
+                                    .ent-label-desc {
+                                        display: block;
+                                        font-size: 0.95rem;
+                                        color: var(--ent-text-muted) !important;
+                                        line-height: 1.5;
+                                    }
+
+                                    /* Inputs & Buttons */
+                                    .ent-input {
+                                        width: 100%;
+                                        background: var(--ent-input-bg) !important;
+                                        border: 1px solid var(--ent-input-border) !important;
+                                        border-radius: 6px !important;
+                                        padding: 10px 14px !important;
+                                        font-size: 1rem !important;
+                                        color: var(--ent-text-main) !important;
+                                        transition: all 0.2s ease;
+                                    }
+
+                                    .ent-input:focus {
+                                        outline: none;
+                                        border-color: var(--accent-color) !important;
+                                        box-shadow: 0 0 0 1px var(--accent-color) !important;
+                                    }
+                                    
+                                    .ent-input:disabled, .ent-input[readonly] {
+                                        background: var(--ent-hover) !important;
+                                        color: var(--ent-text-muted) !important;
+                                        cursor: not-allowed;
+                                    }
+
+                                    .ent-btn-primary {
+                                        background: var(--accent-color);
+                                        color: var(--btn-text-color);
+                                        border: 1px solid transparent;
+                                        border-radius: 6px;
+                                        padding: 6px 16px;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        transition: opacity 0.2s;
+                                        cursor: pointer;
+                                    }
+
+                                    .ent-btn-primary:hover {
+                                        opacity: 0.9;
+                                        color: var(--btn-text-color);
+                                    }
+                                    
+                                    .ent-btn-secondary {
+                                        background: transparent;
+                                        color: var(--ent-text-main);
+                                        border: 1px solid var(--ent-input-border);
+                                        border-radius: 6px;
+                                        padding: 6px 16px;
+                                        font-size: 0.875rem;
+                                        font-weight: 500;
+                                        transition: all 0.2s;
+                                        cursor: pointer;
+                                    }
+                                    
+                                    .ent-btn-secondary:hover {
+                                        border-color: var(--ent-text-muted);
+                                    }
+
+                                    .ent-avatar-container {
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 20px;
+                                    }
+
+                                    .ent-avatar {
+                                        width: 64px;
+                                        height: 64px;
+                                        border-radius: 50%;
+                                        background: var(--accent-color);
+                                        color: var(--btn-text-color);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-size: 1.5rem;
+                                        font-weight: 600;
+                                    }
+
+                                    @media (max-width: 768px) {
+                                        /* Mobile Reset for Glassmorphism */
+                                        .glass-page-bg { background: #fff; padding: 0; min-height: auto; }
+                                        .glass-container { background: none; backdrop-filter: none; border: none; box-shadow: none; padding: 0; border-radius: 0; }
+                                        
+                                        .ent-layout {
+                                            flex-direction: column;
+                                            gap: 0;
+                                            margin: 0 auto;
+                                            padding: 0;
+                                            border-radius: 0;
+                                            min-height: auto;
+                                            box-shadow: none;
+                                            background: #fff;
+                                        }
+                                        /* Mobile Settings Menu Logic */
+                                        .ent-layout.mobile-menu-active .ent-sidebar { display: block; }
+                                        .ent-layout.mobile-menu-active .ent-content { display: none; }
+                                        .ent-layout:not(.mobile-menu-active) .ent-sidebar { display: none; }
+                                        .ent-layout:not(.mobile-menu-active) .ent-content { display: block; padding: 20px; }
+                                        
+                                        .ent-sidebar {
+                                            width: 100%;
+                                            background: #fff;
+                                            min-height: calc(100vh - 60px);
+                                        }
+                                        .ent-nav-link {
+                                            padding: 18px 24px;
+                                            border-bottom: 1px solid #f0f0f0;
+                                            border-radius: 0;
+                                            font-size: 1.05rem;
+                                            color: #262626 !important;
+                                            background: #fff;
+                                        }
+                                        .ent-nav-link:hover, .ent-nav-link.active {
+                                            background: #fafafa;
+                                            color: #262626 !important;
+                                            font-weight: 500;
+                                        }
+                                        .ent-nav-link::after {
+                                            content: '\F285';
+                                            font-family: 'bootstrap-icons';
+                                            margin-left: auto;
+                                            color: #ccc;
+                                            font-size: 1.1rem;
+                                        }
+                                        .ent-sidebar-heading {
+                                            padding: 24px 24px 8px 24px !important;
+                                            margin-bottom: 0 !important;
+                                        }
+
+                                        .ent-form-row {
+                                            flex-direction: column;
+                                        }
+                                        .ent-form-label-col, .ent-form-input-col {
+                                            width: 100%;
+                                            padding-right: 0;
+                                        }
+                                        .ent-form-label-col {
+                                            margin-bottom: 12px;
+                                        }
+                                    }
+
+                                    /* Mobile Back Button */
+                                    .mobile-back-btn {
+                                        display: none;
+                                    }
+                                    @media (max-width: 768px) {
+                                        .mobile-back-btn {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            color: #007bff;
+                                            font-weight: 500;
+                                            font-size: 1.05rem;
+                                            cursor: pointer;
+                                            margin-bottom: 20px;
+                                        }
+                                        .mobile-back-btn i {
+                                            margin-right: 8px;
+                                            font-size: 1.2rem;
+                                        }
+                                    }
+
+
+                                    /* Tabs */
+                                    .ent-tab-content {
+                                        display: none;
+                                        animation: fadeIn 0.3s ease;
+                                    }
+                                    .ent-tab-content.active {
+                                        display: block;
+                                    }
+                                    @keyframes fadeIn {
+                                        from { opacity: 0; transform: translateY(5px); }
+                                        to { opacity: 1; transform: translateY(0); }
+                                    }
+
+                                    /* Tickets */
+                                    .sc-ticket-card {
+                                        background: var(--ent-card-bg);
+                                        border: 1px solid var(--ent-border);
+                                        border-radius: 8px;
+                                        padding: 20px;
+                                        margin-bottom: 16px;
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        transition: all 0.2s ease;
+                                        text-decoration: none;
+                                        color: inherit;
+                                    }
+                                    .sc-ticket-card:hover {
+                                        border-color: var(--ent-text-muted);
+                                        background: var(--ent-hover);
+                                        color: inherit;
+                                    }
+                                    .sc-ticket-id {
+                                        font-family: 'Inter', sans-serif;
+                                        font-size: 1rem;
+                                        font-weight: 600;
+                                        color: var(--ent-text-main);
+                                        margin-bottom: 4px;
+                                    }
+                                    .sc-ticket-subj {
+                                        font-size: 0.9rem;
+                                        color: var(--ent-text-muted);
+                                    }
+                                    .sc-badge {
+                                        font-size: 0.75rem;
+                                        padding: 4px 10px;
+                                        border-radius: 6px;
+                                        font-weight: 600;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.05em;
+                                    }
+                                    .bg-open { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+                                    .bg-pending { background: rgba(234, 179, 8, 0.1); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.2); }
+                                    .bg-resolved { background: rgba(34, 197, 94, 0.1); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.2); }
+                                    .bg-closed { background: rgba(107, 114, 128, 0.1); color: #6b7280; border: 1px solid rgba(107, 114, 128, 0.2); }
+                                </style>
 </head>
+
 <body>
     <%- include('../partials/navbar-new') %>
-    
-    <div class="profile-container">
-        
-        <!-- Alerts -->
-        <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-            <div class="alert alert-danger alert-dismissible fade show theme-alert mb-4" role="alert" style="background: rgba(220, 53, 69, 0.1);">
-                <i class="bi bi-exclamation-octagon-fill me-2"></i><%= error %>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <% } %>
-        
-        <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
-            <div class="alert alert-success alert-dismissible fade show theme-alert mb-4" role="alert" style="background: rgba(25, 135, 84, 0.1);">
-                <i class="bi bi-check-circle-fill me-2"></i><%= success %>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        <% } %>
 
-        <div class="row g-4">
+<div class="glass-page-bg">
+    <div class="glass-container">
+        <div class="ent-layout mobile-menu-active">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="ent-sidebar">
+            <nav>
+                <div class="ent-sidebar-heading" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">Personal</div>
+                <a href="#" class="ent-nav-link tab-link active" data-target="account-tab">
+                    <i class="bi bi-person" style="font-size: 1.25rem;"></i> Account
+                </a>
+                <a href="#" class="ent-nav-link tab-link" data-target="tickets-tab">
+                    <i class="bi bi-headset" style="font-size: 1.25rem;"></i> Support Tickets
+                </a>
+                
+                <div class="ent-sidebar-heading" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 24px; margin-bottom: 12px; color: var(--ent-text-muted); padding-left: 12px;">Billing</div>
+                <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="bi bi-receipt" style="font-size: 1.25rem;"></i> Invoices
+                </a>
+                <a href="#" class="ent-nav-link" style="opacity: 0.5; cursor: not-allowed;">
+                    <i class="bi bi-credit-card" style="font-size: 1.25rem;"></i> Payment Methods
+                </a>
+                
+                <div style="margin-top: 24px; border-top: 1px solid var(--ent-border); padding-top: 16px;" class="ent-sidebar-heading">
+                    <a href="/logout" class="ent-nav-link" style="color: #ff4545 !important;">
+                        <i class="bi bi-box-arrow-right" style="font-size: 1.25rem; color: #ff4545;"></i> Log out
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ent-content">
             
-            <!-- SIDEBAR DASHBOARD -->
-            <div class="col-lg-3">
-                <div class="profile-card p-4 h-100">
-                    <div class="text-center mb-4 pt-2">
-                        <div class="avatar-circle mx-auto mb-3">
-                            <%= user.name.charAt(0).toUpperCase() %>
-                        </div>
-                        <h4 class="fw-bold mb-1"><%= user.name %></h4>
-                        <p class="mb-0" style="font-size: 0.95rem;"><%= user.email %></p>
+            <div class="ent-page-header">
+                <div class="mobile-back-btn" id="mobileBackBtn"><i class="bi bi-arrow-left"></i> Settings</div>
+                <h1 class="ent-page-title" id="pageTitle">Account Settings</h1>
+                <p class="text-muted-custom m-0" id="pageDesc">Manage your profile details, email address, and security preferences.</p>
+            </div>
+
+            <!-- TAB CONTAINER -->
+            <div id="account-tab" class="ent-tab-content active">
+
+            <!-- Alerts -->
+            <% if (typeof error !=='undefined' && error && error.length> 0) { %>
+                <div class="alert alert-danger d-flex align-items-center" style="border-radius: 6px; border: 1px solid rgba(220, 53, 69, 0.3); background: rgba(220, 53, 69, 0.1); color: #ea868f;">
+                    <i class="bi bi-exclamation-triangle-fill me-3"></i>
+                    <div><%= error %></div>
+                </div>
+            <% } %>
+            <% if (typeof success !=='undefined' && success && success.length> 0) { %>
+                <div class="alert alert-success d-flex align-items-center" style="border-radius: 6px; border: 1px solid rgba(25, 135, 84, 0.3); background: rgba(25, 135, 84, 0.1); color: #75b798;">
+                    <i class="bi bi-check-circle-fill me-3"></i>
+                    <div><%= success %></div>
+                </div>
+            <% } %>
+
+            <!-- Profile Info Card -->
+            <form action="/profile" method="POST" id="profileForm" novalidate>
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="ent-card">
+                    <div class="ent-card-header">
+                        <h2 class="ent-card-title">General Information</h2>
+                        <p class="ent-card-desc">Update your personal details and how we can reach you.</p>
                     </div>
                     
-                    <hr style="border-color: var(--profile-divider); opacity: 1;" class="my-4">
+                    <div class="ent-card-body">
+                        
+                        <!-- Avatar Section -->
+                        <div class="ent-form-row">
+                            <div class="ent-form-label-col">
+                                <span class="ent-label-title">Avatar</span>
+                                <span class="ent-label-desc">This is your avatar. Click on the avatar to upload a custom one from your files.</span>
+                            </div>
+                            <div class="ent-form-input-col">
+                                <div class="ent-avatar-container">
+                                    <div class="ent-avatar" id="avatarPreviewContainer">
+                                        <% if (user.profileImage && user.profileImage !== '/images/default-avatar.png') { %>
+                                            <img src="<%= user.profileImage %>" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+                                        <% } else { %>
+                                            <%= user.name.charAt(0).toUpperCase() %>
+                                        <% } %>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="ent-btn-secondary" id="btnUploadAvatar">Upload New</button>
+                                        <input type="file" id="avatarInput" accept="image/jpeg, image/png, image/webp" style="display: none;">
+                                        <div id="avatarScanStatus" class="mt-2 text-muted" style="font-size: 0.8rem;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="ent-form-row">
+                            <div class="ent-form-label-col">
+                                <span class="ent-label-title">Display Name</span>
+                                <span class="ent-label-desc">Please enter your full name, or a display name you are comfortable with.</span>
+                            </div>
+                            <div class="ent-form-input-col">
+                                <input type="text" class="ent-input" name="name" value="<%= user.name %>" required>
+                                <div style="font-size: 0.75rem; margin-top: 8px; color: var(--ent-text-muted);">Please use 32 characters at maximum.</div>
+                            </div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="ent-form-row">
+                            <div class="ent-form-label-col">
+                                <span class="ent-label-title">Phone Number</span>
+                                <span class="ent-label-desc">Used for delivery updates and important security alerts.</span>
+                            </div>
+                            <div class="ent-form-input-col">
+                                <input type="tel" id="phoneInput" class="ent-input" name="phone" value="<%= user.phone %>" required>
+                            </div>
+                        </div>
+
+                    </div>
                     
-                    <ul class="profile-nav">
-                        <li>
-                            <a href="/profile" class="nav-link active">
-                                <i class="bi bi-person-circle me-3 fs-5"></i> Account Details
-                            </a>
-                        </li>
-                        <!-- Future links could go here -->
-                        <li class="mt-2">
-                            <a href="/logout" class="nav-link text-danger">
-                                <i class="bi bi-box-arrow-right me-3 fs-5"></i> Sign Out
-                            </a>
-                        </li>
-                    </ul>
+                    <div class="ent-card-footer">
+                        <div style="font-size: 0.875rem; color: var(--ent-text-muted) !important; margin-right: auto;">Please save your changes.</div>
+                        <button type="submit" class="ent-btn-primary" id="profileSubmitBtn">Save Information</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Email Card -->
+            <div class="ent-card">
+                <div class="ent-card-header">
+                    <h2 class="ent-card-title">Email Address</h2>
+                    <p class="ent-card-desc">Manage the email address associated with your account.</p>
+                </div>
+                
+                <div class="ent-card-body">
+                    <div class="ent-form-row border-0 pb-0">
+                        <div class="ent-form-label-col">
+                            <span class="ent-label-title">Primary Email</span>
+                            <span class="ent-label-desc">You will receive all invoices and communications at this address.</span>
+                        </div>
+                        <div class="ent-form-input-col">
+                            <div class="d-flex align-items-center gap-2 mb-2" id="emailDisplayContainer">
+                                <input type="email" class="ent-input" id="currentEmailInput" value="<%= user.email %>" readonly disabled>
+                                <button type="button" class="ent-btn-secondary flex-shrink-0" id="btnChangeEmail">Edit</button>
+                            </div>
+
+                            <!-- OTP Flow -->
+                            <div id="emailOtpContainer" style="display: none; padding: 16px; background: rgba(255,193,7,0.05); border: 1px solid rgba(255,193,7,0.3); border-radius: 6px;">
+                                <label class="ent-label-title text-warning mb-2" style="color: #ffc107 !important;"><i class="bi bi-shield-lock me-2"></i>Security Check</label>
+                                <p class="ent-label-desc mb-3">We sent a 6-digit verification code to your current email address. Please enter it below to authorize this change.</p>
+                                <div class="d-flex gap-2">
+                                    <input type="text" class="ent-input" id="emailOtpInput" placeholder="6-digit OTP" maxlength="6" style="max-width: 150px;">
+                                    <button class="ent-btn-primary bg-warning text-dark border-warning" type="button" id="btnVerifyEmailOtp">Verify</button>
+                                </div>
+                                <small class="mt-2 d-block" id="emailOtpMessage"></small>
+                            </div>
+
+                            <!-- New Email Entry -->
+                            <div id="newEmailContainer" style="display: none; padding: 16px; background: rgba(25,135,84,0.05); border: 1px solid rgba(25,135,84,0.3); border-radius: 6px;">
+                                <label class="ent-label-title text-success mb-2" style="color: #198754 !important;"><i class="bi bi-check-circle me-2"></i>Identity Verified</label>
+                                <p class="ent-label-desc mb-3">Please enter your new email address. We will use this for future logins.</p>
+                                <div class="d-flex gap-2">
+                                    <input type="email" class="ent-input" id="newEmailInput" placeholder="new@example.com">
+                                    <button class="ent-btn-primary bg-success text-white border-success" type="button" id="btnSaveNewEmail">Save Email</button>
+                                </div>
+                                <small class="mt-2 d-block" id="newEmailMessage"></small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- MAIN CONTENT -->
-            <div class="col-lg-9">
-                <div class="row g-4">
+            <!-- Security Card -->
+            <form action="/profile/password" method="POST" id="passwordForm">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <div class="ent-card border-danger" style="border-color: rgba(220, 53, 69, 0.3) !important;">
+                    <div class="ent-card-header">
+                        <h2 class="ent-card-title text-danger" style="color: #ea868f !important;">Account Security</h2>
+                        <p class="ent-card-desc">Update your password to keep your account secure.</p>
+                    </div>
                     
-                    <!-- Personal Info Section -->
-                    <div class="col-12">
-                        <div class="profile-card p-4 p-md-5">
-                            <div class="section-header">
-                                <h3 class="fw-bold mb-0 d-flex align-items-center">
-                                    <i class="bi bi-person-vcard me-3 fs-4"></i> 
-                                    Personal Information
-                                </h3>
+                    <div class="ent-card-body">
+                        <div class="ent-form-row">
+                            <div class="ent-form-label-col">
+                                <span class="ent-label-title">Current Password</span>
+                                <span class="ent-label-desc">You must provide your current password to set a new one.</span>
                             </div>
-                            
-                            <form action="/profile" method="POST" id="profileForm">
-                                <div class="row g-4">
-                                    <div class="col-md-12">
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <label class="profile-label mb-0">Email Address</label>
-                                            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1" id="btnChangeEmail" style="font-size: 0.75rem; border-color: rgba(255,255,255,0.2);">
-                                                <i class="bi bi-pencil me-1"></i> Change Email
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Step 1: Current Email -->
-                                        <div id="emailDisplayContainer">
-                                            <input type="email" class="form-control profile-input" id="currentEmailInput" value="<%= user.email %>" readonly disabled style="cursor: not-allowed; opacity: 0.7;">
-                                        </div>
-                                        
-                                        <!-- Step 2: OTP Verification -->
-                                        <div id="emailOtpContainer" class="mt-2 p-3 border rounded-3 border-warning" style="display: none; background: rgba(255,193,7,0.1);">
-                                            <label class="profile-label mb-2 text-warning"><i class="bi bi-envelope-check me-1"></i> Security Check: Enter OTP sent to your current email</label>
-                                            <div class="input-group">
-                                                <input type="text" class="form-control profile-input border-warning" id="emailOtpInput" placeholder="6-digit OTP" maxlength="6" style="border-radius: 12px 0 0 12px !important;">
-                                                <button class="btn btn-warning fw-bold px-4 text-dark" type="button" id="btnVerifyEmailOtp" style="border-radius: 0 12px 12px 0 !important; z-index: 0;">Verify</button>
-                                            </div>
-                                            <small class="mt-2 d-block text-white" id="emailOtpMessage"></small>
-                                        </div>
-                                        
-                                        <!-- Step 3: New Email Entry -->
-                                        <div id="newEmailContainer" class="mt-2 p-3 border rounded-3 border-success" style="display: none; background: rgba(25,135,84,0.1);">
-                                            <label class="profile-label text-success mb-2"><i class="bi bi-check-circle me-1"></i> Identity Verified! Enter your new email address</label>
-                                            <div class="input-group">
-                                                <input type="email" class="form-control profile-input border-success" id="newEmailInput" placeholder="new.email@example.com" style="border-radius: 12px 0 0 12px !important;">
-                                                <button class="btn btn-success fw-bold px-4 text-white" type="button" id="btnSaveNewEmail" style="border-radius: 0 12px 12px 0 !important; z-index: 0;">Save Email</button>
-                                            </div>
-                                            <small class="mt-2 d-block text-white" id="newEmailMessage"></small>
-                                        </div>
-                                    </div>
+                            <div class="ent-form-input-col">
+                                <input type="password" class="ent-input" name="currentPassword" required>
+                            </div>
+                        </div>
 
-                                    <div class="col-md-6">
-                                        <label class="profile-label">Full Name *</label>
-                                        <input type="text" class="form-control profile-input" name="name" value="<%= user.name %>" required>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="profile-label">Phone Number *</label>
-                                        <input type="tel" class="form-control profile-input" name="phone" value="<%= user.phone %>" required>
-                                    </div>
-                                    
-                                    <div class="col-md-12 text-end">
-                                        <a href="/tickets" class="profile-btn text-decoration-none d-inline-block">
-                                            <i class="bi bi-ticket-detailed me-2"></i> View My Tickets
-                                        </a>
-                                    </div>
-
-                                    <div class="col-12 mt-4 pt-2 text-end">
-                                        <button type="submit" class="profile-btn" id="profileSubmitBtn">
-                                            <i class="bi bi-check2-circle me-2"></i> Save Changes
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                        <div class="ent-form-row pb-0 border-0">
+                            <div class="ent-form-label-col">
+                                <span class="ent-label-title">New Password</span>
+                                <span class="ent-label-desc">Make sure it's at least 6 characters. A mix of letters, numbers, and symbols is recommended.</span>
+                            </div>
+                            <div class="ent-form-input-col">
+                                <input type="password" class="ent-input mb-3" name="newPassword" placeholder="New Password" minlength="6" required>
+                                <input type="password" class="ent-input" name="confirmPassword" placeholder="Confirm New Password" minlength="6" required>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Security Section -->
-                    <div class="col-12">
-                        <div class="profile-card p-4 p-md-5">
-                            <div class="section-header">
-                                <h3 class="fw-bold mb-0 d-flex align-items-center">
-                                    <i class="bi bi-shield-lock me-3 fs-4"></i> 
-                                    Security & Password
-                                </h3>
-                            </div>
-                            
-                            <form action="/profile/password" method="POST" id="passwordForm">
-                                <div class="row g-4">
-                                    <div class="col-12">
-                                        <label class="profile-label">Current Password *</label>
-                                        <input type="password" class="form-control profile-input" name="currentPassword" required placeholder="Enter current password">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="profile-label">New Password *</label>
-                                        <input type="password" class="form-control profile-input" name="newPassword" placeholder="Minimum 6 characters" minlength="6" required>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="profile-label">Confirm New Password *</label>
-                                        <input type="password" class="form-control profile-input" name="confirmPassword" placeholder="Repeat new password" minlength="6" required>
-                                    </div>
-                                    
-                                    <div class="col-12 mt-4 pt-2 text-end">
-                                        <button type="submit" class="profile-btn" id="passwordSubmitBtn">
-                                            <i class="bi bi-shield-check me-2"></i> Update Password
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                    <div class="ent-card-footer bg-danger bg-opacity-10 border-danger" style="border-color: rgba(220, 53, 69, 0.3) !important;">
+                        <button type="submit" class="ent-btn-primary bg-danger text-white border-danger" id="passwordSubmitBtn">Update Password</button>
                     </div>
-
                 </div>
-            </div>
+            </form>
+            </div> <!-- End Account Tab -->
 
+            <div id="tickets-tab" class="ent-tab-content">
+                <% if (typeof tickets !== 'undefined' && tickets && tickets.length > 0) { %>
+                    <% tickets.forEach(ticket => { %>
+                        <a href="/tickets/<%= ticket.ticketNumber %>" style="text-decoration: none;">
+                            <div class="sc-ticket-card">
+                                <div>
+                                    <div class="sc-ticket-id"><i class="bi bi-ticket-detailed me-2"></i><%= ticket.ticketNumber %></div>
+                                    <div class="sc-ticket-subj"><%= ticket.subject %></div>
+                                    <div style="font-size: 0.8rem; margin-top: 8px; color: var(--ent-text-muted);"><i class="bi bi-clock me-1"></i>Last updated: <%= ticket.updatedAt.toLocaleDateString() %></div>
+                                </div>
+                                <div>
+                                    <span class="sc-badge bg-<%= ticket.status %>"><%= ticket.status %></span>
+                                    <i class="bi bi-chevron-right ms-3" style="color: var(--ent-text-muted);"></i>
+                                </div>
+                            </div>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <div class="ent-card" style="text-align: center; padding: 64px 24px;">
+                        <div class="mb-3"><i class="bi bi-envelope-paper" style="font-size: 3rem; color: var(--ent-text-muted);"></i></div>
+                        <h4 style="color: var(--ent-text-main); font-weight: 600;">No tickets found</h4>
+                        <p style="color: var(--ent-text-muted);">You haven't submitted any inquiries yet.</p>
+                        <a href="/tech-packages" class="ent-btn-secondary mt-3" style="display: inline-block; text-decoration: none;">Explore Packages</a>
+                    </div>
+                <% } %>
+            </div> <!-- End Tickets Tab -->
+
+        </main>
         </div>
     </div>
+</div>
 
-    <%- include('../partials/footer-new') %>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/main.js"></script>
-    <script>
-        document.getElementById('profileForm').addEventListener('submit', function() {
-            var btn = document.getElementById('profileSubmitBtn');
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Saving...';
-            btn.disabled = true;
-        });
-        
-        document.getElementById('passwordForm').addEventListener('submit', function() {
-            var btn = document.getElementById('passwordSubmitBtn');
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Updating...';
-            btn.disabled = true;
-        });
+        <%- include('../partials/footer-new') %>
 
-        // Email Change Logic
-        const btnChangeEmail = document.getElementById('btnChangeEmail');
-        const emailDisplayContainer = document.getElementById('emailDisplayContainer');
-        const emailOtpContainer = document.getElementById('emailOtpContainer');
-        const newEmailContainer = document.getElementById('newEmailContainer');
-        const emailOtpInput = document.getElementById('emailOtpInput');
-        const btnVerifyEmailOtp = document.getElementById('btnVerifyEmailOtp');
-        const emailOtpMessage = document.getElementById('emailOtpMessage');
-        const newEmailInput = document.getElementById('newEmailInput');
-        const btnSaveNewEmail = document.getElementById('btnSaveNewEmail');
-        const newEmailMessage = document.getElementById('newEmailMessage');
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/intlTelInput.min.js"></script>
+            <script src="/js/main.js"></script>
+            
+            <!-- Vanilla JS Toast Container -->
+            <div id="custom-toast-container" style="position: fixed; bottom: 24px; right: 24px; z-index: 999999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;"></div>
 
-        btnChangeEmail.addEventListener('click', async () => {
-            btnChangeEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending OTP...';
-            btnChangeEmail.disabled = true;
-
-            try {
-                const response = await fetch('/profile/email/request-otp', { method: 'POST' });
-                const data = await response.json();
-                
-                if (data.success) {
-                    btnChangeEmail.style.display = 'none';
-                    emailDisplayContainer.style.display = 'none';
-                    emailOtpContainer.style.display = 'block';
-                    emailOtpMessage.className = 'mt-2 d-block text-white';
-                    emailOtpMessage.innerText = data.message;
-                    emailOtpInput.focus(); // Auto-focus the OTP field
-                } else {
-                    btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
-                    btnChangeEmail.disabled = false;
-                    alert(data.message || 'Failed to send OTP.');
+            <script>
+                // Foolproof Vanilla JS Toast Logic (No external libraries required)
+                function showToast(message, type = 'success') {
+                    if (Array.isArray(message)) message = message[0];
+                    const container = document.getElementById('custom-toast-container');
+                    const toast = document.createElement('div');
+                    
+                    toast.style.pointerEvents = 'auto';
+                    toast.style.minWidth = '280px';
+                    toast.style.maxWidth = '400px';
+                    toast.style.padding = '16px 20px';
+                    toast.style.borderRadius = '8px';
+                    toast.style.color = '#fff';
+                    toast.style.fontFamily = 'Inter, sans-serif';
+                    toast.style.fontSize = '14px';
+                    toast.style.fontWeight = '500';
+                    toast.style.boxShadow = '0 10px 15px -3px rgba(0,0,0,0.2), 0 4px 6px -2px rgba(0,0,0,0.1)';
+                    toast.style.display = 'flex';
+                    toast.style.alignItems = 'flex-start';
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(20px)';
+                    toast.style.transition = 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    toast.style.cursor = 'pointer';
+                    
+                    if (type === 'success') {
+                        toast.style.background = '#10b981'; // Emerald 500
+                        toast.innerHTML = `<i class="bi bi-check-circle-fill" style="margin-right:12px; font-size:1.2rem; line-height: 1;"></i> <div style="flex:1;">${message}</div>`;
+                    } else if (type === 'error') {
+                        toast.style.background = '#ef4444'; // Red 500
+                        toast.innerHTML = `<i class="bi bi-exclamation-triangle-fill" style="margin-right:12px; font-size:1.2rem; line-height: 1;"></i> <div style="flex:1;">${message}</div>`;
+                    } else {
+                        toast.style.background = '#3b82f6'; // Blue 500
+                        toast.innerHTML = `<i class="bi bi-info-circle-fill" style="margin-right:12px; font-size:1.2rem; line-height: 1;"></i> <div style="flex:1;">${message}</div>`;
+                    }
+                    
+                    container.appendChild(toast);
+                    
+                    // Trigger animation
+                    requestAnimationFrame(() => {
+                        toast.style.opacity = '1';
+                        toast.style.transform = 'translateY(0)';
+                    });
+                    
+                    // Remove on click
+                    toast.onclick = () => {
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateY(10px) scale(0.95)';
+                        setTimeout(() => toast.remove(), 400);
+                    };
+                    
+                    // Auto remove after 4.5 seconds
+                    setTimeout(() => {
+                        if(toast.parentElement) {
+                            toast.style.opacity = '0';
+                            toast.style.transform = 'translateY(10px) scale(0.95)';
+                            setTimeout(() => { if(toast.parentElement) toast.remove(); }, 400);
+                        }
+                    }, 4500);
                 }
-            } catch (error) {
-                console.error(error);
-                btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
-                btnChangeEmail.disabled = false;
-                alert('Network error while requesting OTP.');
-            }
-        });
 
-        // Allow pressing Enter key to trigger Verify
-        emailOtpInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent main form submission
-                btnVerifyEmailOtp.click();
-            }
-        });
+                // Safely intercept and show flash messages by reading the inline alerts
+                document.addEventListener('DOMContentLoaded', () => {
+                    const successAlert = document.querySelector('.alert-success');
+                    if (successAlert && successAlert.innerText.trim()) {
+                        showToast(successAlert.innerText.trim(), 'success');
+                        successAlert.style.display = 'none'; // Hide the inline alert
+                    }
 
-        btnVerifyEmailOtp.addEventListener('click', async () => {
-            const otp = emailOtpInput.value.trim();
-            if (!otp) return alert('Please enter the OTP');
-
-            btnVerifyEmailOtp.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            btnVerifyEmailOtp.disabled = true;
-
-            try {
-                const response = await fetch('/profile/email/verify-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ otp })
+                    const errorAlert = document.querySelector('.alert-danger');
+                    if (errorAlert && errorAlert.innerText.trim()) {
+                        showToast(errorAlert.innerText.trim(), 'error');
+                        errorAlert.style.display = 'none'; // Hide the inline alert
+                    }
                 });
-                const data = await response.json();
 
-                if (data.success) {
-                    emailOtpContainer.style.display = 'none';
-                    newEmailContainer.style.display = 'block';
-                    newEmailInput.focus(); // Auto-focus new email field
-                } else {
-                    btnVerifyEmailOtp.innerHTML = 'Verify';
-                    btnVerifyEmailOtp.disabled = false;
-                    emailOtpMessage.className = 'mt-2 d-block text-danger fw-bold';
-                    emailOtpMessage.innerText = data.message || 'Invalid OTP';
-                }
-            } catch (error) {
-                console.error(error);
-                btnVerifyEmailOtp.innerHTML = 'Verify';
-                btnVerifyEmailOtp.disabled = false;
-                emailOtpMessage.innerText = 'Network error verifying OTP.';
-            }
-        });
+                // Tab Switching Logic
+                const tabLinks = document.querySelectorAll('.tab-link');
+                const tabContents = document.querySelectorAll('.ent-tab-content');
+                const pageTitle = document.getElementById('pageTitle');
+                const pageDesc = document.getElementById('pageDesc');
 
-        // Allow pressing Enter key to trigger Save Email
-        newEmailInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent main form submission
-                btnSaveNewEmail.click();
-            }
-        });
+                tabLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        
+                        // Remove active class from all links and tabs
+                        tabLinks.forEach(l => l.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        // Add active class to clicked link and corresponding tab
+                        link.classList.add('active');
+                        const targetId = link.getAttribute('data-target');
+                        document.getElementById(targetId).classList.add('active');
 
-        btnSaveNewEmail.addEventListener('click', async () => {
-            const newEmail = newEmailInput.value.trim();
-            if (!newEmail) return alert('Please enter a new email address');
-
-            btnSaveNewEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
-            btnSaveNewEmail.disabled = true;
-
-            try {
-                const response = await fetch('/profile/email/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ newEmail })
+                        // Update Page Header Context
+                        if (targetId === 'account-tab') {
+                            pageTitle.innerText = 'Account Settings';
+                            pageDesc.innerText = 'Manage your profile details, email address, and security preferences.';
+                        } else if (targetId === 'tickets-tab') {
+                            pageTitle.innerText = 'Support Tickets';
+                            pageDesc.innerText = 'View and track the status of your inquiries and requests.';
+                        }
+                        
+                        // Mobile: Hide menu when tab is selected
+                        if (window.innerWidth <= 768) {
+                            document.querySelector('.ent-layout').classList.remove('mobile-menu-active');
+                        }
+                    });
                 });
-                const data = await response.json();
 
-                if (data.success) {
-                    newEmailContainer.innerHTML = `<div class="alert alert-success border-0 bg-success bg-opacity-25 text-white mb-0"><i class="bi bi-check-circle-fill me-2"></i> ${data.message}</div>`;
-                    document.getElementById('currentEmailInput').value = newEmail;
-                    // Optionally, refresh page to reset UI after a few seconds
-                    setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    btnSaveNewEmail.innerHTML = 'Save Email';
-                    btnSaveNewEmail.disabled = false;
-                    newEmailMessage.className = 'mt-2 d-block text-danger fw-bold';
-                    newEmailMessage.innerText = data.message || 'Failed to update email.';
+                // Mobile Back Button Logic
+                document.getElementById('mobileBackBtn').addEventListener('click', () => {
+                    document.querySelector('.ent-layout').classList.add('mobile-menu-active');
+                });
+
+                // Auto-open tab if present in URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const tabParam = urlParams.get('tab');
+                if (tabParam === 'tickets') {
+                    const ticketTabBtn = document.querySelector('[data-target="tickets-tab"]');
+                    if (ticketTabBtn) ticketTabBtn.click();
                 }
-            } catch (error) {
-                console.error(error);
-                btnSaveNewEmail.innerHTML = 'Save Email';
-                btnSaveNewEmail.disabled = false;
-                newEmailMessage.innerText = 'Network error updating email.';
-            }
-        });
-    </script>
+
+                const emojiRegex = /[\u{1F300}-\u{1F5FF}\u{1F900}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F191}-\u{1F251}\u{1F004}\u{1F0CF}\u{1F170}-\u{1F171}\u{1F17E}-\u{1F17F}\u{1F18E}\u{3030}\u{2B50}\u{2B55}\u{2934}-\u{2935}\u{2B05}-\u{2B07}\u{2B1B}-\u{2B1C}\u{3297}\u{3299}\u{303D}\u{00A9}\u{00AE}\u{2122}\u{23F3}\u{24C2}\u{23E9}-\u{23EF}\u{25B6}\u{23F8}-\u{23FA}]/u;
+                const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/ig;
+                const htmlTagRegex = /<\/?\w+((\s+\w+(\s*=\s*(?:".*?"|'.*?'|[^'">\s]+))?)+\s*|\s*)\/?>/gi;
+
+                // Initialize International Phone Input
+                const phoneInputField = document.querySelector("#phoneInput");
+                const iti = window.intlTelInput(phoneInputField, {
+                    initialCountry: "in",
+                    separateDialCode: true,
+                    dropdownContainer: document.body, // This pulls the dropdown out of the card so it can't be cut off
+                    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.0.4/build/js/utils.js",
+                });
+
+                document.getElementById('profileSubmitBtn').addEventListener('click', function (e) {
+                    const phoneInputVal = phoneInputField.value;
+                    const nameInputElem = document.querySelector('input[name="name"]');
+                    const nameInput = nameInputElem.value;
+                    
+                    if (urlRegex.test(nameInput)) {
+                        e.preventDefault();
+                        showToast('URLs and links are strictly prohibited.', 'error');
+                        return;
+                    }
+
+                    if (htmlTagRegex.test(nameInput) || htmlTagRegex.test(phoneInputVal)) {
+                        e.preventDefault();
+                        showToast('HTML tags, images, and file injections are strictly prohibited.', 'error');
+                        return;
+                    }
+                    
+                    if (emojiRegex.test(nameInput) || emojiRegex.test(phoneInputVal)) {
+                        e.preventDefault();
+                        showToast('Emojis are strictly prohibited.', 'error');
+                        return;
+                    }
+
+                    // Strict Phone Validation using intl-tel-input (Checks length and format for the selected country)
+                    if (!iti.isValidNumber()) {
+                        e.preventDefault();
+                        showToast('Please enter a valid phone number for the selected country.', 'error');
+                        return;
+                    }
+                    
+                    // Replace the input value with the full international number right before submitting
+                    phoneInputField.value = iti.getNumber();
+                });
+
+                document.getElementById('passwordSubmitBtn').addEventListener('click', function (e) {
+                    const currentPassword = document.querySelector('input[name="currentPassword"]').value;
+                    const newPassword = document.querySelector('input[name="newPassword"]').value;
+                    const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+                    
+                    if (htmlTagRegex.test(currentPassword) || htmlTagRegex.test(newPassword) || htmlTagRegex.test(confirmPassword)) {
+                        e.preventDefault();
+                        showToast('HTML tags and injections are strictly prohibited.', 'error');
+                        return;
+                    }
+
+                    if (urlRegex.test(currentPassword) || urlRegex.test(newPassword) || urlRegex.test(confirmPassword)) {
+                        e.preventDefault();
+                        showToast('URLs and links are strictly prohibited.', 'error');
+                        return;
+                    }
+
+                    if (emojiRegex.test(currentPassword) || emojiRegex.test(newPassword) || emojiRegex.test(confirmPassword)) {
+                        e.preventDefault();
+                        showToast('Emojis are strictly prohibited.', 'error');
+                        return;
+                    }
+                });
+
+                // Email Change Logic
+                const btnChangeEmail = document.getElementById('btnChangeEmail');
+                const emailDisplayContainer = document.getElementById('emailDisplayContainer');
+                const emailOtpContainer = document.getElementById('emailOtpContainer');
+                const newEmailContainer = document.getElementById('newEmailContainer');
+                const emailOtpInput = document.getElementById('emailOtpInput');
+                const btnVerifyEmailOtp = document.getElementById('btnVerifyEmailOtp');
+                const emailOtpMessage = document.getElementById('emailOtpMessage');
+                const newEmailInput = document.getElementById('newEmailInput');
+                const btnSaveNewEmail = document.getElementById('btnSaveNewEmail');
+                const newEmailMessage = document.getElementById('newEmailMessage');
+
+                btnChangeEmail.addEventListener('click', async () => {
+                    btnChangeEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending OTP...';
+                    btnChangeEmail.disabled = true;
+
+                    try {
+                        const response = await fetch('/profile/email/request-otp', { 
+                            method: 'POST',
+                            headers: { 'x-csrf-token': '<%= csrfToken %>' }
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            btnChangeEmail.style.display = 'none';
+                            emailDisplayContainer.style.display = 'none';
+                            emailOtpContainer.style.display = 'block';
+                            emailOtpMessage.className = 'mt-2 d-block text-success';
+                            emailOtpMessage.innerText = data.message;
+                            emailOtpInput.focus(); // Auto-focus the OTP field
+                            showToast(data.message, 'info');
+                        } else {
+                            btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
+                            btnChangeEmail.disabled = false;
+                            showToast(data.message || 'Failed to send OTP.', 'error');
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        btnChangeEmail.innerHTML = '<i class="bi bi-pencil me-1"></i> Change Email';
+                        btnChangeEmail.disabled = false;
+                        showToast('Network error while requesting OTP.', 'error');
+                    }
+                });
+
+                // Allow pressing Enter key to trigger Verify
+                emailOtpInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent main form submission
+                        btnVerifyEmailOtp.click();
+                    }
+                });
+
+                btnVerifyEmailOtp.addEventListener('click', async () => {
+                    const otp = emailOtpInput.value.trim();
+                    if (!otp) return showToast('Please enter the OTP', 'error');
+
+                    btnVerifyEmailOtp.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                    btnVerifyEmailOtp.disabled = true;
+
+                    try {
+                        const response = await fetch('/profile/email/verify-otp', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'x-csrf-token': '<%= csrfToken %>' 
+                            },
+                            body: JSON.stringify({ otp })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            emailOtpContainer.style.display = 'none';
+                            newEmailContainer.style.display = 'block';
+                            newEmailInput.focus(); // Auto-focus new email field
+                        } else {
+                            btnVerifyEmailOtp.innerHTML = 'Verify';
+                            btnVerifyEmailOtp.disabled = false;
+                            emailOtpMessage.className = 'mt-2 d-block text-danger fw-bold';
+                            emailOtpMessage.innerText = data.message || 'Invalid OTP';
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        btnVerifyEmailOtp.innerHTML = 'Verify';
+                        btnVerifyEmailOtp.disabled = false;
+                        emailOtpMessage.innerText = 'Network error verifying OTP.';
+                    }
+                });
+
+                // Allow pressing Enter key to trigger Save Email
+                newEmailInput.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent main form submission
+                        btnSaveNewEmail.click();
+                    }
+                });
+
+                btnSaveNewEmail.addEventListener('click', async () => {
+                    const newEmail = newEmailInput.value.trim();
+                    if (!newEmail) return showToast('Please enter a new email address', 'error');
+
+                    btnSaveNewEmail.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+                    btnSaveNewEmail.disabled = true;
+
+                    try {
+                        const response = await fetch('/profile/email/update', {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'x-csrf-token': '<%= csrfToken %>' 
+                            },
+                            body: JSON.stringify({ newEmail })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            newEmailContainer.innerHTML = `<div class="alert alert-success border-0 bg-success bg-opacity-25 text-white mb-0"><i class="bi bi-check-circle-fill me-2"></i> ${data.message}</div>`;
+                            document.getElementById('currentEmailInput').value = newEmail;
+                            // Optionally, refresh page to reset UI after a few seconds
+                            setTimeout(() => window.location.reload(), 2000);
+                        } else {
+                            btnSaveNewEmail.innerHTML = 'Save Email';
+                            btnSaveNewEmail.disabled = false;
+                            newEmailMessage.className = 'mt-2 d-block text-danger fw-bold';
+                            newEmailMessage.innerText = data.message || 'Failed to update email.';
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        btnSaveNewEmail.innerHTML = 'Save Email';
+                        btnSaveNewEmail.disabled = false;
+                        newEmailMessage.innerText = 'Network error updating email.';
+                    }
+                });
+
+                // Avatar Upload Logic with Real-time AI NSFW Scanning
+                const btnUploadAvatar = document.getElementById('btnUploadAvatar');
+                const avatarInput = document.getElementById('avatarInput');
+                const avatarScanStatus = document.getElementById('avatarScanStatus');
+                const avatarPreviewContainer = document.getElementById('avatarPreviewContainer');
+
+                let nsfwModel = null;
+
+                btnUploadAvatar.addEventListener('click', () => {
+                    avatarInput.click();
+                });
+
+                avatarInput.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    if (file.size > 20 * 1024 * 1024) {
+                        showToast('Image is too large. Max size is 20MB.', 'error');
+                        avatarInput.value = '';
+                        return;
+                    }
+
+                    let skipAI = false;
+                    try {
+                        avatarScanStatus.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading AI Scanner...';
+                        if (!nsfwModel) {
+                            // Let it hit the default CDN, if it fails, it will be caught.
+                            nsfwModel = await nsfwjs.load();
+                        }
+                    } catch (modelErr) {
+                        console.warn("AI model failed to load. Skipping frontend NSFW check.", modelErr);
+                        skipAI = true;
+                    }
+
+                    if (!skipAI && nsfwModel) {
+                        try {
+                            avatarScanStatus.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Scanning image for explicit content...';
+                            
+                            const imgElement = new Image();
+                            imgElement.src = URL.createObjectURL(file);
+                            await new Promise((resolve, reject) => {
+                                imgElement.onload = resolve;
+                                imgElement.onerror = reject;
+                            });
+
+                            const predictions = await nsfwModel.classify(imgElement);
+                            const isVulgar = predictions.some(p => (p.className === 'Porn' || p.className === 'Hentai' || p.className === 'Sexy') && p.probability > 0.6);
+
+                            if (isVulgar) {
+                                showToast('Upload rejected: Image violates content policies.', 'error');
+                                avatarScanStatus.innerHTML = '<span class="text-danger fw-bold"><i class="bi bi-x-circle"></i> Inappropriate content detected.</span>';
+                                avatarInput.value = '';
+                                return;
+                            }
+                        } catch (scanErr) {
+                            console.warn("AI scan failed, skipping.", scanErr);
+                        }
+                    }
+
+                    avatarScanStatus.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Image is safe. Uploading...</span>';
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('avatar', file);
+
+                        const response = await fetch('/profile/avatar', {
+                            method: 'POST',
+                            headers: {
+                                'x-csrf-token': '<%= csrfToken %>'
+                            },
+                            body: formData
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            avatarPreviewContainer.innerHTML = `<img src="${data.url}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+                            avatarScanStatus.innerHTML = '';
+                            showToast(data.message, 'success');
+                        } else {
+                            throw new Error(data.message);
+                        }
+
+                    } catch (error) {
+                        console.error('Upload Error:', error);
+                        avatarScanStatus.innerHTML = '';
+                        showToast(error.message || 'Error uploading image.', 'error');
+                        avatarInput.value = '';
+                    }
+                });
+            </script>
+            
+            <!-- NSFWJS Dependencies -->
+            <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/nsfwjs@2.4.2/dist/nsfwjs.min.js"></script>
 </body>
+
 </html>
