@@ -5,18 +5,24 @@ const { uploadBufferToCloudinary } = require('../helpers/uploadToCloudinary');
 const { inferFileType } = require('../helpers/cloudinaryHelper');
 const Media = require('../models/mediaModel');
 
-// IMAP Configuration
-const config = {
+// IMAP Configuration — increased timeouts so Gmail doesn't drop us
+const buildConfig = () => ({
   imap: {
     user: process.env.IMAP_USER,
     password: process.env.IMAP_PASS,
     host: 'imap.gmail.com',
     port: 993,
     tls: true,
-    authTimeout: 10000,
-    tlsOptions: { rejectUnauthorized: false }
+    authTimeout: 30000,      // 30 seconds (was 10s)
+    connTimeout: 60000,      // 60 seconds connection timeout (was missing entirely)
+    tlsOptions: { rejectUnauthorized: false },
+    keepalive: {
+      interval: 10000,
+      idleInterval: 300000,  // 5 minutes keepalive
+      forceNoop: true
+    }
   }
-};
+});
 
 const ALLOWED_ATTACHMENT_TYPES = [
   'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
@@ -27,9 +33,16 @@ const ALLOWED_ATTACHMENT_TYPES = [
 const MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024; // 25MB
 const MAX_ATTACHMENTS      = 5;
 
+// Sync interval & exponential backoff settings
+const BASE_INTERVAL_MS = 60 * 1000;      // Check inbox every 60 seconds (was 10s causing spam)
+const BASE_RETRY_DELAY = 30 * 1000;      // First retry after 30 seconds
+const MAX_RETRY_DELAY  = 10 * 60 * 1000; // Max retry delay = 10 minutes
+
+let retryDelay = BASE_RETRY_DELAY;
+let retryTimer = null;
 let connection = null;
 
-const uploadEmailAttachment = async (attachment, ticketNumber, uploadedByModel) => {
+const uploadEmailAttachment = async (attachment, ticketNumber) => {
   try {
     const mimeType = attachment.contentType || 'application/octet-stream';
     if (!ALLOWED_ATTACHMENT_TYPES.includes(mimeType)) {
@@ -37,7 +50,7 @@ const uploadEmailAttachment = async (attachment, ticketNumber, uploadedByModel) 
       return null;
     }
 
-    const buffer = attachment.content; // Buffer from mailparser
+    const buffer = attachment.content;
     if (!buffer || buffer.length === 0) return null;
     if (buffer.length > MAX_ATTACHMENT_BYTES) {
       console.log(`[EmailSync] Skipping attachment "${attachment.filename}" – too large (${buffer.length} bytes)`);
@@ -56,7 +69,6 @@ const uploadEmailAttachment = async (attachment, ticketNumber, uploadedByModel) 
 
     const fileType = inferFileType(result.resource_type, result.format, mimeType);
 
-    // Persist in Media collection
     await Media.findOneAndUpdate(
       { publicId: result.public_id },
       {
@@ -95,22 +107,31 @@ const uploadEmailAttachment = async (attachment, ticketNumber, uploadedByModel) 
   }
 };
 
+const scheduleNext = (app, delay) => {
+  if (retryTimer) clearTimeout(retryTimer);
+  retryTimer = setTimeout(() => startEmailSync(app), delay);
+};
+
 const startEmailSync = async (app) => {
+  // Skip if IMAP credentials are not configured
+  if (!process.env.IMAP_USER || !process.env.IMAP_PASS) {
+    console.warn('[EmailSync] IMAP credentials not configured. Skipping email sync.');
+    return;
+  }
+
   try {
-    connection = await imaps.connect(config);
-    // Prevent socket errors from crashing the main Node.js process
+    connection = await imaps.connect(buildConfig());
+
+    // Prevent unhandled socket errors from crashing the process
     connection.on('error', (err) => {
+      if (err && err.source === 'timeout') return; // suppress noisy keepalive timeouts
       console.error('[EmailSync] Socket Error:', err.message);
     });
 
     await connection.openBox('INBOX');
 
-    // Search for UNREAD emails with TKT- in the subject
     const searchCriteria = ['UNSEEN', ['SUBJECT', 'TKT-']];
-    const fetchOptions = {
-      bodies: ['HEADER', 'TEXT', ''],
-      markSeen: true
-    };
+    const fetchOptions   = { bodies: ['HEADER', 'TEXT', ''], markSeen: true };
 
     const messages = await connection.search(searchCriteria, fetchOptions);
     if (messages.length > 0) {
@@ -120,25 +141,24 @@ const startEmailSync = async (app) => {
     for (const msg of messages) {
       const all = msg.parts.find(part => part.which === '');
       const id = msg.attributes.uid;
-      const idHeader = "Imap-Id: "+id+"\r\n";
+      const idHeader = "Imap-Id: " + id + "\r\n";
 
-      const mail = await simpleParser(idHeader + all.body);
+      const mail    = await simpleParser(idHeader + all.body);
       const subject = mail.subject || '';
-      const text = mail.text || '';
-      const from = mail.from.value[0].address;
+      const text    = mail.text || '';
+      const from    = mail.from.value[0].address;
 
       console.log(`[EmailSync] Processing Email: "${subject}" from ${from}`);
 
-      // Check if this is a reply to a ticket (e.g., "[TKT-1234-ABCD] We received your inquiry")
       const ticketMatch = subject.match(/\[(TKT-[0-9]{4}-[A-Z0-9]{4})\]/i);
-      
+
       if (ticketMatch) {
         const ticketNumber = ticketMatch[1].toUpperCase();
         console.log(`[EmailSync] Extracted Ticket ID: ${ticketNumber}`);
 
         const ticket = await Ticket.findOne({ ticketNumber });
         if (ticket) {
-          // Clean the reply (remove original quoted text - handles multi-line)
+          // Strip quoted reply text
           let cleanMessage = text.split(/On [\s\S]*?wrote:/i)[0].trim();
           cleanMessage = cleanMessage.split(/From:[\s\S]*?Sent:/i)[0].trim();
           cleanMessage = cleanMessage.split(/From: /)[0].trim();
@@ -146,17 +166,16 @@ const startEmailSync = async (app) => {
 
           const finalMessage = cleanMessage || text.trim();
 
-          // Process email attachments (images, videos, PDFs only)
-          const rawAttachments = Array.isArray(mail.attachments) ? mail.attachments.slice(0, MAX_ATTACHMENTS) : [];
-          const isUserEmail = ticket.email.toLowerCase() === from.toLowerCase();
-          const uploadedByModel = isUserEmail ? 'User' : 'Admin';
+          const rawAttachments  = Array.isArray(mail.attachments) ? mail.attachments.slice(0, MAX_ATTACHMENTS) : [];
+          const isUserEmail     = ticket.email.toLowerCase() === from.toLowerCase();
 
           const uploadedAttachments = (
-            await Promise.all(rawAttachments.map(att => uploadEmailAttachment(att, ticketNumber, uploadedByModel)))
+            await Promise.all(rawAttachments.map(att => uploadEmailAttachment(att, ticketNumber)))
           ).filter(Boolean);
 
-          // Prevent duplicate text messages (since we fetch all matching subjects now)
-          const isDuplicateText = finalMessage && ticket.messages.some(m => m.message === finalMessage && m.attachments.length === 0);
+          const isDuplicateText = finalMessage && ticket.messages.some(
+            m => m.message === finalMessage && m.attachments.length === 0
+          );
 
           if (!isDuplicateText || uploadedAttachments.length > 0) {
             if (finalMessage || uploadedAttachments.length > 0) {
@@ -169,12 +188,12 @@ const startEmailSync = async (app) => {
               });
 
               if (ticket.status === 'closed' || ticket.status === 'resolved') {
-                ticket.status = 'open'; // Reopen if they reply
+                ticket.status = 'open';
               }
 
               await ticket.save();
               console.log(`[EmailSync] Successfully synced reply to ticket ${ticketNumber} (${uploadedAttachments.length} attachments)`);
-              
+
               if (app) {
                 const io = app.get('io');
                 if (io) {
@@ -191,14 +210,34 @@ const startEmailSync = async (app) => {
       }
     }
 
-    // Disconnect and schedule next run
-    connection.end();
+    // Successful run — reset backoff counter
+    retryDelay = BASE_RETRY_DELAY;
+
+    // Close connection and schedule next normal check
+    try { connection.end(); } catch (_) {}
+
   } catch (error) {
-    console.error('[EmailSync] Error connecting to IMAP:', error);
-  } finally {
-    // Run again in 10 seconds for faster syncing
-    setTimeout(() => startEmailSync(app), 10000);
+    const isTimeout = error.message && error.message.includes('timed out');
+    if (isTimeout) {
+      console.warn(`[EmailSync] IMAP connection timed out. Retrying in ${Math.round(retryDelay / 1000)}s.`);
+    } else {
+      console.error('[EmailSync] Error:', error.message);
+    }
+
+    // Clean up stale connection
+    if (connection) {
+      try { connection.end(); } catch (_) {}
+      connection = null;
+    }
+
+    // Exponential backoff: 30s → 60s → 120s → ... → max 10 minutes
+    scheduleNext(app, retryDelay);
+    retryDelay = Math.min(retryDelay * 2, MAX_RETRY_DELAY);
+    return;
   }
+
+  // Schedule the next normal sync run
+  scheduleNext(app, BASE_INTERVAL_MS);
 };
 
 module.exports = startEmailSync;
