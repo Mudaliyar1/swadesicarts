@@ -219,16 +219,13 @@ exports.postDeletePolicy = async (req, res) => {
 // ==========================================
 
 // Get a policy by slug for public view
-exports.getPolicyBySlug = async (req, res) => {
+exports.getPolicyBySlug = async (req, res, next) => {
   try {
     const slug = req.params.slug || req.path.replace('/', '');
     const policy = await Policy.findOne({ slug, status: 'published' });
     
     if (!policy) {
-      return res.status(404).render('public/404', {
-        title: 'Page Not Found - Swadesi Carts',
-        currentPage: ''
-      });
+      return next();
     }
 
     // Load other published policies for the sidebar list

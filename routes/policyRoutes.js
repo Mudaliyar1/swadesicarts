@@ -31,7 +31,7 @@ standardSlugs.forEach(slug => {
 });
 
 // Generic dynamic lookup route for other policies
-publicRouter.get('/policies/:slug', policyController.getPolicyBySlug);
+publicRouter.get('/:slug', policyController.getPolicyBySlug);
 
 module.exports = {
   adminRouter,

@@ -168,12 +168,22 @@ const loadWebsiteSettings = async (req, res, next) => {
       // ignore
     }
 
+    // Fetch active policies dynamically
+    const Policy = require('../models/Policy');
+    try {
+      res.locals.activePolicies = await Policy.find({ status: 'published' }).select('title slug').sort({ title: 1 });
+    } catch (policyErr) {
+      console.error('Error loading active policies:', policyErr);
+      res.locals.activePolicies = [];
+    }
+
     res.locals.siteSettings = settings;
     next();
   } catch (error) {
     console.error('Error loading website settings:', error);
     // Continue even if settings can't be loaded
     res.locals.siteSettings = null;
+    res.locals.activePolicies = [];
     next();
   }
 };

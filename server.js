@@ -157,7 +157,6 @@ const userRoutes = require('./routes/user');
 const ticketRoutes = require('./routes/ticket');
 
 app.use('/', publicRoutes);
-app.use('/', publicPolicyRoutes);
 app.use('/', userAuthRoutes);
 app.use('/', userRoutes);
 app.use('/', sitemapRoutes);
@@ -167,6 +166,7 @@ app.use('/tech-packages', techRoutes);
 app.use('/organic-products', organicRoutes);
 app.use('/admin', adminRoutes);
 app.use('/tickets', ticketRoutes);
+app.use('/', publicPolicyRoutes);
 
 // 404 Handler
 app.use((req, res) => {

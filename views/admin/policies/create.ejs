@@ -214,8 +214,6 @@
             const contentInput = document.getElementById('contentInput');
 
             form.addEventListener('submit', (e) => {
-                const contentHtml = quill.getSemanticHTML();
-                
                 // Content validation
                 if (quill.getText().trim() === '') {
                     e.preventDefault();
@@ -223,6 +221,7 @@
                     return;
                 }
                 
+                const contentHtml = quill.root.innerHTML;
                 contentInput.value = contentHtml;
             });
         });
