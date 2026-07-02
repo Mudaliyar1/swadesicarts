@@ -307,6 +307,136 @@
         .mnc-signin-footer a:hover {
             text-decoration: underline;
         }
+
+        /* ── RESPONSIVE ─────────────────────────────────────────── */
+
+        /* Tablet (≤ 768px) */
+        @media (max-width: 768px) {
+            .mnc-viewport {
+                padding: 2rem 1rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2.5rem 2rem;
+                border-radius: 20px;
+                margin-top: 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.75rem;
+            }
+
+            .mnc-card-header p {
+                font-size: 0.95rem;
+            }
+
+            /* Stack passwords vertically on tablet */
+            .mnc-pw-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .mnc-pw-col .mnc-input {
+                padding-left: 48px;
+            }
+
+            .mnc-pw-col i {
+                left: 18px;
+            }
+        }
+
+        /* Mobile (≤ 576px) */
+        @media (max-width: 576px) {
+            .mnc-viewport {
+                padding: 1rem 0.75rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2rem 1.25rem;
+                border-radius: 16px;
+                margin-top: 0.5rem;
+                border-left: none;
+                border-right: none;
+                border-radius: 16px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+
+            .mnc-card-header {
+                margin-bottom: 1.5rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.55rem;
+            }
+
+            .mnc-card-header .logo-box img {
+                max-height: 30px;
+            }
+
+            .mnc-label {
+                font-size: 0.92rem;
+            }
+
+            .mnc-input {
+                height: 50px;
+                font-size: 1rem;
+            }
+
+            /* Phone number row stacks gracefully */
+            .mnc-phone-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .mnc-phone-row select {
+                max-width: 100% !important;
+                border-radius: 12px !important;
+                border-right: 1.5px solid #e2e8f0 !important;
+            }
+
+            .mnc-phone-row .mnc-input {
+                border-radius: 12px !important;
+            }
+
+            /* Passwords already stacked via tablet breakpoint */
+            .mnc-pw-col .mnc-input {
+                height: 50px;
+                font-size: 1rem;
+            }
+
+            .mnc-btn-submit {
+                height: 50px;
+                font-size: 1rem;
+                margin-top: 1.25rem;
+            }
+
+            .mnc-tc-scrollbox {
+                height: 100px;
+                font-size: 0.85rem;
+            }
+
+            .mnc-signin-footer {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Very small (≤ 375px) */
+        @media (max-width: 375px) {
+            .mnc-card-wrapper {
+                padding: 1.75rem 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .mnc-input {
+                height: 48px;
+                font-size: 0.95rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -361,7 +491,7 @@
                  <!-- Phone -->
                 <div class="mb-3">
                     <label class="mnc-label">Phone Number</label>
-                    <div class="d-flex">
+                    <div class="d-flex mnc-phone-row">
                         <select class="form-select" id="countryCodeSelect" style="max-width: 110px; height: 56px; border: 1.5px solid #e2e8f0; border-radius: 12px 0 0 12px; font-size: 0.95rem; font-weight: 600; color: #000000; background-color: #f8fafc; outline: none; border-right: none;">
                             <option value="+91">🇮🇳 +91</option>
                             <option value="+1">🇺🇸 +1</option>

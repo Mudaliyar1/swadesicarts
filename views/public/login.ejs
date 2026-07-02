@@ -6,82 +6,434 @@
     <title><%= title %></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
     <% if (typeof seo !== 'undefined') { %>
         <%- include('../partials/seo-meta') %>
     <% } %>
+    <style>
+        /* MATCHING REGISTER PAGE DESIGN SYSTEM (CLEAN SINGLE-COLUMN) */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #334155;
+        }
+
+        .mnc-viewport {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 4rem 1.5rem;
+        }
+
+        .mnc-card-wrapper {
+            width: 100%;
+            max-width: 480px;
+            background: #ffffff !important;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            padding: 3.5rem 3.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Override dynamic-styles inside form container to protect legibility */
+        .mnc-card-wrapper h2,
+        .mnc-card-wrapper p,
+        .mnc-card-wrapper label,
+        .mnc-card-wrapper span,
+        .mnc-card-wrapper div,
+        .mnc-card-wrapper input,
+        .mnc-card-wrapper a:not(.btn),
+        .mnc-card-wrapper h6 {
+            color: inherit;
+        }
+
+        .mnc-card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mnc-card-header .logo-box {
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .mnc-card-header .logo-box img {
+            max-height: 36px;
+            object-fit: contain;
+        }
+
+        .mnc-card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.1rem;
+            letter-spacing: -0.5px;
+            color: #000000 !important;
+            margin-bottom: 0.35rem;
+        }
+
+        .mnc-card-header p {
+            color: #64748b !important;
+            font-size: 1.02rem;
+            font-weight: 500;
+        }
+
+        /* Labels */
+        .mnc-label {
+            font-size: 0.98rem;
+            font-weight: 600;
+            color: #475569 !important;
+            letter-spacing: 0.3px;
+            margin-left: 2px;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Input Groups */
+        .mnc-input-group {
+            position: relative;
+            margin-bottom: 1.15rem;
+        }
+
+        .mnc-input-group i.field-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.3rem;
+            z-index: 10;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .mnc-input {
+            width: 100%;
+            height: 56px;
+            padding: 10px 16px 10px 48px;
+            background: #ffffff !important;
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: 12px;
+            font-size: 1.12rem;
+            color: #0f172a !important;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .mnc-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .mnc-input:focus {
+            background: #ffffff !important;
+            border-color: #000000 !important;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+            color: #000000 !important;
+        }
+
+        /* Password toggle button */
+        .btn-toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: #94a3b8;
+            z-index: 15;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .btn-toggle-password:hover {
+            color: #000000 !important;
+        }
+
+        .btn-toggle-password i {
+            font-size: 1.25rem;
+        }
+
+        /* Forgot password row */
+        .mnc-pw-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .mnc-pw-header .mnc-label {
+            margin-bottom: 0;
+        }
+
+        .mnc-forgot-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #000000 !important;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        .mnc-forgot-link:hover {
+            text-decoration: underline;
+            opacity: 0.75;
+        }
+
+        /* Submit button */
+        .mnc-btn-submit {
+            width: 100%;
+            height: 56px;
+            background: transparent !important;
+            border: 2px solid #000000 !important;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.12rem;
+            transition: all 0.2s ease;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+            color: #000000 !important;
+        }
+
+        .mnc-btn-submit span,
+        .mnc-btn-submit i {
+            color: #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) {
+            background: #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) span,
+        .mnc-btn-submit:hover:not(:disabled) i {
+            color: #ffffff !important;
+        }
+
+        .mnc-btn-submit:disabled {
+            background: #f1f5f9 !important;
+            border: 1.5px solid #cbd5e1 !important;
+            cursor: not-allowed;
+        }
+
+        /* Footer link */
+        .mnc-signin-footer {
+            text-align: center;
+            font-size: 1.02rem;
+            color: #64748b !important;
+        }
+
+        .mnc-signin-footer a {
+            color: #0f172a !important;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .mnc-signin-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── RESPONSIVE ─────────────────────────────────────────── */
+
+        /* Tablet (≤ 768px) */
+        @media (max-width: 768px) {
+            .mnc-viewport {
+                padding: 2rem 1rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2.5rem 2rem;
+                border-radius: 20px;
+                margin-top: 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.75rem;
+            }
+
+            .mnc-card-header p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Mobile (≤ 576px) */
+        @media (max-width: 576px) {
+            .mnc-viewport {
+                padding: 1rem 0.75rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2rem 1.25rem;
+                border-radius: 16px;
+                margin-top: 0.5rem;
+                border-left: none;
+                border-right: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.55rem;
+            }
+
+            .mnc-card-header .logo-box img {
+                max-height: 30px;
+            }
+
+            .mnc-label {
+                font-size: 0.92rem;
+            }
+
+            .mnc-input {
+                height: 50px;
+                font-size: 1rem;
+            }
+
+            .mnc-btn-submit {
+                height: 50px;
+                font-size: 1rem;
+                margin-top: 1.25rem;
+            }
+
+            .mnc-signin-footer {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Very small (≤ 375px) */
+        @media (max-width: 375px) {
+            .mnc-card-wrapper {
+                padding: 1.75rem 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .mnc-input {
+                height: 48px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <%- include('../partials/navbar-new') %>
-    
-    <!-- PAGE HEADER -->
-    <section class="page-header text-center">
-        <div class="container">
-            <h1>Welcome Back</h1>
-            <p>Sign in to your account</p>
-        </div>
-    </section>
 
-    <!-- LOGIN SECTION -->
-    <section class="py-5 bg-light-custom">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6 col-xl-5">
-                    <div class="card border-0 shadow-sm" style="border-radius: 24px;">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <i class="bi bi-person-circle mb-3" style="font-size: 3rem; color: var(--accent);"></i>
-                            </div>
+    <div class="mnc-viewport">
+        <div class="mnc-card-wrapper">
+            <div class="mnc-card-header">
+                <div class="logo-box">
+                    <% if (siteSettings && siteSettings.logo && siteSettings.logo.url) { %>
+                        <img src="<%= siteSettings.logo.url %>" alt="Swadesi Carts">
+                    <% } else { %>
+                        <h4 class="fw-bold mb-0 text-dark" style="letter-spacing: 0.5px; font-family: 'Poppins', sans-serif;">Swadesi<span style="color: #FFD700;">Carts</span></h4>
+                    <% } %>
+                </div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to your Swadesi Carts account</p>
+            </div>
 
-                            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-                                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                                    <i class="bi bi-exclamation-circle me-2"></i><%= error %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            <% } %>
-                            
-                            <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
-                                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
-                                    <i class="bi bi-check-circle me-2"></i><%= success %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            <% } %>
+            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+                <div class="alert border-0 mb-4" role="alert" style="border-radius: 12px; font-size: 0.9rem; background-color: #fef2f2; color: #b91c1c;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
+                </div>
+            <% } %>
 
-                            <form action="/login" method="POST">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <div class="mb-4">
-                                    <label class="form-label fw-medium text-muted small ms-1 mb-1">Email Address *</label>
-                                    <input type="email" class="form-control form-control-lg" name="email" placeholder="name@example.com" required autofocus style="border-radius: 12px; font-size: 1rem;">
-                                </div>
-                                
-                                <div class="mb-5">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <label class="form-label fw-medium text-muted small ms-1 mb-0">Password *</label>
-                                        <a href="/forgot-password" class="small text-decoration-none fw-medium" style="color: var(--primary);">Forgot Password?</a>
-                                    </div>
-                                    <input type="password" class="form-control form-control-lg" name="password" placeholder="••••••••" required style="border-radius: 12px; font-size: 1rem;">
-                                </div>
-                                
-                                <button type="submit" class="btn btn-accent btn-lg w-100 mb-4" style="border-radius: 12px; font-weight: 600;">
-                                    Login
-                                </button>
-                                
-                                <div class="text-center">
-                                    <p class="text-muted-custom mb-0">Don't have an account? <a href="/register" class="fw-bold text-decoration-none" style="color: var(--primary);">Create one</a></p>
-                                </div>
-                            </form>
-                        </div>
+            <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+                <div class="alert border-0 mb-4" role="alert" style="border-radius: 12px; font-size: 0.9rem; background-color: #f0fdf4; color: #15803d;">
+                    <i class="bi bi-check-circle-fill me-2"></i> <%= success %>
+                </div>
+            <% } %>
+
+            <form action="/login" method="POST" id="loginForm">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="mnc-label">Email Address</label>
+                    <div class="mnc-input-group">
+                        <input type="email" class="mnc-input" name="email" id="emailInput" placeholder="name@example.com" required autofocus autocomplete="email">
+                        <i class="bi bi-envelope field-icon"></i>
                     </div>
                 </div>
-            </div>
+
+                <!-- Password -->
+                <div class="mb-1">
+                    <div class="mnc-pw-header">
+                        <label class="mnc-label" for="passwordInput">Password</label>
+                        <a href="/forgot-password" class="mnc-forgot-link">Forgot password?</a>
+                    </div>
+                    <div class="mnc-input-group" style="margin-bottom: 0;">
+                        <input type="password" class="mnc-input" name="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password" style="padding-right: 48px;">
+                        <i class="bi bi-lock field-icon"></i>
+                        <button type="button" class="btn-toggle-password" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                            <i class="bi bi-eye" id="pwIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="mnc-btn-submit" id="submitBtn">
+                    <span>Sign In</span> <i class="bi bi-arrow-right"></i>
+                </button>
+
+                <div class="mnc-signin-footer">
+                    Don't have an account? <a href="/register" class="fw-bold">Create your account &rarr;</a>
+                </div>
+            </form>
         </div>
-    </section>
+    </div>
 
     <%- include('../partials/footer-new') %>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/main.js"></script>
+    <script>
+        // Toggle password visibility
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passwordInput = document.getElementById('passwordInput');
+        const pwIcon = document.getElementById('pwIcon');
+
+        toggleBtn.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                pwIcon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                pwIcon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+
+        // Add hover effect via JS (mirrors register page)
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.addEventListener('mouseover', () => {
+            submitBtn.style.setProperty('background', '#000000', 'important');
+            submitBtn.querySelector('span').style.setProperty('color', '#ffffff', 'important');
+            submitBtn.querySelector('i').style.setProperty('color', '#ffffff', 'important');
+        });
+        submitBtn.addEventListener('mouseout', () => {
+            submitBtn.style.setProperty('background', 'transparent', 'important');
+            submitBtn.querySelector('span').style.setProperty('color', '#000000', 'important');
+            submitBtn.querySelector('i').style.setProperty('color', '#000000', 'important');
+        });
+
+        // Show loading state on submit
+        document.getElementById('loginForm').addEventListener('submit', function() {
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Signing in... <i class="bi bi-arrow-right"></i>';
+            submitBtn.disabled = true;
+        });
+    </script>
 </body>
 </html>
