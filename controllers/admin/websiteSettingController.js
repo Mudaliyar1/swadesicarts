@@ -1,9 +1,10 @@
-const WebsiteSetting = require('../../models/WebsiteSetting');
+﻿const WebsiteSetting = require('../../models/WebsiteSetting');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
 const fs = require('fs');
 const path = require('path');
 const { normalizeSiteUrl } = require('../../helpers/siteUrl');
+const { invalidateSettingsCache } = require('../../middleware/websiteSettings');
 
 const buildDefaultDesignEditor = () => ({ rules: [] });
 
@@ -139,58 +140,58 @@ exports.getSettings = async (req, res) => {
           teamMembers: [],
           values: [
             {
-              icon: '🌟',
+              icon: 'ðŸŒŸ',
               title: 'Quality',
               description: 'We never compromise on quality. Every product is carefully selected and tested.'
             },
             {
-              icon: '✓',
+              icon: 'âœ“',
               title: 'Authenticity',
               description: 'All products come with proper certifications and guarantees.'
             },
             {
-              icon: '💙',
+              icon: 'ðŸ’™',
               title: 'Customer Care',
               description: 'Your satisfaction is our priority. We\'re always here to help.'
             },
             {
-              icon: '🚀',
+              icon: 'ðŸš€',
               title: 'Innovation',
               description: 'We continuously improve our services and offerings.'
             }
           ]
         }
       });
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     // Ensure teamMembers array exists
     if (!settings.about.teamMembers) {
       settings.about.teamMembers = [];
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!settings.carousel) {
       settings.carousel = [];
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!settings.siteUrl) {
       settings.siteUrl = normalizeSiteUrl();
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!settings.announcementBar) {
       settings.announcementBar = {
         enabled: false,
-        text: '🔥 Fresh offers and updates available now',
+        text: 'ðŸ”¥ Fresh offers and updates available now',
         speed: 18,
         backgroundColor: '#2c5f2d',
         textColor: '#ffffff',
         loop: true,
         closeButton: true
       };
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     // Ensure layout exists with defaults
@@ -199,7 +200,7 @@ exports.getSettings = async (req, res) => {
         heroPaddingTop: 100,
         heroPaddingBottom: 100
       };
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     // Ensure colors exist with defaults
@@ -213,24 +214,24 @@ exports.getSettings = async (req, res) => {
         linkColor: '#B5A886',
         headerFooterLinkColor: '#FFD700'
       };
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     } else {
       // Ensure text colors exist in existing color objects
       if (!settings.colors.headingText) {
         settings.colors.headingText = '#2c3e50';
-        await settings.save();
+        await settings.save(); invalidateSettingsCache();
       }
       if (!settings.colors.bodyText) {
         settings.colors.bodyText = '#495057';
-        await settings.save();
+        await settings.save(); invalidateSettingsCache();
       }
       if (!settings.colors.linkColor) {
         settings.colors.linkColor = '#B5A886';
-        await settings.save();
+        await settings.save(); invalidateSettingsCache();
       }
       if (!settings.colors.headerFooterLinkColor) {
         settings.colors.headerFooterLinkColor = '#FFD700';
-        await settings.save();
+        await settings.save(); invalidateSettingsCache();
       }
     }
 
@@ -259,17 +260,17 @@ exports.getSiteEditor = async (req, res) => {
       settings = new WebsiteSetting({
         designEditor: buildDefaultDesignEditor()
       });
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!settings.designEditor) {
       settings.designEditor = buildDefaultDesignEditor();
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!Array.isArray(settings.designEditor.rules)) {
       settings.designEditor.rules = [];
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     const selectedPage = normalizePreviewPath(req.query.page || '/');
@@ -317,7 +318,7 @@ exports.saveSiteEditor = async (req, res) => {
 
     settings.designEditor = settings.designEditor || buildDefaultDesignEditor();
     settings.designEditor.rules = parsedRules;
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     req.flash('success', 'Website editor styles saved successfully');
     res.redirect(`/admin/site-editor?page=${encodeURIComponent(normalizePreviewPath(req.body.previewPage || '/'))}`);
@@ -337,7 +338,7 @@ exports.resetSiteEditor = async (req, res) => {
 
     // Clear all design editor rules to restore default theme
     settings.designEditor = buildDefaultDesignEditor();
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     req.flash('success', 'Website has been reset to default theme');
     res.redirect('/admin/site-editor');
@@ -354,12 +355,12 @@ exports.getCarousel = async (req, res) => {
 
     if (!settings) {
       settings = new WebsiteSetting({ carousel: [] });
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     if (!settings.carousel) {
       settings.carousel = [];
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     const editId = req.query.edit || '';
@@ -426,7 +427,7 @@ exports.addCarouselItem = async (req, res) => {
       descFontSize: descFontSize || '1.25rem'
     });
 
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
     req.flash('success', 'Carousel item added successfully');
     res.redirect('/admin/settings/carousel');
   } catch (error) {
@@ -485,7 +486,7 @@ exports.updateCarouselItem = async (req, res) => {
       };
     }
 
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
     req.flash('success', 'Carousel item updated successfully');
     res.redirect('/admin/settings/carousel');
   } catch (error) {
@@ -514,7 +515,7 @@ exports.deleteCarouselItem = async (req, res) => {
     }
 
     settings.carousel.pull(req.params.id);
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     return res.status(200).json({ success: true, message: 'Carousel item deleted successfully' });
   } catch (error) {
@@ -592,7 +593,7 @@ exports.updateSettings = async (req, res) => {
         : Object.values(req.body.values);
 
       settings.about.values = valuesArray.map(value => ({
-        icon: value.icon || '🌟',
+        icon: value.icon || 'ðŸŒŸ',
         title: value.title || '',
         description: value.description || ''
       }));
@@ -677,7 +678,7 @@ exports.updateSettings = async (req, res) => {
     const currentAnnouncementBar = settings.announcementBar || {};
     settings.announcementBar = {
       enabled: req.body['announcementBar.enabled'] === 'on' || req.body['announcementBar.enabled'] === 'true',
-      text: req.body['announcementBar.text'] || currentAnnouncementBar.text || '🔥 Fresh offers and updates available now',
+      text: req.body['announcementBar.text'] || currentAnnouncementBar.text || 'ðŸ”¥ Fresh offers and updates available now',
       speed: parseInt(req.body['announcementBar.speed'], 10) || currentAnnouncementBar.speed || 18,
       backgroundColor: req.body['announcementBar.backgroundColor'] || currentAnnouncementBar.backgroundColor || '#2c5f2d',
       textColor: req.body['announcementBar.textColor'] || currentAnnouncementBar.textColor || '#ffffff',
@@ -784,7 +785,7 @@ exports.updateSettings = async (req, res) => {
       };
     }
 
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
     persistRobotsTxt(settings.siteUrl || normalizeSiteUrl());
 
     req.flash('success', 'Website settings updated successfully');
@@ -810,7 +811,7 @@ exports.deleteLogo = async (req, res) => {
 
     settings.logo.url = '';
     settings.logo.publicId = '';
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     return res.status(200).json({ success: true });
   } catch (error) {
@@ -833,7 +834,7 @@ exports.deleteAboutImage = async (req, res) => {
 
     settings.about.image.url = '';
     settings.about.image.publicId = '';
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     return res.status(200).json({ success: true });
   } catch (error) {
@@ -874,7 +875,7 @@ exports.addTeamMember = async (req, res) => {
     };
 
     settings.about.teamMembers.push(newMember);
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     req.flash('success', 'Team member added successfully');
     res.redirect('/admin/settings/team');
@@ -918,7 +919,7 @@ exports.updateTeamMember = async (req, res) => {
       member.image.publicId = result.public_id;
     }
 
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     req.flash('success', 'Team member updated successfully');
     res.redirect('/admin/settings/team');
@@ -949,7 +950,7 @@ exports.deleteTeamMember = async (req, res) => {
     }
 
     settings.about.teamMembers.pull(memberId);
-    await settings.save();
+    await settings.save(); invalidateSettingsCache();
 
     return res.status(200).json({ success: true, message: 'Team member deleted successfully' });
   } catch (error) {
@@ -969,35 +970,35 @@ exports.getTeamMembers = async (req, res) => {
           teamMembers: [],
           values: [
             {
-              icon: '🌟',
+              icon: 'ðŸŒŸ',
               title: 'Quality',
               description: 'We never compromise on quality. Every product is carefully selected and tested.'
             },
             {
-              icon: '✓',
+              icon: 'âœ“',
               title: 'Authenticity',
               description: 'All products come with proper certifications and guarantees.'
             },
             {
-              icon: '💙',
+              icon: 'ðŸ’™',
               title: 'Customer Care',
               description: 'Your satisfaction is our priority. We\'re always here to help.'
             },
             {
-              icon: '🚀',
+              icon: 'ðŸš€',
               title: 'Innovation',
               description: 'We continuously improve our services and offerings.'
             }
           ]
         }
       });
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     // Ensure teamMembers array exists
     if (!settings.about.teamMembers) {
       settings.about.teamMembers = [];
-      await settings.save();
+      await settings.save(); invalidateSettingsCache();
     }
 
     res.render('admin/settings/team', {
@@ -1016,3 +1017,4 @@ exports.getTeamMembers = async (req, res) => {
     res.redirect('/admin/settings');
   }
 };
+
