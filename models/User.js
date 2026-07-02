@@ -69,6 +69,22 @@ const userSchema = new mongoose.Schema({
   },
   lockUntil: {
     type: Date
+  },
+  resetOtp: {
+    type: String,
+    default: null
+  },
+  resetOtpExpires: {
+    type: Date,
+    default: null
+  },
+  resetOtpAttempts: {
+    type: Number,
+    default: 0
+  },
+  resetOtpLastSent: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

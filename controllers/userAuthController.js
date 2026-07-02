@@ -499,3 +499,243 @@ exports.clearIpAttempts = (ip) => {
     delete ipOtpAttempts[ip];
   }
 };
+
+// Show Forgot Password request form
+exports.showForgotPassword = (req, res) => {
+  res.render('public/forgot-password', {
+    title: 'Forgot Password - Swadesi Carts',
+    success: req.flash('success'),
+    error: req.flash('error')
+  });
+};
+
+// Process Forgot Password request
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      req.flash('error', 'Please enter your email address');
+      return res.redirect('/forgot-password');
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      req.flash('error', 'User with this email address does not exist');
+      return res.redirect('/forgot-password');
+    }
+
+    // Generate 6 digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetOtp = otp;
+    user.resetOtpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+    user.resetOtpAttempts = 0;
+    user.resetOtpLastSent = new Date();
+    await user.save();
+
+    // Send reset email
+    try {
+      const subject = 'Reset your password - Swadesi Carts';
+      const htmlContent = `<p>Hello ${user.name},</p><p>We received a request to reset your password. Your OTP for password reset is: <strong>${otp}</strong></p><p>This OTP is valid for 10 minutes. If you did not request this, you can ignore this email.</p>`;
+      await sendEmail(user.email, subject, htmlContent);
+    } catch (emailError) {
+      console.error('Error sending reset OTP email:', emailError);
+      req.flash('error', 'Failed to send OTP email. Please try again.');
+      return res.redirect('/forgot-password');
+    }
+
+    req.flash('success', 'A password reset code has been sent to your email.');
+    res.redirect(`/forgot-password/verify?email=${encodeURIComponent(cleanEmail)}`);
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect('/forgot-password');
+  }
+};
+
+// Show Forgot Password OTP verification page
+exports.showForgotPasswordVerify = (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    req.flash('error', 'Invalid password reset request');
+    return res.redirect('/forgot-password');
+  }
+  res.render('public/forgot-password-verify', {
+    title: 'Verify Password Reset - Swadesi Carts',
+    email: email.trim().toLowerCase(),
+    success: req.flash('success'),
+    error: req.flash('error')
+  });
+};
+
+// Process OTP Verification (AJAX)
+exports.forgotPasswordVerify = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Check if OTP exists and is not expired
+    if (!user.resetOtp || !user.resetOtpExpires || user.resetOtpExpires < new Date()) {
+      return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+    }
+
+    // Check if attempts exceeded
+    if (user.resetOtpAttempts >= 5) {
+      // Invalidate OTP
+      user.resetOtp = null;
+      user.resetOtpExpires = null;
+      user.resetOtpAttempts = 0;
+      await user.save();
+      return res.status(400).json({ success: false, message: 'Too many verification attempts. This OTP has been invalidated. Please request a new code.' });
+    }
+
+    if (user.resetOtp !== otp.trim()) {
+      user.resetOtpAttempts += 1;
+      await user.save();
+
+      if (user.resetOtpAttempts >= 5) {
+        // Invalidate OTP
+        user.resetOtp = null;
+        user.resetOtpExpires = null;
+        user.resetOtpAttempts = 0;
+        await user.save();
+        return res.status(400).json({ success: false, message: 'Too many incorrect attempts. This OTP has been invalidated. Please request a new code.' });
+      }
+
+      return res.status(400).json({ success: false, message: `Incorrect OTP. You have ${5 - user.resetOtpAttempts} attempts left.` });
+    }
+
+    // Verification successful. Set reset session parameter.
+    req.session.resetEmail = user.email;
+    
+    return res.json({ success: true, redirect: '/forgot-password/reset' });
+  } catch (error) {
+    console.error('Verify reset OTP error:', error);
+    return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+  }
+};
+
+// API: Resend Reset OTP with 15-second cooldown
+exports.apiResendResetOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: cleanEmail });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Cooldown check: 15 seconds
+    const now = new Date();
+    if (user.resetOtpLastSent && (now - user.resetOtpLastSent < 15 * 1000)) {
+      const waitTime = Math.ceil((15 * 1000 - (now - user.resetOtpLastSent)) / 1000);
+      return res.status(429).json({ success: false, message: `Please wait ${waitTime} seconds before requesting a new OTP.` });
+    }
+
+    // Generate new OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetOtp = otp;
+    user.resetOtpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+    user.resetOtpAttempts = 0;
+    user.resetOtpLastSent = now;
+    await user.save();
+
+    // Send email
+    try {
+      const subject = 'Resend Reset OTP - Swadesi Carts';
+      const htmlContent = `<p>Hello ${user.name},</p><p>Your password reset OTP has been resent. Your code is: <strong>${otp}</strong></p><p>This OTP is valid for 10 minutes. If you did not request this, please ignore it.</p>`;
+      await sendEmail(user.email, subject, htmlContent);
+    } catch (emailError) {
+      console.error('Error sending resend reset OTP email:', emailError);
+      return res.status(500).json({ success: false, message: 'Failed to send OTP email. Please try again.' });
+    }
+
+    return res.json({ success: true, message: 'New password reset OTP sent successfully.' });
+  } catch (error) {
+    console.error('Resend reset OTP error:', error);
+    return res.status(500).json({ success: false, message: 'An error occurred. Please try again.' });
+  }
+};
+
+// Show New Password Reset entry form
+exports.showForgotPasswordReset = (req, res) => {
+  if (!req.session.resetEmail) {
+    req.flash('error', 'Session expired. Please request a password reset again.');
+    return res.redirect('/forgot-password');
+  }
+
+  res.render('public/forgot-password-reset', {
+    title: 'Reset Password - Swadesi Carts',
+    email: req.session.resetEmail,
+    success: req.flash('success'),
+    error: req.flash('error')
+  });
+};
+
+// Process Password Reset Submission
+exports.forgotPasswordReset = async (req, res) => {
+  try {
+    if (!req.session.resetEmail) {
+      req.flash('error', 'Session expired. Please request a password reset again.');
+      return res.redirect('/forgot-password');
+    }
+
+    const { password, confirmPassword } = req.body;
+    if (!password || !confirmPassword) {
+      req.flash('error', 'All fields are required');
+      return res.redirect('/forgot-password/reset');
+    }
+
+    if (password.length < 6) {
+      req.flash('error', 'Password must be at least 6 characters long');
+      return res.redirect('/forgot-password/reset');
+    }
+
+    if (password !== confirmPassword) {
+      req.flash('error', 'Passwords do not match');
+      return res.redirect('/forgot-password/reset');
+    }
+
+    const user = await User.findOne({ email: req.session.resetEmail });
+    if (!user) {
+      req.flash('error', 'User not found');
+      return res.redirect('/forgot-password');
+    }
+
+    // Set new password (pre-save middleware automatically hashes it!)
+    user.password = password;
+    
+    // Clear reset OTP fields
+    user.resetOtp = null;
+    user.resetOtpExpires = null;
+    user.resetOtpAttempts = 0;
+    user.resetOtpLastSent = null;
+
+    await user.save();
+
+    // Clean up reset session
+    delete req.session.resetEmail;
+
+    req.flash('success', 'Your password has been successfully reset. Please log in with your new password.');
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Reset password submission error:', error);
+    req.flash('error', 'An error occurred. Please try again.');
+    res.redirect('/forgot-password/reset');
+  }
+};
