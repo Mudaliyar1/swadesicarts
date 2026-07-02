@@ -34,11 +34,17 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-Disallow: /admin/
-Disallow: /admin/login
-Disallow: /admin/dashboard
-Disallow: /dashboard
-Disallow: /api/visitor
+# Directives
+Disallow: /admin/*
+Disallow: /dashboard/*
+Disallow: /login-admin
+Disallow: /auth/*
+Disallow: /api/private/*
+Disallow: /internal/*
+Disallow: /private/*
+Disallow: /config/*
+Disallow: /uploads/private/*
 
-# Sitemap location
-Sitemap: https://swadeshi-official-b-a-c.officialbac.in/sitemap.xml
+# Sitemap Locations
+Sitemap: https://swadesicarts.in/sitemap.xml
+Sitemap: https://swadesicarts.in/geositemap.xml

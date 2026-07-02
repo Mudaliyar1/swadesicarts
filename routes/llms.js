@@ -9,6 +9,10 @@ router.get('/ai-manifest.json', llmsController.getAiManifest);
 router.get('/entities.json', llmsController.getEntitiesJson);
 router.get('/knowledge-base.json', llmsController.getKnowledgeBase);
 router.get('/api/ai-discovery', llmsController.getAiDiscovery);
+router.get('/organization.json', llmsController.getOrganizationJson);
+router.get('/products.json', llmsController.getProductsJson);
+router.get('/services.json', llmsController.getServicesJson);
+router.get('/faqs.json', llmsController.getFaqsJson);
 
 module.exports = router;
 

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<%= csrfToken %>">
+    <title><%= title %> - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <style>
+        :root {
+            --primary: #4C1E4F;
+            --primary-light: #6c2b70;
+            --accent: #B5A886;
+            --secondary: #6C8E7F;
+            --dark-bg: #1e1e2f;
+            --light-bg: #f8f9fa;
+        }
+
+        .asset-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -3px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+        .status-badge {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            border-radius: 20px;
+            padding: 4px 10px;
+        }
+        .progress-bar-glow {
+            box-shadow: 0 0 15px rgba(76, 30, 79, 0.3);
+            height: 12px;
+            border-radius: 6px;
+        }
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin: 0 auto;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transition: all 0.4s ease;
+        }
+        .score-circle-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff;
+        }
+        .score-circle-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+        }
+        .score-circle-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #ffffff;
+        }
+        .intelligence-panel {
+            background: linear-gradient(135deg, #ffffff 0%, #fefaff 100%);
+            border: 1px solid rgba(76, 30, 79, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+        }
+        .nav-pills .nav-link {
+            color: #495057;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            margin: 0 4px;
+        }
+        .nav-pills .nav-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(76, 30, 79, 0.15);
+        }
+        .nav-pills .nav-link:hover:not(.active) {
+            background-color: rgba(76, 30, 79, 0.05);
+            color: var(--primary);
+        }
+        .copy-btn-badge {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .copy-btn-badge:hover {
+            transform: scale(1.05);
+        }
+        /* Chat Simulator Styling */
+        .chat-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+        .chat-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 16px;
+        }
+        .chat-body {
+            padding: 16px;
+            background-color: #fcfcfd;
+        }
+        .chat-bubble {
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            max-width: 85%;
+        }
+        .chat-bubble-user {
+            background-color: #f1edf2;
+            color: #2d1a30;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .chat-bubble-bot {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #333333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .chat-header-chatgpt { border-top: 4px solid #10a37f !important; }
+        .chat-header-gemini { border-top: 4px solid #1a73e8 !important; }
+        .chat-header-perplexity { border-top: 4px solid #39a2db !important; }
+        .chat-header-claude { border-top: 4px solid #d97753 !important; }
+        .chat-header-copilot { border-top: 4px solid #0078d4 !important; }
+        
+        .chat-title-chatgpt { color: #10a37f !important; }
+        .chat-title-gemini { color: #1a73e8 !important; }
+        .chat-title-perplexity { color: #39a2db !important; }
+        .chat-title-claude { color: #d97753 !important; }
+        .chat-title-copilot { color: #0078d4 !important; }
+    </style>
+</head>
+<body class="admin-body">
+    
+    <%- include('../../partials/admin-sidebar') %>
+
+    <div class="admin-content" style="margin-left: 280px; padding-top: 20px;">
+        <div class="container-fluid p-4">
+            
+            <div id="alertContainer"></div>
+
+            <!-- Page Title Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <div>
+                    <h2 class="fw-bold mb-1" style="color: var(--dark-bg);"><i class="bi bi-cpu-fill text-primary me-2"></i>AI-Powered Website Intelligence Center</h2>
+                    <p class="text-muted mb-0">Unified dashboard for SEO tracking, GEO local intent indexing, sitemap auditing, and simulated AI search intelligence.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button id="analyzeBtn" class="btn btn-primary fw-semibold shadow-sm" style="border-radius: 10px; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border: none;">
+                        <i class="bi bi-arrow-repeat me-1"></i> Analyze Website
+                    </button>
+                </div>
+            </div>
+
+            <!-- Progress Bar Loader -->
+            <div id="progressBarContainer" class="card border-0 shadow-sm p-4 mb-4 d-none" style="border-radius: 20px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-semibold text-primary" id="progressText">Analyzing website entities...</span>
+                    <span class="text-muted small">Please wait</span>
+                </div>
+                <div class="progress progress-bar-glow bg-light">
+                    <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Health Score Gauges -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm text-center p-4 bg-white" style="border-radius: 20px;">
+                        <h6 class="text-muted mb-3 font-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">SEO Health Score</h6>
+                        <div class="score-circle <%= stats.seoScore >= 80 ? 'score-circle-success' : stats.seoScore >= 50 ? 'score-circle-warning' : 'score-circle-danger' %> mb-3">
+                            <%= stats.seoScore %>%
+                        </div>
+                        <p class="mb-0 text-muted small"><%= stats.totalMissingSeo %> meta elements missing</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm text-center p-4 bg-white" style="border-radius: 20px;">
+                        <h6 class="text-muted mb-3 font-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">GEO Health Score</h6>
+                        <div class="score-circle <%= stats.geoScore >= 80 ? 'score-circle-success' : stats.geoScore >= 50 ? 'score-circle-warning' : 'score-circle-danger' %> mb-3">
+                            <%= stats.geoScore %>%
+                        </div>
+                        <p class="mb-0 text-muted small"><%= stats.totalMissingGeo %> AI elements missing</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm p-4 bg-white d-flex flex-column justify-content-between" style="border-radius: 20px; min-height: 178px;">
+                        <div>
+                            <h6 class="text-muted mb-2 font-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Organic & Seasonal</h6>
+                            <h3 class="fw-bold mb-1" style="color: var(--dark-bg);"><%= stats.organicTotal + stats.seasonalTotal %></h3>
+                        </div>
+                        <p class="mb-0 text-muted small"><%= stats.organicMissingSeo + stats.seasonalMissingSeo %> missing SEO, <%= stats.organicMissingGeo + stats.seasonalMissingGeo %> missing GEO</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="card border-0 shadow-sm p-4 bg-white d-flex flex-column justify-content-between" style="border-radius: 20px; min-height: 178px;">
+                        <div>
+                            <h6 class="text-muted mb-2 font-semibold text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px;">Tech & Policies</h6>
+                            <h3 class="fw-bold mb-1" style="color: var(--dark-bg);"><%= stats.techTotal + stats.policyTotal %></h3>
+                        </div>
+                        <p class="mb-0 text-muted small"><%= stats.techMissingSeo + stats.policyMissingSeo %> missing SEO, <%= stats.techMissingGeo + stats.policyMissingGeo %> missing GEO</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabbed Navigation -->
+            <ul class="nav nav-pills nav-fill mb-4" id="seoGeoTab" role="tablist" style="background-color: #f1f3f5; border-radius: 12px; padding: 6px; border: 1px solid #e9ecef;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active fw-bold py-2.5" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                        <i class="bi bi-speedometer2 me-2"></i>Overview & Pages
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold py-2.5" id="keywords-tab" data-bs-toggle="tab" data-bs-target="#keywords" type="button" role="tab" aria-controls="keywords" aria-selected="false">
+                        <i class="bi bi-tags me-2"></i>SEO & GEO Keywords
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold py-2.5" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#simulator" type="button" role="tab" aria-controls="simulator" aria-selected="false">
+                        <i class="bi bi-chat-left-dots me-2"></i>AI Search Simulator
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link fw-bold py-2.5" id="diagnostics-tab" data-bs-toggle="tab" data-bs-target="#diagnostics" type="button" role="tab" aria-controls="diagnostics" aria-selected="false">
+                        <i class="bi bi-shield-exclamation me-2"></i>System Diagnostics
+                        <% if (reportData && reportData.diagnostics && reportData.diagnostics.length > 0) { %>
+                            <span class="badge rounded-pill bg-danger ms-1"><%= reportData.diagnostics.length %></span>
+                        <% } %>
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="seoGeoTabContent">
+                
+                <!-- TAB 1: OVERVIEW & PAGES -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+                    
+                    <!-- Intelligence Action Center -->
+                    <div class="intelligence-panel mb-4">
+                        <div class="row align-items-center">
+                            <div class="col-lg-7">
+                                <h5 class="fw-bold text-primary mb-2"><i class="bi bi-lightning-charge-fill me-1"></i>AI-Powered Metadata Automations</h5>
+                                <p class="text-muted small mb-0">
+                                    Clicking apply operations will write structured entity descriptions and keywords directly to blank document fields in MongoDB, preserving your custom entries.
+                                </p>
+                            </div>
+                            <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
+                                <button id="applySeoBtn" class="btn btn-outline-primary fw-semibold me-2" style="border-radius: 8px;">
+                                    <i class="bi bi-file-earmark-arrow-up me-1"></i> Apply SEO Intelligence
+                                </button>
+                                <button id="applyGeoBtn" class="btn btn-outline-secondary fw-semibold" style="border-radius: 8px;">
+                                    <i class="bi bi-geo-alt me-1"></i> Apply GEO Intelligence
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indexable Assets & AI Discovery Endpoints -->
+                    <h5 class="fw-bold mb-3" style="color: var(--dark-bg);"><i class="bi bi-file-earmark-text-fill me-2 text-primary"></i>Indexable Assets & AI Discovery Endpoints</h5>
+                    <div class="row g-4 mb-4">
+                        <% if (reportData && reportData.auditedFiles) { %>
+                            <% reportData.auditedFiles.forEach(f => { %>
+                                <div class="col-md-6 col-lg-3">
+                                    <div class="card asset-card p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold mb-0 text-truncate" style="max-width: 140px;"><%= f.filename %></h6>
+                                            <span class="status-badge <%= f.status === 'Optimal' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger' %>">
+                                                <%= f.status %>
+                                            </span>
+                                        </div>
+                                        <p class="text-muted small mb-3">Location: <span class="font-monospace"><%= f.path %></span><br>Size: <%= f.size %> bytes</p>
+                                        <a href="<%= f.path %>" target="_blank" class="btn btn-sm btn-outline-primary align-self-start"><i class="bi bi-box-arrow-up-right me-1"></i> View File</a>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="col-12">
+                                <div class="alert alert-info border-0 shadow-sm" style="border-radius: 12px;">
+                                    <i class="bi bi-info-circle-fill me-2"></i> Please run the Website Analysis to audit your AI and Search Engine endpoint files.
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- Page-Level Optimizations Details -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" style="border-top-left-radius: 20px; border-top-right-radius: 20px;">
+                            <h5 class="mb-0 fw-bold" style="color: var(--dark-bg);">Page Optimization Status Drawer</h5>
+                            <div class="d-flex gap-2">
+                                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search page..." style="width: 250px; border-radius: 8px;">
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0" id="seoGeoTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Page Title</th>
+                                            <th>Segment</th>
+                                            <th>SEO Meta Status</th>
+                                            <th>GEO AI Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% products.forEach(p => { %>
+                                        <tr>
+                                            <td class="fw-semibold"><%= p.title %></td>
+                                            <td>
+                                                <span class="badge bg-light text-dark text-capitalize"><%= p.type %></span>
+                                            </td>
+                                            <td>
+                                                <% if (p.isMissingSeo) { %>
+                                                    <span class="badge bg-danger-subtle text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Missing Tags</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>SEO Completed</span>
+                                                <% } %>
+                                            </td>
+                                            <td>
+                                                <% if (p.isMissingGeo) { %>
+                                                    <span class="badge bg-danger-subtle text-danger"><i class="bi bi-exclamation-circle-fill me-1"></i>Missing GEO</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>GEO Completed</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="text-end">
+                                                <a href="<%= p.editUrl %>" class="btn btn-sm btn-outline-primary" style="border-radius: 8px;">
+                                                    <i class="bi bi-pencil-square me-1"></i> Edit Tags
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: SEO & GEO KEYWORDS -->
+                <div class="tab-pane fade" id="keywords" role="tabpanel" aria-labelledby="keywords-tab">
+                    
+                    <% if (reportData && reportData.keywords) { %>
+                        
+                        <!-- Report Center Controls -->
+                        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 bg-light p-3 rounded-4 border">
+                            <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-file-earmark-zip me-1"></i>Export & Report Center</h6>
+                            <div class="d-flex gap-2">
+                                <button onclick="exportCSV()" class="btn btn-sm btn-outline-success fw-bold"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV</button>
+                                <button onclick="exportTXT()" class="btn btn-sm btn-outline-dark fw-bold"><i class="bi bi-file-earmark-text me-1"></i>Print TXT Report</button>
+                                <a href="/seo-geo-intelligence-report.json" download class="btn btn-sm btn-outline-primary fw-bold"><i class="bi bi-filetype-json me-1"></i>Download JSON</a>
+                            </div>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- SEO Keyphrase Pools -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 bg-white mb-4" style="border-radius: 20px;">
+                                    <h5 class="fw-bold text-primary mb-3"><i class="bi bi-globe me-2"></i>SEO Target Keyword Pools</h5>
+                                    
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold mb-0 text-dark">Semantic long-tail Keywords</h6>
+                                            <span class="badge bg-secondary copy-btn-badge" id="btn-seo-sem" onclick="copyToClipboard('<%= reportData.keywords.seo.semantic.join(', ') %>', 'btn-seo-sem')"><i class="bi bi-clipboard me-1"></i>Copy</span>
+                                        </div>
+                                        <p class="text-muted small"><%= reportData.keywords.seo.semantic.join(', ') %></p>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold mb-0 text-dark">Voice Search Phrases</h6>
+                                            <span class="badge bg-secondary copy-btn-badge" id="btn-seo-voice" onclick="copyToClipboard('<%= reportData.keywords.seo.voice.join(', ') %>', 'btn-seo-voice')"><i class="bi bi-clipboard me-1"></i>Copy</span>
+                                        </div>
+                                        <p class="text-muted small"><%= reportData.keywords.seo.voice.join(', ') %></p>
+                                    </div>
+
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold mb-0 text-dark">Trending Search Semantics</h6>
+                                            <span class="badge bg-secondary copy-btn-badge" id="btn-seo-trend" onclick="copyToClipboard('<%= reportData.keywords.seo.trending.join(', ') %>', 'btn-seo-trend')"><i class="bi bi-clipboard me-1"></i>Copy</span>
+                                        </div>
+                                        <p class="text-muted small"><%= reportData.keywords.seo.trending.join(', ') %></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- GEO Local Sourcing Pools -->
+                            <div class="col-lg-6">
+                                <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 20px;">
+                                    <h5 class="fw-bold text-success mb-3"><i class="bi bi-geo-alt-fill me-2"></i>GEO & Local Sourcing Intent</h5>
+                                    
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold mb-0 text-dark">Hyperlocal Sourcing Keywords</h6>
+                                            <span class="badge bg-secondary copy-btn-badge" id="btn-geo-local" onclick="copyToClipboard('<%= reportData.keywords.geo.local.join(', ') %>', 'btn-geo-local')"><i class="bi bi-clipboard me-1"></i>Copy</span>
+                                        </div>
+                                        <p class="text-muted small"><%= reportData.keywords.geo.local.join(', ') %></p>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-semibold mb-0 text-dark">Local Coordinates & Area</h6>
+                                            <span class="badge bg-secondary copy-btn-badge" id="btn-geo-coord" onclick="copyToClipboard('<%= reportData.keywords.geo.locationIntent.coordinates %>', 'btn-geo-coord')"><i class="bi bi-clipboard me-1"></i>Copy</span>
+                                        </div>
+                                        <p class="text-muted small mb-1">Center: <strong><%= reportData.keywords.geo.locationIntent.center %></strong></p>
+                                        <p class="text-muted small mb-0">Coordinates: <span class="font-monospace"><%= reportData.keywords.geo.locationIntent.coordinates %></span></p>
+                                    </div>
+
+                                    <div>
+                                        <h6 class="fw-semibold text-dark mb-2">Service Target Sub-Municipalities</h6>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            <% reportData.keywords.geo.locationIntent.serviceAreas.forEach(area => { %>
+                                                <span class="badge bg-success-subtle text-success"><%= area %></span>
+                                            <% }); %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <% } else { %>
+                        <div class="alert alert-info border-0 shadow-sm" style="border-radius: 12px;">
+                            <i class="bi bi-info-circle-fill me-2"></i> Please run the Website Analysis to generate optimized SEO & GEO Keyword Pools.
+                        </div>
+                    <% } %>
+
+                </div>
+
+                <!-- TAB 3: AI SEARCH INTENT SIMULATOR -->
+                <div class="tab-pane fade" id="simulator" role="tabpanel" aria-labelledby="simulator-tab">
+                    
+                    <% if (reportData && reportData.aiSearchIntelligence) { %>
+                        <div class="row g-4">
+                            <% Object.keys(reportData.aiSearchIntelligence).forEach(key => { 
+                                const bot = reportData.aiSearchIntelligence[key];
+                            %>
+                                <div class="col-lg-6">
+                                    <div class="chat-container shadow-sm">
+                                        <div class="chat-header d-flex justify-content-between align-items-center chat-header-<%= key %>">
+                                            <span class="fw-bold chat-title-<%= key %>"><i class="bi bi-robot me-2"></i><%= bot.summary %></span>
+                                            <span class="badge bg-light text-dark font-monospace text-uppercase" style="font-size: 0.65rem;">Simulation</span>
+                                        </div>
+                                        <div class="chat-body d-flex flex-column">
+                                            <div class="chat-bubble chat-bubble-user">
+                                                <div class="small fw-semibold text-uppercase text-secondary mb-1">User Query</div>
+                                                <%= bot.query %>
+                                            </div>
+                                            <div class="chat-bubble chat-bubble-bot">
+                                                <div class="small fw-semibold text-uppercase text-primary mb-1">Simulated Output</div>
+                                                <%= bot.simulatedResponse %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    <% } else { %>
+                        <div class="alert alert-info border-0 shadow-sm" style="border-radius: 12px;">
+                            <i class="bi bi-info-circle-fill me-2"></i> Please run the Website Analysis to generate AI Search Simulator modules.
+                        </div>
+                    <% } %>
+
+                </div>
+
+                <!-- TAB 4: SYSTEM DIAGNOSTICS & ALERTS -->
+                <div class="tab-pane fade" id="diagnostics" role="tabpanel" aria-labelledby="diagnostics-tab">
+                    
+                    <% if (reportData && reportData.diagnostics) { %>
+                        
+                        <div class="row g-4">
+                            <div class="col-lg-7">
+                                <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 20px;">
+                                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-shield-exclamation text-danger me-2"></i>Automated System Flags</h5>
+                                    
+                                    <% if (reportData.diagnostics.length === 0) { %>
+                                        <div class="text-center py-4">
+                                            <i class="bi bi-shield-fill-check text-success fs-1 mb-2"></i>
+                                            <p class="fw-bold text-success mb-0">System fully optimized! 0 flags returned.</p>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="d-flex flex-column gap-3">
+                                            <% reportData.diagnostics.forEach(d => { 
+                                                let border = 'border-start border-4 border-warning';
+                                                let badgeClass = 'bg-warning-subtle text-warning';
+                                                if (d.type === 'CRITICAL') {
+                                                    border = 'border-start border-4 border-danger';
+                                                    badgeClass = 'bg-danger-subtle text-danger';
+                                                } else if (d.type === 'INFO') {
+                                                    border = 'border-start border-4 border-info';
+                                                    badgeClass = 'bg-info-subtle text-info';
+                                                }
+                                            %>
+                                                <div class="p-3 bg-light rounded-3 <%= border %> shadow-sm">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <span class="badge <%= badgeClass %> font-monospace text-uppercase" style="font-size: 0.7rem;"><%= d.type %></span>
+                                                    </div>
+                                                    <p class="fw-semibold text-dark mb-1" style="font-size: 0.95rem;"><%= d.message %></p>
+                                                    <p class="text-muted small mb-0"><strong>Impact:</strong> <%= d.impact %></p>
+                                                </div>
+                                            <% }); %>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-5">
+                                <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 20px;">
+                                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-signpost-split me-2 text-primary"></i>Sitemap Discrepancy Index</h5>
+                                    <p class="text-muted small">The following pages are active in the database but could not be resolved inside <span class="font-monospace">public/sitemap.xml</span>.</p>
+                                    
+                                    <div style="max-height: 380px; overflow-y: auto; padding-right: 4px;">
+                                        <% 
+                                            const missingInSitemap = reportData.items.filter(i => !i.inSitemap);
+                                            if (missingInSitemap.length === 0) { 
+                                        %>
+                                            <div class="text-center py-4">
+                                                <i class="bi bi-check-circle-fill text-success fs-2 mb-2"></i>
+                                                <p class="small text-muted mb-0">All database items mapped in sitemap.xml!</p>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="list-group list-group-flush">
+                                                <% missingInSitemap.forEach(item => { %>
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-0 bg-transparent">
+                                                        <div>
+                                                            <div class="fw-semibold text-dark small"><%= item.title %></div>
+                                                            <div class="text-muted" style="font-size: 0.75rem;">Slug: /<%= item.slug %></div>
+                                                        </div>
+                                                        <span class="badge bg-danger-subtle text-danger" style="font-size: 0.75rem;">Orphan / Desynced</span>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <% } else { %>
+                        <div class="alert alert-info border-0 shadow-sm" style="border-radius: 12px;">
+                            <i class="bi bi-info-circle-fill me-2"></i> Please run the Website Analysis to generate optimized System Diagnostics reports.
+                        </div>
+                    <% } %>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script id="products-data" type="application/json">
+        <%- JSON.stringify(products.map(p => ({ title: p.title, type: p.type, slug: p.slug, isMissingSeo: p.isMissingSeo, isMissingGeo: p.isMissingGeo }))) %>
+    </script>
+    <script id="report-data" type="application/json">
+        <%- JSON.stringify(reportData || null) %>
+    </script>
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const applySeoBtn = document.getElementById('applySeoBtn');
+        const applyGeoBtn = document.getElementById('applyGeoBtn');
+        const progressBarContainer = document.getElementById('progressBarContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const alertContainer = document.getElementById('alertContainer');
+
+        function showAlert(message, type = 'success') {
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show border-0 shadow-sm" role="alert" style="border-radius: 12px; margin-top: 10px;">
+                    <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}-fill me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+            setTimeout(() => {
+                const alertEl = alertContainer.querySelector('.alert');
+                if (alertEl) {
+                    const bsAlert = new bootstrap.Alert(alertEl);
+                    bsAlert.close();
+                }
+            }, 6000);
+        }
+
+        function startProgress(duration, steps, callback) {
+            progressBarContainer.classList.remove('d-none');
+            progressBar.style.width = '0%';
+            let currentPct = 0;
+            let stepIndex = 0;
+
+            const interval = setInterval(() => {
+                if (stepIndex < steps.length) {
+                    progressText.innerText = steps[stepIndex].text;
+                    currentPct = steps[stepIndex].pct;
+                    progressBar.style.width = `${currentPct}%`;
+                    stepIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressBarContainer.classList.add('d-none');
+                        callback();
+                    }, 500);
+                }
+            }, duration / steps.length);
+        }
+
+        if (analyzeBtn) {
+            analyzeBtn.addEventListener('click', async () => {
+                analyzeBtn.disabled = true;
+                const steps = [
+                    { text: 'Scanning Mongoose database models...', pct: 15 },
+                    { text: 'Auditing physical files (robots.txt, manifests)...', pct: 35 },
+                    { text: 'Checking public/sitemap.xml discrepancies...', pct: 60 },
+                    { text: 'Generating AI discoverability keywords...', pct: 85 },
+                    { text: 'Generating simulated search queries...', pct: 100 }
+                ];
+
+                startProgress(2500, steps, async () => {
+                    try {
+                        const response = await fetch('/admin/seo-geo/analyze', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-csrf-token': '<%= csrfToken %>'
+                            }
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            showAlert(data.message, 'success');
+                            setTimeout(() => window.location.reload(), 1200);
+                        } else {
+                            showAlert(data.message || 'Analysis failed.', 'danger');
+                            analyzeBtn.disabled = false;
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        showAlert('Network error occurred during analysis.', 'danger');
+                        analyzeBtn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        const handleApply = (mode, btn) => {
+            btn.disabled = true;
+            const steps = [
+                { text: `Querying empty fields in database...`, pct: 20 },
+                { text: `Applying automated ${mode.toUpperCase()} recommendations...`, pct: 50 },
+                { text: `Saving updates to MongoDB...`, pct: 80 },
+                { text: `Re-running website system audit...`, pct: 100 }
+            ];
+
+            startProgress(2000, steps, async () => {
+                try {
+                    const response = await fetch('/admin/seo-geo/apply', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-csrf-token': '<%= csrfToken %>'
+                        },
+                        body: JSON.stringify({ mode })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showAlert(data.message, 'success');
+                        setTimeout(() => window.location.reload(), 1200);
+                    } else {
+                        showAlert(data.message || 'Failed to apply intelligence.', 'danger');
+                        btn.disabled = false;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    showAlert('Network error occurred during application.', 'danger');
+                    btn.disabled = false;
+                }
+            });
+        };
+
+        if (applySeoBtn) {
+            applySeoBtn.addEventListener('click', () => {
+                if (confirm('This will fill missing SEO Meta fields (Title, Keywords, Description) with auto-suggestions without overriding custom settings. Proceed?')) {
+                    handleApply('seo', applySeoBtn);
+                }
+            });
+        }
+
+        if (applyGeoBtn) {
+            applyGeoBtn.addEventListener('click', () => {
+                if (confirm('This will fill missing GEO / AI fields (geoSummary, aiDescription, aiKeywords, entityDescription) with auto-suggestions without overriding custom settings. Proceed?')) {
+                    handleApply('geo', applyGeoBtn);
+                }
+            });
+        }
+
+        // Copy functionality
+        function copyToClipboard(text, elementId) {
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBadge = document.getElementById(elementId);
+                if (copyBadge) {
+                    const originalText = copyBadge.innerHTML;
+                    copyBadge.innerHTML = '<i class="bi bi-check-lg me-1"></i> Copied!';
+                    copyBadge.classList.remove('bg-secondary');
+                    copyBadge.classList.add('bg-success');
+                    setTimeout(() => {
+                        copyBadge.innerHTML = originalText;
+                        copyBadge.classList.remove('bg-success');
+                        copyBadge.classList.add('bg-secondary');
+                    }, 2000);
+                }
+            });
+        }
+        // CSV Export of Pages status
+        function exportCSV() {
+            const productsData = JSON.parse(document.getElementById('products-data').textContent || '[]');
+            const rows = [
+                ['Page Title', 'Segment', 'Slug', 'SEO Status', 'GEO Status']
+            ];
+            productsData.forEach(p => {
+                rows.push([
+                    p.title.replace(/"/g, '""'),
+                    p.type,
+                    p.slug,
+                    p.isMissingSeo ? 'Missing Metadata' : 'Optimal',
+                    p.isMissingGeo ? 'Missing AI Summary' : 'Optimal'
+                ]);
+            });
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            rows.forEach(r => {
+                csvContent += r.map(val => `"${val}"`).join(",") + "\r\n";
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "swadesi-carts-pages-optimization.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Formatted TXT export of the full audit
+        function exportTXT() {
+            const reportData = JSON.parse(document.getElementById('report-data').textContent || 'null');
+            let txt = "==================================================\n";
+            txt += "SWADESI CARTS - SEO & GEO INTELLIGENCE REPORT\n";
+            txt += "==================================================\n";
+            if (reportData) {
+                txt += `Report Generated: ${reportData.lastUpdated}\n`;
+                txt += `SEO Health Score: ${reportData.seoHealth}%\n`;
+                txt += `GEO Health Score: ${reportData.geoHealth}%\n`;
+                txt += `Manifest Score: ${reportData.fileScore}%\n\n`;
+                
+                txt += "DIAGNOSTICS & SYSTEM ALERTS:\n";
+                (reportData.diagnostics || []).forEach(d => {
+                    txt += `[${d.type}] ${d.message}\n`;
+                    txt += `  Impact: ${d.impact}\n\n`;
+                });
+                
+                txt += "KEYWORD INTENT POOL:\n";
+                if (reportData.keywords && reportData.keywords.seo) {
+                    txt += `1. Semantic SEO: ${(reportData.keywords.seo.semantic || []).join(', ')}\n`;
+                    txt += `2. Voice Search: ${(reportData.keywords.seo.voice || []).join(', ')}\n`;
+                    txt += `3. Local GEO: ${(reportData.keywords.geo.local || []).join(', ')}\n`;
+                    txt += `4. Ahmedabad Intent Queries: ${(reportData.keywords.geo.queries || []).join(', ')}\n\n`;
+                }
+            } else {
+                txt += "No intelligence data generated yet. Please run Website Analysis first.\n";
+            }
+            
+            const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement("a");
+            link.setAttribute("href", URL.createObjectURL(blob));
+            link.setAttribute("download", "swadesi-carts-audit-report.txt");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const val = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#seoGeoTable tbody tr');
+            rows.forEach(row => {
+                const text = row.querySelector('td').textContent.toLowerCase();
+                if (text.includes(val)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

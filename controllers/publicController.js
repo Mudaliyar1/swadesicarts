@@ -4,6 +4,7 @@ const OrganicProduct = require('../models/OrganicProduct');
 const Story = require('../models/Story');
 const Company = require('../models/companyModel');
 const { getSiteUrl } = require('../helpers/siteUrl');
+const { organizationSchema, breadcrumbSchema, toJsonLd } = require('../helpers/schemaHelper');
 
 function buildSeo({ title, description, path, keywords = '', ogType = 'website', baseUrl }) {
   const canonical = `${baseUrl || getSiteUrl()}${path}`;
@@ -55,6 +56,44 @@ exports.getHome = async (req, res) => {
 
     const stories = await getActiveStories();
 
+    // Dynamically build advanced schemas
+    const homeBreadcrumb = breadcrumbSchema([
+      { name: 'Home', url: baseUrl + '/' }
+    ]);
+    const websiteSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Swadesi Carts",
+      "url": baseUrl,
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": `${baseUrl}/organic-products?search={search_term_string}`,
+        "query-input": "required name=search_term_string"
+      }
+    };
+    const orgSchema = organizationSchema({
+      name: 'Swadesi Carts',
+      url: baseUrl,
+      description: 'Premium organic products, fresh seasonal produce, and professional tech packages from Swadesi Carts.',
+      logo: `${baseUrl}/favicon.svg`
+    });
+    const localBizSchema = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Swadesi Carts",
+      "image": `${baseUrl}/favicon.svg`,
+      "telephone": res.locals.siteSettings?.contact?.phone || '+91-XXXX-XXXXXX',
+      "email": res.locals.siteSettings?.contact?.email || 'info@swadesicarts.in',
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": res.locals.siteSettings?.contact?.location || 'Ahmedabad, Gujarat, India',
+        "addressLocality": "Ahmedabad",
+        "addressRegion": "Gujarat",
+        "addressCountry": "IN"
+      },
+      "url": baseUrl
+    };
+
     res.render('public/home-new', {
       title: 'Swadesi Carts - Home',
       seo: buildSeo({
@@ -69,7 +108,13 @@ exports.getHome = async (req, res) => {
       featuredOrganic,
       companies,
       stories,
-      currentPage: 'home'
+      currentPage: 'home',
+      schemaJsonLd: [
+        toJsonLd(websiteSchema),
+        toJsonLd(orgSchema),
+        toJsonLd(localBizSchema),
+        toJsonLd(homeBreadcrumb)
+      ]
     });
   } catch (error) {
     console.error('Home page error:', error);
@@ -82,6 +127,19 @@ exports.getAbout = async (req, res) => {
   try {
     const stories = await getActiveStories();
     const baseUrl = getSiteUrl(res.locals.siteSettings);
+
+    const aboutBreadcrumb = breadcrumbSchema([
+      { name: 'Home', url: baseUrl + '/' },
+      { name: 'About Us', url: baseUrl + '/about' }
+    ]);
+    const aboutPageSchema = {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "About Swadesi Carts",
+      "description": "Learn about Swadesi Carts, our mission, values, and the team behind our organic, seasonal, and tech products.",
+      "url": `${baseUrl}/about`
+    };
+
     res.render('public/about-new', {
       title: 'About Us - Swadesi Carts',
       seo: buildSeo({
@@ -93,7 +151,11 @@ exports.getAbout = async (req, res) => {
         ogType: 'article'
       }),
       stories,
-      currentPage: 'about'
+      currentPage: 'about',
+      schemaJsonLd: [
+        toJsonLd(aboutPageSchema),
+        toJsonLd(aboutBreadcrumb)
+      ]
     });
   } catch (error) {
     console.error('About page error:', error);
@@ -106,6 +168,35 @@ exports.getContact = async (req, res) => {
   try {
     const stories = await getActiveStories();
     const baseUrl = getSiteUrl(res.locals.siteSettings);
+
+    const contactBreadcrumb = breadcrumbSchema([
+      { name: 'Home', url: baseUrl + '/' },
+      { name: 'Contact Us', url: baseUrl + '/contact' }
+    ]);
+    const contactPageSchema = {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contact Swadesi Carts",
+      "description": "Contact Swadesi Carts for organic products, seasonal produce, tech packages, and business inquiries.",
+      "url": `${baseUrl}/contact`
+    };
+    const localBizSchema = {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Swadesi Carts",
+      "image": `${baseUrl}/favicon.svg`,
+      "telephone": res.locals.siteSettings?.contact?.phone || '+91-XXXX-XXXXXX',
+      "email": res.locals.siteSettings?.contact?.email || 'info@swadesicarts.in',
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": res.locals.siteSettings?.contact?.location || 'Ahmedabad, Gujarat, India',
+        "addressLocality": "Ahmedabad",
+        "addressRegion": "Gujarat",
+        "addressCountry": "IN"
+      },
+      "url": baseUrl
+    };
+
     res.render('public/contact-new', {
       title: 'Contact Us - Swadesi Carts',
       seo: buildSeo({
@@ -119,7 +210,12 @@ exports.getContact = async (req, res) => {
       stories,
       currentPage: 'contact',
       success: req.flash('success'),
-      error: req.flash('error')
+      error: req.flash('error'),
+      schemaJsonLd: [
+        toJsonLd(contactPageSchema),
+        toJsonLd(localBizSchema),
+        toJsonLd(contactBreadcrumb)
+      ]
     });
   } catch (error) {
     console.error('Contact page error:', error);

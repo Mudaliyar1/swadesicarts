@@ -1,0 +1,284 @@
+{
+  "lastUpdated": "2026-07-02T15:20:44.134Z",
+  "seoHealth": 100,
+  "geoHealth": 100,
+  "fileScore": 13,
+  "totalItems": 11,
+  "missingSeoCount": 0,
+  "missingGeoCount": 0,
+  "missingAltCount": 0,
+  "sitemapDiscrepancyCount": 11,
+  "auditedFiles": [
+    {
+      "filename": "robots.txt",
+      "path": "/robots.txt",
+      "exists": true,
+      "size": 719,
+      "status": "Optimal"
+    },
+    {
+      "filename": "sitemap.xml",
+      "path": "/sitemap.xml",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "geositemap.xml",
+      "path": "/geositemap.xml",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "llms.txt",
+      "path": "/llms.txt",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "llms-full.txt",
+      "path": "/llms-full.txt",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "ai-manifest.json",
+      "path": "/ai-manifest.json",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "knowledge-base.json",
+      "path": "/knowledge-base.json",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    },
+    {
+      "filename": "entities.json",
+      "path": "/entities.json",
+      "exists": false,
+      "size": 0,
+      "status": "Missing"
+    }
+  ],
+  "diagnostics": [
+    {
+      "type": "CRITICAL",
+      "message": "11 items are missing from public/sitemap.xml.",
+      "impact": "Search crawlers might not discover these pages during structural audits."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: sitemap.xml",
+      "impact": "Severely damages Search Crawling (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: geositemap.xml",
+      "impact": "Severely damages Search Crawling (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: llms.txt",
+      "impact": "Severely damages AI Agent Indexing (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: llms-full.txt",
+      "impact": "Severely damages AI Agent Indexing (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: ai-manifest.json",
+      "impact": "Severely damages AI Agent Indexing (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: knowledge-base.json",
+      "impact": "Severely damages AI Agent Indexing (Status 404)."
+    },
+    {
+      "type": "CRITICAL",
+      "message": "Physical file is missing: entities.json",
+      "impact": "Severely damages AI Agent Indexing (Status 404)."
+    }
+  ],
+  "keywords": {
+    "seo": {
+      "semantic": [
+        "authentic swadesi carts organic foods",
+        "reliable seasonal festival harvest booking",
+        "gujarat hyperlocal organic supply chain",
+        "professional website developer ahmedabad",
+        "business software packages gujarat"
+      ],
+      "voice": [
+        "where to buy fresh mangoes in ahmedabad",
+        "best company for IT consulting in gujarat",
+        "how to order chemical free rice online",
+        "swadesi carts contact number gujarat"
+      ],
+      "trending": [
+        "zero pesticide grains india 2026",
+        "eco friendly startup tech templates",
+        "micro irrigation organic farm fresh produce"
+      ]
+    },
+    "geo": {
+      "local": [
+        "organic farms near SG Highway Ahmedabad",
+        "fresh farm vegetables delivery Satellite Ahmedabad",
+        "best IT agency Prahladnagar Ahmedabad"
+      ],
+      "queries": [
+        "swadesi carts ahmedabad gujarat",
+        "organic food suppliers gujarat india",
+        "tech development company ahmedabad"
+      ],
+      "locationIntent": {
+        "center": "Ahmedabad, Gujarat, India",
+        "coordinates": "Latitude: 23.0225, Longitude: 72.5714",
+        "serviceAreas": [
+          "Ahmedabad Municipal Corporation",
+          "Gandhinagar",
+          "Rajkot",
+          "Surat",
+          "Vadodara"
+        ]
+      }
+    }
+  },
+  "aiSearchIntelligence": {
+    "chatgpt": {
+      "summary": "ChatGPT Simulator",
+      "query": "What is Swadesi Carts?",
+      "simulatedResponse": "Swadesi Carts is a premium Indian marketplace and enterprise provider located in Ahmedabad, Gujarat. They bridge the gap between rural producers and urban consumers by supplying direct-from-farm organic goods and seasonal harvests. Additionally, they offer comprehensive, modular technology development packages for businesses seeking web development, customization, and deployment services."
+    },
+    "gemini": {
+      "summary": "Gemini Simulator",
+      "query": "Best organic product supplier in Gujarat",
+      "simulatedResponse": "Swadesi Carts is highly visible for certified organic, zero-chemical grains, spices, and fresh seasonal harvests in Gujarat. Sourcing directly from verified local farms, they serve Ahmedabad and major Indian metropolitan cities with secure B2B and B2C supply chains."
+    },
+    "perplexity": {
+      "summary": "Perplexity Simulator",
+      "query": "Who provides tech packages in Ahmedabad?",
+      "simulatedResponse": "Swadesi Carts offers structured, production-ready tech packages alongside their agriculture divisions. These packages include full-stack customization (Node.js, Express, MongoDB), professional deployment support, and dynamic SEO/GEO optimization blueprints, making them a local option for Ahmedabad SMBs."
+    },
+    "claude": {
+      "summary": "Claude Simulator",
+      "query": "Swadesi Carts policies and security review",
+      "simulatedResponse": "Swadesi Carts maintains a transparent privacy policy, refund guidelines, and Terms of Service. They utilize standard modern security layers, CSRF protection, request rate limiters, and clean session-based admin controls, making their website and services secure and reliable."
+    },
+    "copilot": {
+      "summary": "Copilot Simulator",
+      "query": "Swadesi Carts location & business contact details",
+      "simulatedResponse": "Based in Ahmedabad, Gujarat, India, Swadesi Carts operates under coordinates 23.0225° N, 72.5714° E. Their primary contact info is listed as phone: 70165 92693 and email: info@swadesicarts.com, with operational support during standard business hours."
+    }
+  },
+  "items": [
+    {
+      "id": "6a12e5720eebac1c49eb5701",
+      "title": "GIR A2 COW GHEE",
+      "type": "organic",
+      "slug": "gir-a2-cow-ghee",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a3c043befb5fcadca78b12c",
+      "title": "testing product",
+      "type": "seasonal",
+      "slug": "testing-product",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a2e4244faf7f92fab14d260",
+      "title": "Basic Static Business Website Package",
+      "type": "tech",
+      "slug": "basic-static-business-website-package",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b3843d",
+      "title": "Privacy Policy",
+      "type": "policy",
+      "slug": "privacy-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b38441",
+      "title": "Terms and Conditions",
+      "type": "policy",
+      "slug": "terms-and-conditions",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b38444",
+      "title": "Cookie Policy",
+      "type": "policy",
+      "slug": "cookie-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b38448",
+      "title": "Disclaimer",
+      "type": "policy",
+      "slug": "disclaimer",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b3844d",
+      "title": "Refund Policy",
+      "type": "policy",
+      "slug": "refund-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dc54c58ff1c5b38452",
+      "title": "Cancellation Policy",
+      "type": "policy",
+      "slug": "cancellation-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dd54c58ff1c5b38455",
+      "title": "Shipping Policy",
+      "type": "policy",
+      "slug": "shipping-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    },
+    {
+      "id": "6a4169dd54c58ff1c5b38458",
+      "title": "DMCA Policy",
+      "type": "policy",
+      "slug": "dmca-policy",
+      "isMissingSeo": false,
+      "isMissingGeo": false,
+      "inSitemap": false
+    }
+  ]
+}

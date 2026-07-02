@@ -1,5 +1,10 @@
 const rateLimit = require('express-rate-limit');
 
+// Common key generator that is safe from undefined req.ip
+const getIpKey = (req) => {
+    return req.ip || req.headers['x-forwarded-for'] || req.connection?.remoteAddress || req.socket?.remoteAddress || '127.0.0.1';
+};
+
 // 1. Global Rate Limiter (Applied to all routes to prevent simple DDoS)
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -7,6 +12,8 @@ const globalLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getIpKey,
+    validate: { default: false }
 });
 
 // 2. Strict Login Rate Limiter (Brute force protection)
@@ -16,6 +23,8 @@ const loginLimiter = rateLimit({
     message: 'Too many login attempts from this IP, please try again after 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getIpKey,
+    validate: { default: false }
 });
 
 // 3. OTP & Forgot Password Limiter
@@ -25,6 +34,8 @@ const authLimiter = rateLimit({
     message: 'Too many password reset/OTP requests from this IP, please try again after an hour',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getIpKey,
+    validate: { default: false }
 });
 
 // 4. Inquiry & Contact Form Limiter (Spam protection)
@@ -34,6 +45,8 @@ const spamLimiter = rateLimit({
     message: 'You are sending too many inquiries, please try again later',
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getIpKey,
+    validate: { default: false }
 });
 
 module.exports = {

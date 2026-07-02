@@ -103,9 +103,12 @@ router.get('/users/:id', isAuthenticated, adminUserController.view);
 router.post('/users/:id/toggle-status', isAuthenticated, adminUserController.toggleStatus);
 router.delete('/users/delete/:id', isAuthenticated, adminUserController.delete);
 
-// GEO / Generative AI Discoverability routes
-router.get('/geo', isAuthenticated, adminController.getGeoDashboard);
+// GEO / SEO / Generative AI Discoverability routes
+router.get('/seo-geo', isAuthenticated, adminController.getSeoGeoDashboard);
+router.get('/geo', isAuthenticated, (req, res) => res.redirect(301, '/admin/seo-geo'));
 router.post('/geo/bulk-generate', isAuthenticated, adminController.bulkGenerateGeo);
+router.post('/seo-geo/analyze', isAuthenticated, adminController.postAnalyzeWebsite);
+router.post('/seo-geo/apply', isAuthenticated, adminController.postApplyIntelligence);
 
 // Visitors routes
 router.get('/visitors', isAuthenticated, visitorController.getAllVisitors);

@@ -213,6 +213,11 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
             </a>
         </li>
         <li>
+            <a href="/admin/seo-geo" class="<%= current === 'seo-geo' ? 'active' : '' %>" title="SEO & GEO Hub">
+                <i class="bi bi-search-heart"></i> <span class="sidebar-text">SEO & GEO Hub</span>
+            </a>
+        </li>
+        <li>
             <a href="/admin/seasonal-products" class="<%= current === 'seasonal' ? 'active' : '' %>" title="Seasonal Products">
                 <i class="bi bi-calendar-event-fill"></i> <span class="sidebar-text">Seasonal Products</span>
             </a>
@@ -325,6 +330,7 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
         <ul class="sidebar-nav admin-sidebar-2026" style="width: 100%; box-shadow: none; border: none; background: transparent !important;">
             <li><a href="/admin/dashboard" class="<%= current === 'dashboard' ? 'active' : '' %>"><i class="bi bi-grid-1x2-fill"></i> Dashboard</a></li>
             <li><a href="/admin/site-editor" class="<%= current === 'site-editor' ? 'active' : '' %>"><i class="bi bi-magic"></i> Website Editor</a></li>
+            <li><a href="/admin/seo-geo" class="<%= current === 'seo-geo' ? 'active' : '' %>"><i class="bi bi-search-heart"></i> SEO & GEO Hub</a></li>
             <li><a href="/admin/seasonal-products" class="<%= current === 'seasonal' ? 'active' : '' %>"><i class="bi bi-calendar-event-fill"></i> Seasonal Products</a></li>
             <li><a href="/admin/organic-products" class="<%= current === 'organic' ? 'active' : '' %>"><i class="bi bi-flower1"></i> Organic Products</a></li>
             <li><a href="/admin/tech-packages" class="<%= current === 'tech' ? 'active' : '' %>"><i class="bi bi-cpu-fill"></i> Tech Packages</a></li>

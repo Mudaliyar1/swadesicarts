@@ -2,6 +2,7 @@ const OrganicProduct = require('../models/OrganicProduct');
 const SeasonalProduct = require('../models/SeasonalProduct');
 const TechPackage = require('../models/TechPackage');
 const WebsiteSetting = require('../models/WebsiteSetting');
+const Policy = require('../models/Policy');
 const { getSiteUrl } = require('../helpers/siteUrl');
 const geoHelper = require('../helpers/geoHelper');
 
@@ -32,10 +33,11 @@ exports.getLlmsTxt = async (req, res) => {
     const phone = settings.contact?.phone || '+91-XXXX-XXXXXX';
     const aboutDesc = settings.about?.story || 'Swadesi Carts is premium Swadeshi supply network sourcing and delivering organic products, seasonal produce, and custom tech services.';
 
-    const [organicProducts, seasonalProducts, techPackages] = await Promise.all([
+    const [organicProducts, seasonalProducts, techPackages, policies] = await Promise.all([
       OrganicProduct.find({ isVisible: true }).lean(),
       SeasonalProduct.find({ isVisible: true }).lean(),
-      TechPackage.find({ isVisible: true }).lean()
+      TechPackage.find({ isVisible: true }).lean(),
+      Policy.find({ status: 'published' }).lean()
     ]);
 
     let text = `# Swadesi Carts - Generative Engine Information Index
@@ -58,10 +60,16 @@ Welcome to the AI and LLM agent discovery index for Swadesi Carts. This file con
 - **Organic Products Catalog**: ${siteUrl}/organic-products
 - **Seasonal Products Catalog**: ${siteUrl}/seasonal-products
 - **Tech Packages Catalog**: ${siteUrl}/tech-packages
-
-## Organic Products
 `;
 
+    // Add policies to navigation index
+    if (policies.length > 0) {
+      for (const p of policies) {
+        text += `- **${p.title}**: ${siteUrl}/${p.slug}\n`;
+      }
+    }
+
+    text += `\n## Organic Products\n`;
     if (organicProducts.length === 0) {
       text += `*No organic products currently available.*\n`;
     } else {
@@ -120,6 +128,20 @@ Welcome to the AI and LLM agent discovery index for Swadesi Carts. This file con
 - **AI Description**: ${geo.aiDescription}
 - **Keywords**: ${geo.aiKeywords}
 - **Entity Description**: ${geo.entityDescription}
+`;
+      }
+    }
+
+    text += `\n## Legal & Policy Documents\n`;
+    if (policies.length === 0) {
+      text += `*No policies currently listed.*\n`;
+    } else {
+      for (const p of policies) {
+        text += `
+### ${p.title}
+- **URL**: ${siteUrl}/${p.slug}
+- **Summary**: ${p.geoSummary || p.seoDescription || 'Legal policy documentation for Swadesi Carts.'}
+- **AI Description**: ${p.aiDescription || p.seoDescription || 'Detailed policy and guidelines.'}
 `;
       }
     }
@@ -292,10 +314,11 @@ exports.getLlmsFullTxt = async (req, res) => {
     const aboutDesc = settings.about?.story || 'Swadesi Carts is premium Swadeshi supply network sourcing and delivering organic products, seasonal produce, and custom tech services.';
     const whatsapp = settings.contact?.whatsapp || phone;
 
-    const [organicProducts, seasonalProducts, techPackages] = await Promise.all([
+    const [organicProducts, seasonalProducts, techPackages, policies] = await Promise.all([
       OrganicProduct.find({ isVisible: true }).lean(),
       SeasonalProduct.find({ isVisible: true }).lean(),
-      TechPackage.find({ isVisible: true }).lean()
+      TechPackage.find({ isVisible: true }).lean(),
+      Policy.find({ status: 'published' }).lean()
     ]);
 
     let text = `# Swadesi Carts — Full LLM Content Index (llms-full.txt)
@@ -347,7 +370,14 @@ To promote authentic Indian products and Swadeshi enterprise through modern digi
 | Organic Products | ${siteUrl}/organic-products | Full catalog of certified organic products |
 | Seasonal Products | ${siteUrl}/seasonal-products | Fresh seasonal and festival products |
 | Tech Packages | ${siteUrl}/tech-packages | IT services and business solution packages |
+`;
 
+    // Append policies to public pages list
+    for (const p of policies) {
+      text += `| ${p.title} | ${siteUrl}/${p.slug} | Official ${p.title} document |\n`;
+    }
+
+    text += `
 ### AI Discovery Endpoints
 | Endpoint | Format | Description |
 |----------|--------|-------------|
@@ -497,7 +527,6 @@ A: Yes. You can contact Swadesi Carts at ${email} or ${phone} to request customi
 
 **Q: How do I place a bulk order?**
 A: Visit the product or package page and use the inquiry form. Alternatively, contact ${email} or WhatsApp ${whatsapp}.
-
 ---
 
 ## 7. Contact & Social Information
@@ -507,9 +536,28 @@ A: Visit the product or package page and use the inquiry form. Alternatively, co
 - **WhatsApp**: ${whatsapp}
 - **Location**: ${location}
 - **Contact Page**: ${siteUrl}/contact
+`;
+
+    text += `\n## 8. Legal & Policy Documents\n\n`;
+    if (policies.length === 0) {
+      text += `*No legal policies currently listed.*\n\n`;
+    } else {
+      for (const p of policies) {
+        text += `### ${p.title}
+- **URL**: ${siteUrl}/${p.slug}
+- **Last Updated**: ${p.updatedAt ? p.updatedAt.toISOString().split('T')[0] : 'N/A'}
+- **Summary**: ${p.geoSummary || p.seoDescription || 'Legal policy documentation for Swadesi Carts.'}
+- **AI Description**: ${p.aiDescription || p.seoDescription || 'Detailed policy and guidelines.'}
+
+**Policy Document Content excerpt**:
+${p.content ? p.content.replace(/<[^>]*>/g, '').substring(0, 1000) + '...' : 'Content empty'}
 
 ---
-*Generated dynamically by Swadesi Carts LLM Infrastructure. Last update: ${new Date().toISOString()}*
+`;
+      }
+    }
+
+    text += `*Generated dynamically by Swadesi Carts LLM Infrastructure. Last update: ${new Date().toISOString()}*
 `;
 
     res.header('Content-Type', 'text/plain; charset=utf-8');
@@ -800,6 +848,232 @@ exports.getKnowledgeBase = async (req, res) => {
   } catch (error) {
     console.error('knowledge-base.json error:', error);
     res.status(500).json({ error: 'Error generating knowledge-base.json' });
+  }
+};
+
+// GET /organization.json
+exports.getOrganizationJson = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne().lean() || {};
+    const siteUrl = getSiteUrl(settings);
+    const location = settings.contact?.location || settings.footer?.address || 'Ahmedabad, Gujarat, India';
+    
+    const org = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Swadesi Carts",
+      "url": siteUrl,
+      "logo": settings.logo?.url || `${siteUrl}/favicon.svg`,
+      "description": settings.about?.story || 'Premium Swadeshi supply network sourcing organic foods, seasonal produce, and custom tech packages.',
+      "email": settings.contact?.email || 'info@swadesicarts.in',
+      "telephone": settings.contact?.phone || '+91-XXXX-XXXXXX',
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": location,
+        "addressLocality": "Ahmedabad",
+        "addressRegion": "Gujarat",
+        "postalCode": settings.contact?.zip || "",
+        "addressCountry": "IN"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Balram Yadav"
+      },
+      "foundingDate": "2023",
+      "sameAs": [
+        siteUrl,
+        `${siteUrl}/about`,
+        `${siteUrl}/contact`
+      ]
+    };
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=3600');
+    res.json(org);
+  } catch (error) {
+    console.error('organization.json error:', error);
+    res.status(500).json({ error: 'Error generating organization.json' });
+  }
+};
+
+// GET /products.json
+exports.getProductsJson = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne().lean() || {};
+    const siteUrl = getSiteUrl(settings);
+    
+    const [organic, seasonal] = await Promise.all([
+      OrganicProduct.find({ isVisible: true }).lean(),
+      SeasonalProduct.find({ isVisible: true }).lean()
+    ]);
+    
+    const formatProduct = (p, type) => {
+      const slug = p.slug || p._id.toString();
+      const geo = getGeoFields(p, type);
+      const pageUrl = `${siteUrl}/${type === 'organic' ? 'organic-products' : 'seasonal-products'}/${slug}`;
+      
+      return {
+        "@type": "Product",
+        "name": p.title,
+        "description": p.shortDescription,
+        "url": pageUrl,
+        "image": p.featuredImage?.url || "",
+        "category": p.category,
+        "sku": p.slug,
+        "offers": {
+          "@type": "Offer",
+          "price": p.price ? parseFloat(p.price) : undefined,
+          "priceCurrency": "INR",
+          "availability": p.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        },
+        "geo": {
+          "keywords": geo.aiKeywords,
+          "summary": geo.geoSummary,
+          "description": geo.aiDescription
+        }
+      };
+    };
+    
+    const productsPayload = {
+      "@context": "https://schema.org",
+      "totalProducts": organic.length + seasonal.length,
+      "organic": organic.map(p => formatProduct(p, 'organic')),
+      "seasonal": seasonal.map(p => formatProduct(p, 'seasonal'))
+    };
+    
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=1800');
+    res.json(productsPayload);
+  } catch (error) {
+    console.error('products.json error:', error);
+    res.status(500).json({ error: 'Error generating products.json' });
+  }
+};
+
+// GET /services.json
+exports.getServicesJson = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne().lean() || {};
+    const siteUrl = getSiteUrl(settings);
+    
+    const tech = await TechPackage.find({ isVisible: true }).lean();
+    
+    const servicesPayload = {
+      "@context": "https://schema.org",
+      "totalServices": tech.length,
+      "services": tech.map(p => {
+        const slug = p.slug || p._id.toString();
+        const geo = getGeoFields(p, 'tech');
+        const pageUrl = `${siteUrl}/tech-packages/${slug}`;
+        
+        return {
+          "@type": "Service",
+          "name": p.title,
+          "description": p.shortDescription,
+          "url": pageUrl,
+          "provider": {
+            "@type": "Organization",
+            "name": "Swadesi Carts",
+            "url": siteUrl
+          },
+          "category": p.category,
+          "offers": p.price ? {
+            "@type": "Offer",
+            "price": typeof p.price === 'object' ? p.price.amount : parseFloat(p.price),
+            "priceCurrency": typeof p.price === 'object' ? (p.price.currency || 'INR') : 'INR'
+          } : undefined,
+          "geo": {
+            "keywords": geo.aiKeywords,
+            "summary": geo.geoSummary,
+            "description": geo.aiDescription
+          }
+        };
+      })
+    };
+    
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=1800');
+    res.json(servicesPayload);
+  } catch (error) {
+    console.error('services.json error:', error);
+    res.status(500).json({ error: 'Error generating services.json' });
+  }
+};
+
+// GET /faqs.json
+exports.getFaqsJson = async (req, res) => {
+  try {
+    const settings = await WebsiteSetting.findOne().lean() || {};
+    const siteUrl = getSiteUrl(settings);
+    const location = settings.contact?.location || settings.footer?.address || 'Ahmedabad, Gujarat, India';
+    const email = settings.contact?.email || 'info@swadesicarts.in';
+    const phone = settings.contact?.phone || '+91-XXXX-XXXXXX';
+    
+    const [organic, seasonal, tech] = await Promise.all([
+      OrganicProduct.find({ isVisible: true }).select('title category shortDescription slug').lean(),
+      SeasonalProduct.find({ isVisible: true }).select('title category shortDescription slug').lean(),
+      TechPackage.find({ isVisible: true }).select('title category shortDescription slug').lean()
+    ]);
+    
+    const faqs = [
+      {
+        "question": "What is Swadesi Carts?",
+        "answer": "Swadesi Carts is a premium supply chain network from India that delivers organic foods, seasonal produce, and custom business technology packages direct to B2B and B2C consumers."
+      },
+      {
+        "question": "Where is Swadesi Carts located?",
+        "answer": `Swadesi Carts is headquartered in ${location}, Gujarat, India.`
+      },
+      {
+        "question": "Does Swadesi Carts ship pan-India?",
+        "answer": "Yes, we ship and deliver bulk orders across all states and union territories in India."
+      },
+      {
+        "question": "Are Swadesi Carts products certified organic?",
+        "answer": "Yes, all our organic products are sourced from verified farmers and are 100% natural, pesticide-free, and certified chemical-free."
+      }
+    ];
+    
+    // Append product-specific FAQs
+    organic.forEach(p => {
+      faqs.push({
+        "question": `What organic benefits does Swadesi Carts ${p.title} provide?`,
+        "answer": `${p.title} is an organic ${p.category.toLowerCase()} product. ${p.shortDescription}`
+      });
+    });
+    
+    seasonal.forEach(p => {
+      faqs.push({
+        "question": `What makes Swadesi Carts seasonal ${p.title} unique?`,
+        "answer": `${p.title} is a fresh seasonal ${p.category.toLowerCase()} sourced direct-from-farm at harvest peak. ${p.shortDescription}`
+      });
+    });
+    
+    tech.forEach(p => {
+      faqs.push({
+        "question": `What does the ${p.title} tech package include?`,
+        "answer": `${p.title} is a professional ${p.category.toLowerCase()} service package. ${p.shortDescription}`
+      });
+    });
+    
+    const faqPage = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.question,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": f.answer
+        }
+      }))
+    };
+    
+    res.header('Content-Type', 'application/json; charset=utf-8');
+    res.header('Cache-Control', 'public, max-age=1800');
+    res.json(faqPage);
+  } catch (error) {
+    console.error('faqs.json error:', error);
+    res.status(500).json({ error: 'Error generating faqs.json' });
   }
 };
 

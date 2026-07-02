@@ -1,6 +1,7 @@
 const OrganicProduct = require('../models/OrganicProduct');
 const SeasonalProduct = require('../models/SeasonalProduct');
 const TechPackage = require('../models/TechPackage');
+const Policy = require('../models/Policy');
 const { getSiteUrl } = require('../helpers/siteUrl');
 
 // Helper: format date for sitemap
@@ -26,11 +27,12 @@ exports.getSitemap = async (req, res) => {
     const siteUrl = getSiteUrl(res.locals.siteSettings);
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch all visible products
-    const [organicProducts, seasonalProducts, techPackages] = await Promise.all([
+    // Fetch all visible products and published policies
+    const [organicProducts, seasonalProducts, techPackages, policies] = await Promise.all([
       OrganicProduct.find({ isVisible: true }).select('slug _id updatedAt title').lean(),
       SeasonalProduct.find({ isVisible: true }).select('slug _id updatedAt title').lean(),
-      TechPackage.find({ isVisible: true }).select('slug _id updatedAt title').lean()
+      TechPackage.find({ isVisible: true }).select('slug _id updatedAt title').lean(),
+      Policy.find({ status: 'published' }).select('slug updatedAt').lean()
     ]);
 
     // Static pages
@@ -56,6 +58,17 @@ exports.getSitemap = async (req, res) => {
     <lastmod>${page.lastmod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
     <priority>${page.priority}</priority>
+  </url>
+`;
+    }
+
+    // Policies
+    for (const p of policies) {
+      xml += `  <url>
+    <loc>${siteUrl}/${escapeXml(p.slug)}</loc>
+    <lastmod>${formatDate(p.updatedAt)}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
   </url>
 `;
     }
