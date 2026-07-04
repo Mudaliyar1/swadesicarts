@@ -258,3 +258,33 @@ exports.replyTicketAdmin = async (req, res) => {
   }
 };
 
+// Delete single ticket
+exports.deleteTicket = async (req, res) => {
+  try {
+    const ticket = await Ticket.findById(req.params.id);
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: 'Ticket not found' });
+    }
+    await Ticket.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error('Delete ticket error:', error);
+    res.status(500).json({ success: false, message: 'An error occurred while deleting the ticket' });
+  }
+};
+
+// Bulk delete tickets
+exports.bulkDeleteTickets = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'No ticket IDs provided' });
+    }
+    await Ticket.deleteMany({ _id: { $in: ids } });
+    res.json({ success: true, message: `${ids.length} tickets deleted successfully` });
+  } catch (error) {
+    console.error('Bulk delete tickets error:', error);
+    res.status(500).json({ success: false, message: 'An error occurred during bulk deletion' });
+  }
+};
+

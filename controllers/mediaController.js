@@ -139,7 +139,7 @@ const syncMediaLibrary = async (force = false) => {
   isSyncing = true;
   try {
     const assets = await getAllCloudinaryAssets();
-    
+
     const [settings, companies, stories, seasonalProducts, organicProducts, techPackages, users] = await Promise.all([
       WebsiteSetting.findOne().lean(),
       Company.find({}).lean(),
@@ -270,11 +270,11 @@ const applyFilters = async (filters) => {
 exports.index = async (req, res) => {
   try {
     const filters = req.mediaFilters;
-    
+
     // Check if the local cache is empty
     const mediaCount = await Media.countDocuments();
     const cacheDuration = 5 * 60 * 1000; // 5 minutes
-    
+
     if (mediaCount === 0) {
       // Force sync synchronously so we have data to display
       await syncMediaLibrary(true);

@@ -83,6 +83,8 @@ router.post('/inquiries/:id/status', isAuthenticated, inquiryController.updateSt
 // Support Tickets routes
 router.get('/tickets', isAuthenticated, ticketController.getAdminTickets);
 router.get('/tickets/:ticketNumber', isAuthenticated, ticketController.getAdminTicketDetail);
+router.delete('/tickets/:id', isAuthenticated, ticketController.deleteTicket);
+router.post('/tickets/bulk-delete', isAuthenticated, doubleCsrfProtection, ticketController.bulkDeleteTickets);
 router.post(
   '/tickets/:ticketNumber/reply',
   isAuthenticated,

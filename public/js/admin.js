@@ -275,7 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterForm = document.getElementById('filterForm');
     if (filterForm) {
         const searchInput = filterForm.querySelector('input[name="search"]');
-        const selects = filterForm.querySelectorAll('select');
         
         let debounceTimer;
         
@@ -349,9 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         
-        selects.forEach(select => {
-            select.removeAttribute('onchange');
-            select.addEventListener('change', loadContent);
+        const autoControls = filterForm.querySelectorAll('select, input[type="date"]');
+        autoControls.forEach(ctrl => {
+            ctrl.removeAttribute('onchange');
+            ctrl.addEventListener('change', loadContent);
         });
         
         window.addEventListener('popstate', () => {
@@ -422,5 +422,61 @@ function confirmBulkDelete(url) {
     }
 }
 window.confirmBulkDelete = confirmBulkDelete;
+
+// Toggle checkbox when clicking on thumbnail images/videos or card containers
+document.addEventListener('click', (e) => {
+    // 1. Table views (products, tickets, media table view)
+    if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+        const row = e.target.closest('tr');
+        if (row) {
+            const checkbox = row.querySelector('.product-select-checkbox, .media-checkbox, input[type="checkbox"][name="selectedIds[]"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            return;
+        }
+        
+        // 2. Media grid view (cards)
+        const mediaCard = e.target.closest('.media-card');
+        if (mediaCard) {
+            // If they clicked a button, don't toggle
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            const checkbox = mediaCard.querySelector('.media-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            return;
+        }
+    }
+    
+    // Also handle clicking raw document icon boxes or card bodies in media grid
+    const mediaThumbRaw = e.target.closest('.media-thumb.raw');
+    if (mediaThumbRaw) {
+        const mediaCard = mediaThumbRaw.closest('.media-card');
+        if (mediaCard) {
+            const checkbox = mediaCard.querySelector('.media-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            return;
+        }
+    }
+
+    // Toggle if clicking card body of a media card (non-button parts)
+    const cardBody = e.target.closest('.media-card .card-body');
+    if (cardBody) {
+        const mediaCard = cardBody.closest('.media-card');
+        if (mediaCard) {
+            const checkbox = mediaCard.querySelector('.media-checkbox');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+    }
+});
 
 console.log('Admin dashboard loaded successfully');

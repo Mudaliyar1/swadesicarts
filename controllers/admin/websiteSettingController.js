@@ -1,4 +1,4 @@
-﻿const WebsiteSetting = require('../../models/WebsiteSetting');
+const WebsiteSetting = require('../../models/WebsiteSetting');
 const cloudinary = require('../../config/cloudinary');
 const streamifier = require('streamifier');
 const fs = require('fs');

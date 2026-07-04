@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %> - Admin</title>
+    <title>
+        <%= title %> - Admin
+    </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/css/admin.css">
@@ -72,384 +75,539 @@
         }
     </style>
 </head>
+
 <body class="admin-body">
-    
+
     <%- include('../../partials/admin-sidebar') %>
 
-    <div class="admin-content">
-        <div class="container-fluid p-4">
-            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <div>
-                    <h2 class="fw-bold mb-1"><i class="bi bi-sliders"></i> <%= title %></h2>
-                    <p class="text-muted mb-0">Manage homepage carousel slides with images, videos, text and links</p>
-                </div>
-                <a href="/admin/settings" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Back to Settings
-                </a>
-            </div>
-
-            <% if (messages.success && messages.success.length > 0) { %>
-                <div class="alert alert-success alert-dismissible fade show">
-                    <%= messages.success %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <% } %>
-
-            <% if (messages.error && messages.error.length > 0) { %>
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <%= messages.error %>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <% } %>
-
-            <div class="row g-4">
-                <div class="col-lg-5">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <h5 class="fw-bold mb-3"><%= carouselEditItem ? 'Edit Carousel Slide' : 'Add Carousel Slide' %></h5>
-                            <form action="<%= carouselEditItem ? `/admin/settings/carousel/${carouselEditItem._id}` : '/admin/settings/carousel' %>" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <div class="mb-3">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" class="form-control" name="title" value="<%= carouselEditItem ? carouselEditItem.title : '' %>" placeholder="Slide title">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Description</label>
-                                    <textarea class="form-control" name="description" rows="4" placeholder="Short text to show on the slide"><%= carouselEditItem ? carouselEditItem.description : '' %></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Link Text</label>
-                                    <input type="text" class="form-control" name="linkText" value="<%= carouselEditItem ? carouselEditItem.linkText : '' %>" placeholder="Shop Now / Learn More">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Link URL</label>
-                                    <input type="text" class="form-control" name="linkUrl" value="<%= carouselEditItem ? carouselEditItem.linkUrl : '' %>" placeholder="/seasonal-products or https://...">
-                                    <small class="text-muted">Leave blank if you do not want a button on this slide.</small>
-                                </div>
-                                <h6 class="fw-bold mt-4 mb-3">Slide Typography & Colors</h6>
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Box Background Color</label>
-                                        <input type="text" class="form-control form-control-color w-100" name="boxBgColor" value="<%= carouselEditItem ? (carouselEditItem.boxBgColor || 'rgba(0, 0, 0, 0.55)') : 'rgba(0, 0, 0, 0.55)' %>">
-                                        <small class="text-muted">Supports hex (#000000) or rgba(). Default is translucent black.</small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Text Color</label>
-                                        <input type="color" class="form-control form-control-color w-100" name="textColor" value="<%= carouselEditItem ? (carouselEditItem.textColor || '#ffffff') : '#ffffff' %>">
-                                    </div>
-                                </div>
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Link Text Color</label>
-                                        <input type="color" class="form-control form-control-color w-100" name="linkColor" value="<%= carouselEditItem ? (carouselEditItem.linkColor || '#ffffff') : '#ffffff' %>">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Link Background Color</label>
-                                        <input type="color" class="form-control form-control-color w-100" name="linkBgColor" value="<%= carouselEditItem ? (carouselEditItem.linkBgColor || '#B5A886') : '#B5A886' %>">
-                                        <small class="text-muted">Or type CSS vars like 'var(--primary)' in text box</small>
-                                    </div>
-                                </div>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Title Font Size</label>
-                                        <input type="text" class="form-control" name="titleFontSize" value="<%= carouselEditItem ? (carouselEditItem.titleFontSize || '2.5rem') : '2.5rem' %>">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Desc Font Size</label>
-                                        <input type="text" class="form-control" name="descFontSize" value="<%= carouselEditItem ? (carouselEditItem.descFontSize || '1.25rem') : '1.25rem' %>">
-                                    </div>
-                                </div>
-                                <h6 class="fw-bold mb-3">Slide Layout & Media</h6>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Order</label>
-                                        <input type="number" class="form-control" name="order" id="carouselOrder" value="<%= carouselEditItem ? carouselEditItem.order : 0 %>">
-                                    </div>
-                                    <div class="col-md-6 d-flex align-items-end">
-                                        <div class="form-check form-switch mb-2">
-                                            <input class="form-check-input" type="checkbox" name="isActive" id="carouselIsActive" <%= !carouselEditItem || carouselEditItem.isActive ? 'checked' : '' %>>
-                                            <label class="form-check-label">Show on website</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row g-3 mt-1">
-                                    <div class="col-md-6">
-                                        <label class="form-label">Text Left %</label>
-                                        <input type="range" class="form-range" name="textLeft" id="carouselTextLeft" min="0" max="100" value="<%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50 %>">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Text Top %</label>
-                                        <input type="range" class="form-range" name="textTop" id="carouselTextTop" min="0" max="100" value="<%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50 %>">
-                                    </div>
-                                </div>
-                                <div class="mt-2 mb-3 d-flex justify-content-between small text-muted">
-                                    <span>Left: <strong id="carouselTextLeftValue"><%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50 %></strong>%</span>
-                                    <span>Top: <strong id="carouselTextTopValue"><%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50 %></strong>%</span>
-                                </div>
-                                <div class="mt-3 mb-3">
-                                    <label class="form-label">Media File</label>
-                                    <input type="file" class="form-control" name="media" id="carouselMediaInput" accept="image/*,video/*" <%= carouselEditItem ? '' : 'required' %> >
-                                    <small class="text-muted">Upload one image or video. For updates, choosing a new file replaces the current one.</small>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label class="form-label">Drag Preview</label>
-                                    <div id="carouselDragCanvas" class="position-relative border rounded overflow-hidden bg-dark" style="min-height: 260px; touch-action: none;">
-                                        <% if (carouselEditItem && carouselEditItem.media && carouselEditItem.media.url) { %>
-                                            <% if (carouselEditItem.media.type === 'video') { %>
-                                                <video id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; background: transparent;" muted playsinline></video>
-                                            <% } else { %>
-                                                <img id="carouselPreviewMedia" src="<%= carouselEditItem.media.url %>" alt="Current media" class="w-100 h-100 position-absolute top-0 start-0" style="object-fit: cover; background: transparent;">
-                                            <% } %>
-                                        <% } else { %>
-                                            <div id="carouselPreviewMedia" class="w-100 h-100 d-flex align-items-center justify-content-center text-white-50 position-absolute top-0 start-0" style="background: linear-gradient(135deg, #111827, #1f2937); min-height: 260px;">
-                                                <div class="text-center">
-                                                    <i class="bi bi-image" style="font-size: 2.5rem;"></i>
-                                                    <div class="small mt-2">Upload media to preview drag position</div>
-                                                </div>
-                                            </div>
-                                        <% } %>
-                                        <%
-                                            const leftPos = carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50;
-                                            const topPos = carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50;
-                                            const boxStyleAttr = `style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); cursor: move; user-select: none; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); min-width: 220px; max-width: 80%;"`;
-                                        %>
-                                        <div id="carouselTextBox" class="position-absolute text-white p-3 rounded shadow" <%- boxStyleAttr %>>
-                                            <div class="fw-bold mb-1"><%= carouselEditItem ? (carouselEditItem.title || 'Slide Title') : 'Slide Title' %></div>
-                                            <div class="small opacity-75"><%= carouselEditItem ? (carouselEditItem.description || 'Drag me anywhere on the image') : 'Drag me anywhere on the image' %></div>
-                                        </div>
-                                    </div>
-                                    <small class="text-muted d-block mt-2">Drag the text box to place it anywhere on the slide.</small>
-                                </div>
-
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button type="submit" class="btn btn-swadesi">
-                                        <i class="bi bi-save"></i> <%= carouselEditItem ? 'Update Slide' : 'Add Slide' %>
-                                    </button>
-                                    <% if (carouselEditItem) { %>
-                                        <a href="/admin/settings/carousel" class="btn btn-outline-secondary">Cancel</a>
-                                    <% } %>
-                                </div>
-                            </form>
-                        </div>
+        <div class="admin-content">
+            <div class="container-fluid p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                    <div>
+                        <h2 class="fw-bold mb-1"><i class="bi bi-sliders"></i>
+                            <%= title %>
+                        </h2>
+                        <p class="text-muted mb-0">Manage homepage carousel slides with images, videos, text and links
+                        </p>
                     </div>
+                    <a href="/admin/settings" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Settings
+                    </a>
                 </div>
 
-                <div class="col-lg-7">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="fw-bold mb-0">Existing Slides</h5>
-                                <span class="badge bg-swadesi"><%= settings.carousel ? settings.carousel.length : 0 %> slides</span>
+                <% if (messages.success && messages.success.length> 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <%= messages.success %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <% } %>
+
+                        <% if (messages.error && messages.error.length> 0) { %>
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <%= messages.error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
+                            <% } %>
 
-                            <% const carouselItems = (settings.carousel || []).slice().sort((a, b) => (a.order || 0) - (b.order || 0)); %>
-                            <% if (carouselItems.length === 0) { %>
-                                <div class="text-center py-5 text-muted">
-                                    <i class="bi bi-sliders" style="font-size: 3rem;"></i>
-                                    <p class="mt-3 mb-0">No carousel slides yet. Add the first slide using the form.</p>
-                                </div>
-                            <% } else { %>
-                                <div class="row g-3">
-                                    <% carouselItems.forEach(item => { %>
-                                        <div class="col-12">
-                                            <div class="carousel-item-card position-relative">
-                                                <span class="slide-order-pill">#<%= item.order || 0 %></span>
-                                                <% if (!item.isActive) { %>
-                                                    <span class="carousel-badge badge bg-secondary">Hidden</span>
-                                                <% } else { %>
-                                                    <span class="carousel-badge badge bg-success">Visible</span>
-                                                <% } %>
-
-                                                <% if (item.media && item.media.url) { %>
-                                                    <% if (item.media.type === 'video') { %>
-                                                        <video src="<%= item.media.url %>" controls class="carousel-media-preview"></video>
-                                                    <% } else { %>
-                                                        <img src="<%= item.media.url %>" alt="<%= item.title %>" class="carousel-media-preview">
-                                                    <% } %>
-                                                <% } else { %>
-                                                    <div class="media-placeholder">
-                                                        <i class="bi bi-image"></i>
+                                <div class="row g-4">
+                                    <div class="col-lg-5">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body p-4">
+                                                <h5 class="fw-bold mb-3">
+                                                    <%= carouselEditItem ? 'Edit Carousel Slide' : 'Add Carousel Slide'
+                                                        %>
+                                                </h5>
+                                                <form
+                                                    action="<%= carouselEditItem ? `/admin/settings/carousel/${carouselEditItem._id}` : '/admin/settings/carousel' %>"
+                                                    method="POST" enctype="multipart/form-data">
+                                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Title</label>
+                                                        <input type="text" class="form-control" name="title"
+                                                            value="<%= carouselEditItem ? carouselEditItem.title : '' %>"
+                                                            placeholder="Slide title">
                                                     </div>
-                                                <% } %>
-
-                                                <div class="p-3">
-                                                    <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
-                                                        <div class="flex-grow-1" style="min-width: 0;">
-                                                            <h6 class="fw-bold mb-1"><%= item.title || 'Untitled Slide' %></h6>
-                                                            <% if (item.description) { %>
-                                                                <p class="text-muted small mb-2"><%= item.description %></p>
-                                                            <% } %>
-                                                            <% if (item.linkUrl) { %>
-                                                                <div class="small mb-2">
-                                                                    <i class="bi bi-link-45deg"></i>
-                                                                    <a href="<%= item.linkUrl %>" target="_blank" rel="noopener" class="carousel-link-url"><%= item.linkUrl %></a>
-                                                                </div>
-                                                            <% } %>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Description</label>
+                                                        <textarea class="form-control" name="description" rows="4"
+                                                            placeholder="Short text to show on the slide"><%= carouselEditItem ? carouselEditItem.description : '' %></textarea>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Link Text</label>
+                                                        <input type="text" class="form-control" name="linkText"
+                                                            value="<%= carouselEditItem ? carouselEditItem.linkText : '' %>"
+                                                            placeholder="Shop Now / Learn More">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Link URL</label>
+                                                        <input type="text" class="form-control" name="linkUrl"
+                                                            value="<%= carouselEditItem ? carouselEditItem.linkUrl : '' %>"
+                                                            placeholder="/seasonal-products or https://...">
+                                                        <small class="text-muted">Leave blank if you do not want a
+                                                            button on this slide.</small>
+                                                    </div>
+                                                    <h6 class="fw-bold mt-4 mb-3">Slide Typography & Colors</h6>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Box Background Color</label>
+                                                            <input type="text"
+                                                                class="form-control form-control-color w-100"
+                                                                name="boxBgColor"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.boxBgColor || 'rgba(0, 0, 0, 0.55)') : 'rgba(0, 0, 0, 0.55)' %>">
+                                                            <small class="text-muted">Supports hex (#000000) or rgba().
+                                                                Default is translucent black.</small>
                                                         </div>
-                                                        <div class="d-flex gap-2 flex-wrap justify-content-end flex-shrink-0">
-                                                            <a href="/admin/settings/carousel?edit=<%= item._id %>" class="btn btn-sm btn-primary">
-                                                                <i class="bi bi-pencil"></i> Edit
-                                                            </a>
-                                                            <% const safeTitle = item.title ? item.title.replace(/'/g, "\\'") : 'this slide'; %>
-                                                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteCarouselItem('<%= item._id %>', '<%= safeTitle %>')">
-                                                                <i class="bi bi-trash"></i> Delete
-                                                            </button>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Text Color</label>
+                                                            <input type="color"
+                                                                class="form-control form-control-color w-100"
+                                                                name="textColor"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.textColor || '#ffffff') : '#ffffff' %>">
                                                         </div>
                                                     </div>
-                                                </div>
+                                                    <div class="row g-3 mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Link Text Color</label>
+                                                            <input type="color"
+                                                                class="form-control form-control-color w-100"
+                                                                name="linkColor"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.linkColor || '#ffffff') : '#ffffff' %>">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Link Background Color</label>
+                                                            <input type="color"
+                                                                class="form-control form-control-color w-100"
+                                                                name="linkBgColor"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.linkBgColor || '#B5A886') : '#B5A886' %>">
+                                                            <small class="text-muted">Or type CSS vars like
+                                                                'var(--primary)' in text box</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mb-4">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Title Font Size</label>
+                                                            <input type="text" class="form-control" name="titleFontSize"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.titleFontSize || '2.5rem') : '2.5rem' %>">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Desc Font Size</label>
+                                                            <input type="text" class="form-control" name="descFontSize"
+                                                                value="<%= carouselEditItem ? (carouselEditItem.descFontSize || '1.25rem') : '1.25rem' %>">
+                                                        </div>
+                                                    </div>
+                                                    <h6 class="fw-bold mb-3">Slide Layout & Media</h6>
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Order</label>
+                                                            <input type="number" class="form-control" name="order"
+                                                                id="carouselOrder"
+                                                                value="<%= carouselEditItem ? carouselEditItem.order : 0 %>">
+                                                        </div>
+                                                        <div class="col-md-6 d-flex align-items-end">
+                                                            <div class="form-check form-switch mb-2">
+                                                                <input class="form-check-input" type="checkbox"
+                                                                    name="isActive" id="carouselIsActive"
+                                                                    <%=!carouselEditItem || carouselEditItem.isActive
+                                                                    ? 'checked' : '' %>>
+                                                                <label class="form-check-label">Show on website</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row g-3 mt-1">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Text Left %</label>
+                                                            <input type="range" class="form-range" name="textLeft"
+                                                                id="carouselTextLeft" min="0" max="100"
+                                                                value="<%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.left : 50 %>">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label">Text Top %</label>
+                                                            <input type="range" class="form-range" name="textTop"
+                                                                id="carouselTextTop" min="0" max="100"
+                                                                value="<%= carouselEditItem && carouselEditItem.textPosition ? carouselEditItem.textPosition.top : 50 %>">
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        class="mt-2 mb-3 d-flex justify-content-between small text-muted">
+                                                        <span>Left: <strong id="carouselTextLeftValue">
+                                                                <%= carouselEditItem && carouselEditItem.textPosition ?
+                                                                    carouselEditItem.textPosition.left : 50 %>
+                                                            </strong>%</span>
+                                                        <span>Top: <strong id="carouselTextTopValue">
+                                                                <%= carouselEditItem && carouselEditItem.textPosition ?
+                                                                    carouselEditItem.textPosition.top : 50 %>
+                                                            </strong>%</span>
+                                                    </div>
+                                                    <div class="mt-3 mb-3">
+                                                        <label class="form-label">Media File</label>
+                                                        <input type="file" class="form-control" name="media"
+                                                            id="carouselMediaInput" accept="image/*,video/*"
+                                                            <%=carouselEditItem ? '' : 'required' %> >
+                                                        <small class="text-muted">Upload one image or video. For
+                                                            updates, choosing a new file replaces the current
+                                                            one.</small>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Drag Preview</label>
+                                                        <div id="carouselDragCanvas"
+                                                            class="position-relative border rounded overflow-hidden bg-dark"
+                                                            style="min-height: 260px; touch-action: none;">
+                                                            <% if (carouselEditItem && carouselEditItem.media &&
+                                                                carouselEditItem.media.url) { %>
+                                                                <% if (carouselEditItem.media.type==='video' ) { %>
+                                                                    <video id="carouselPreviewMedia"
+                                                                        src="<%= carouselEditItem.media.url %>"
+                                                                        class="w-100 h-100 position-absolute top-0 start-0"
+                                                                        style="object-fit: cover; background: transparent;"
+                                                                        muted playsinline></video>
+                                                                    <% } else { %>
+                                                                        <img id="carouselPreviewMedia"
+                                                                            src="<%= carouselEditItem.media.url %>"
+                                                                            alt="Current media"
+                                                                            class="w-100 h-100 position-absolute top-0 start-0"
+                                                                            style="object-fit: cover; background: transparent;">
+                                                                        <% } %>
+                                                                            <% } else { %>
+                                                                                <div id="carouselPreviewMedia"
+                                                                                    class="w-100 h-100 d-flex align-items-center justify-content-center text-white-50 position-absolute top-0 start-0"
+                                                                                    style="background: linear-gradient(135deg, #111827, #1f2937); min-height: 260px;">
+                                                                                    <div class="text-center">
+                                                                                        <i class="bi bi-image"
+                                                                                            style="font-size: 2.5rem;"></i>
+                                                                                        <div class="small mt-2">Upload
+                                                                                            media to preview drag
+                                                                                            position</div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <% } %>
+                                                                                    <% const leftPos=carouselEditItem &&
+                                                                                        carouselEditItem.textPosition ?
+                                                                                        carouselEditItem.textPosition.left
+                                                                                        : 50; const
+                                                                                        topPos=carouselEditItem &&
+                                                                                        carouselEditItem.textPosition ?
+                                                                                        carouselEditItem.textPosition.top
+                                                                                        : 50; const
+                                                                                        boxStyleAttr=`style="left: ${leftPos}%; top: ${topPos}%; transform: translate(-50%, -50%); cursor: move; user-select: none; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(8px); min-width: 220px; max-width: 80%;"
+                                                                                        `; %>
+                                                                                        <div id="carouselTextBox"
+                                                                                            class="position-absolute text-white p-3 rounded shadow"
+                                                                                            <%- boxStyleAttr %>>
+                                                                                            <div class="fw-bold mb-1">
+                                                                                                <%= carouselEditItem ?
+                                                                                                    (carouselEditItem.title
+                                                                                                    || 'Slide Title' )
+                                                                                                    : 'Slide Title' %>
+                                                                                            </div>
+                                                                                            <div
+                                                                                                class="small opacity-75">
+                                                                                                <%= carouselEditItem ?
+                                                                                                    (carouselEditItem.description
+                                                                                                    || 'Drag me anywhere on the image'
+                                                                                                    )
+                                                                                                    : 'Drag me anywhere on the image'
+                                                                                                    %>
+                                                                                            </div>
+                                                                                        </div>
+                                                        </div>
+                                                        <small class="text-muted d-block mt-2">Drag the text box to
+                                                            place it anywhere on the slide.</small>
+                                                    </div>
+
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        <button type="submit" class="btn btn-swadesi">
+                                                            <i class="bi bi-save"></i>
+                                                            <%= carouselEditItem ? 'Update Slide' : 'Add Slide' %>
+                                                        </button>
+                                                        <% if (carouselEditItem) { %>
+                                                            <a href="/admin/settings/carousel"
+                                                                class="btn btn-outline-secondary">Cancel</a>
+                                                            <% } %>
+                                                    </div>
+                                                </form>
                                             </div>
                                         </div>
-                                    <% }); %>
+                                    </div>
+
+                                    <div class="col-lg-7">
+                                        <div class="card border-0 shadow-sm">
+                                            <div class="card-body p-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h5 class="fw-bold mb-0">Existing Slides</h5>
+                                                    <span class="badge bg-swadesi">
+                                                        <%= settings.carousel ? settings.carousel.length : 0 %> slides
+                                                    </span>
+                                                </div>
+
+                                                <% const carouselItems=(settings.carousel || []).slice().sort((a, b)=>
+                                                    (a.order || 0) - (b.order || 0)); %>
+                                                    <% if (carouselItems.length===0) { %>
+                                                        <div class="text-center py-5 text-muted">
+                                                            <i class="bi bi-sliders" style="font-size: 3rem;"></i>
+                                                            <p class="mt-3 mb-0">No carousel slides yet. Add the first
+                                                                slide using the form.</p>
+                                                        </div>
+                                                        <% } else { %>
+                                                            <div class="row g-3">
+                                                                <% carouselItems.forEach(item=> { %>
+                                                                    <div class="col-12">
+                                                                        <div
+                                                                            class="carousel-item-card position-relative">
+                                                                            <span class="slide-order-pill">#<%=
+                                                                                    item.order || 0 %></span>
+                                                                            <% if (!item.isActive) { %>
+                                                                                <span
+                                                                                    class="carousel-badge badge bg-secondary">Hidden</span>
+                                                                                <% } else { %>
+                                                                                    <span
+                                                                                        class="carousel-badge badge bg-success">Visible</span>
+                                                                                    <% } %>
+
+                                                                                        <% if (item.media &&
+                                                                                            item.media.url) { %>
+                                                                                            <% if
+                                                                                                (item.media.type==='video'
+                                                                                                ) { %>
+                                                                                                <video
+                                                                                                    src="<%= item.media.url %>"
+                                                                                                    controls
+                                                                                                    class="carousel-media-preview"></video>
+                                                                                                <% } else { %>
+                                                                                                    <img src="<%= item.media.url %>"
+                                                                                                        alt="<%= item.title %>"
+                                                                                                        class="carousel-media-preview">
+                                                                                                    <% } %>
+                                                                                                        <% } else { %>
+                                                                                                            <div
+                                                                                                                class="media-placeholder">
+                                                                                                                <i
+                                                                                                                    class="bi bi-image"></i>
+                                                                                                            </div>
+                                                                                                            <% } %>
+
+                                                                                                                <div
+                                                                                                                    class="p-3">
+                                                                                                                    <div
+                                                                                                                        class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                                                                                                                        <div class="flex-grow-1"
+                                                                                                                            style="min-width: 0;">
+                                                                                                                            <h6
+                                                                                                                                class="fw-bold mb-1">
+                                                                                                                                <%= item.title
+                                                                                                                                    || 'Untitled Slide'
+                                                                                                                                    %>
+                                                                                                                            </h6>
+                                                                                                                            <% if
+                                                                                                                                (item.description)
+                                                                                                                                {
+                                                                                                                                %>
+                                                                                                                                <p
+                                                                                                                                    class="text-muted small mb-2">
+                                                                                                                                    <%= item.description
+                                                                                                                                        %>
+                                                                                                                                </p>
+                                                                                                                                <% }
+                                                                                                                                    %>
+                                                                                                                                    <% if
+                                                                                                                                        (item.linkUrl)
+                                                                                                                                        {
+                                                                                                                                        %>
+                                                                                                                                        <div
+                                                                                                                                            class="small mb-2">
+                                                                                                                                            <i
+                                                                                                                                                class="bi bi-link-45deg"></i>
+                                                                                                                                            <a href="<%= item.linkUrl %>"
+                                                                                                                                                target="_blank"
+                                                                                                                                                rel="noopener"
+                                                                                                                                                class="carousel-link-url">
+                                                                                                                                                <%= item.linkUrl
+                                                                                                                                                    %>
+                                                                                                                                            </a>
+                                                                                                                                        </div>
+                                                                                                                                        <% }
+                                                                                                                                            %>
+                                                                                                                        </div>
+                                                                                                                        <div
+                                                                                                                            class="d-flex gap-2 flex-wrap justify-content-end flex-shrink-0">
+                                                                                                                            <a href="/admin/settings/carousel?edit=<%= item._id %>"
+                                                                                                                                class="btn btn-sm btn-primary">
+                                                                                                                                <i
+                                                                                                                                    class="bi bi-pencil"></i>
+                                                                                                                                Edit
+                                                                                                                            </a>
+                                                                                                                            <% const
+                                                                                                                                safeTitle=item.title
+                                                                                                                                ?
+                                                                                                                                item.title.replace(/'/g, "\\'"
+                                                                                                                                )
+                                                                                                                                : 'this slide'
+                                                                                                                                ;
+                                                                                                                                %>
+                                                                                                                                <button
+                                                                                                                                    type="button"
+                                                                                                                                    class="btn btn-sm btn-danger"
+                                                                                                                                    onclick="deleteCarouselItem('<%= item._id %>', '<%= safeTitle %>')">
+                                                                                                                                    <i
+                                                                                                                                        class="bi bi-trash"></i>
+                                                                                                                                    Delete
+                                                                                                                                </button>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <% }); %>
+                                                            </div>
+                                                            <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/admin.js"></script>
-    <script>
-        const carouselMediaInput = document.getElementById('carouselMediaInput');
-        const carouselDragCanvas = document.getElementById('carouselDragCanvas');
-        const carouselTextBox = document.getElementById('carouselTextBox');
-        const carouselTextLeft = document.getElementById('carouselTextLeft');
-        const carouselTextTop = document.getElementById('carouselTextTop');
-        const carouselTextLeftValue = document.getElementById('carouselTextLeftValue');
-        const carouselTextTopValue = document.getElementById('carouselTextTopValue');
-        let activePreviewObjectUrl = null;
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/admin.js"></script>
+        <script>
+            const carouselMediaInput = document.getElementById('carouselMediaInput');
+            const carouselDragCanvas = document.getElementById('carouselDragCanvas');
+            const carouselTextBox = document.getElementById('carouselTextBox');
+            const carouselTextLeft = document.getElementById('carouselTextLeft');
+            const carouselTextTop = document.getElementById('carouselTextTop');
+            const carouselTextLeftValue = document.getElementById('carouselTextLeftValue');
+            const carouselTextTopValue = document.getElementById('carouselTextTopValue');
+            let activePreviewObjectUrl = null;
 
-        function updateTextPosition(left, top) {
-            const safeLeft = Math.max(0, Math.min(100, left));
-            const safeTop = Math.max(0, Math.min(100, top));
+            function updateTextPosition(left, top) {
+                const safeLeft = Math.max(0, Math.min(100, left));
+                const safeTop = Math.max(0, Math.min(100, top));
 
-            carouselTextLeft.value = safeLeft;
-            carouselTextTop.value = safeTop;
-            carouselTextLeftValue.textContent = safeLeft;
-            carouselTextTopValue.textContent = safeTop;
-            carouselTextBox.style.left = `${safeLeft}%`;
-            carouselTextBox.style.top = `${safeTop}%`;
-        }
-
-        function setPreviewMedia(file) {
-            if (!file) {
-                return;
+                carouselTextLeft.value = safeLeft;
+                carouselTextTop.value = safeTop;
+                carouselTextLeftValue.textContent = safeLeft;
+                carouselTextTopValue.textContent = safeTop;
+                carouselTextBox.style.left = `${safeLeft}%`;
+                carouselTextBox.style.top = `${safeTop}%`;
             }
 
-            if (activePreviewObjectUrl) {
-                URL.revokeObjectURL(activePreviewObjectUrl);
-                activePreviewObjectUrl = null;
-            }
-
-            const existingMedia = document.getElementById('carouselPreviewMedia');
-            const isVideo = file.type.startsWith('video/');
-            const objectUrl = URL.createObjectURL(file);
-            activePreviewObjectUrl = objectUrl;
-
-            let nextElement;
-            if (isVideo) {
-                nextElement = document.createElement('video');
-                nextElement.controls = true;
-                nextElement.muted = true;
-                nextElement.playsInline = true;
-            } else {
-                nextElement = document.createElement('img');
-            }
-
-            nextElement.id = 'carouselPreviewMedia';
-            nextElement.src = objectUrl;
-            nextElement.className = 'w-100 h-100 position-absolute top-0 start-0';
-            nextElement.style.objectFit = 'cover';
-            nextElement.style.background = 'transparent';
-
-            if (existingMedia && existingMedia.parentNode) {
-                existingMedia.parentNode.replaceChild(nextElement, existingMedia);
-            } else {
-                carouselDragCanvas.prepend(nextElement);
-            }
-        }
-
-        if (carouselMediaInput) {
-            carouselMediaInput.addEventListener('change', function() {
-                setPreviewMedia(this.files && this.files[0]);
-            });
-        }
-
-        if (carouselTextBox) {
-            let isDragging = false;
-            let dragOffsetX = 0;
-            let dragOffsetY = 0;
-
-            const moveTextBox = (event) => {
-                if (!isDragging) {
+            function setPreviewMedia(file) {
+                if (!file) {
                     return;
                 }
 
-                const canvasRect = carouselDragCanvas.getBoundingClientRect();
-                const left = ((event.clientX - canvasRect.left - dragOffsetX) / canvasRect.width) * 100;
-                const top = ((event.clientY - canvasRect.top - dragOffsetY) / canvasRect.height) * 100;
-                updateTextPosition(left, top);
-            };
-
-            carouselTextBox.addEventListener('pointerdown', (event) => {
-                event.preventDefault();
-                const canvasRect = carouselDragCanvas.getBoundingClientRect();
-                const boxRect = carouselTextBox.getBoundingClientRect();
-                isDragging = true;
-                dragOffsetX = event.clientX - boxRect.left;
-                dragOffsetY = event.clientY - boxRect.top;
-                carouselTextBox.setPointerCapture(event.pointerId);
-                document.addEventListener('pointermove', moveTextBox);
-            });
-
-            carouselTextBox.addEventListener('pointerup', (event) => {
-                isDragging = false;
-                try {
-                    carouselTextBox.releasePointerCapture(event.pointerId);
-                } catch (error) {
-                    // ignore
+                if (activePreviewObjectUrl) {
+                    URL.revokeObjectURL(activePreviewObjectUrl);
+                    activePreviewObjectUrl = null;
                 }
-                document.removeEventListener('pointermove', moveTextBox);
-            });
 
-            carouselTextBox.addEventListener('pointercancel', () => {
-                isDragging = false;
-                document.removeEventListener('pointermove', moveTextBox);
-            });
+                const existingMedia = document.getElementById('carouselPreviewMedia');
+                const isVideo = file.type.startsWith('video/');
+                const objectUrl = URL.createObjectURL(file);
+                activePreviewObjectUrl = objectUrl;
 
-            carouselTextLeft.addEventListener('input', () => updateTextPosition(Number(carouselTextLeft.value), Number(carouselTextTop.value)));
-            carouselTextTop.addEventListener('input', () => updateTextPosition(Number(carouselTextLeft.value), Number(carouselTextTop.value)));
+                let nextElement;
+                if (isVideo) {
+                    nextElement = document.createElement('video');
+                    nextElement.controls = true;
+                    nextElement.muted = true;
+                    nextElement.playsInline = true;
+                } else {
+                    nextElement = document.createElement('img');
+                }
 
-            updateTextPosition(Number(carouselTextLeft.value || 50), Number(carouselTextTop.value || 50));
-        }
+                nextElement.id = 'carouselPreviewMedia';
+                nextElement.src = objectUrl;
+                nextElement.className = 'w-100 h-100 position-absolute top-0 start-0';
+                nextElement.style.objectFit = 'cover';
+                nextElement.style.background = 'transparent';
 
-        function deleteCarouselItem(id, title) {
-            if (!confirm(`Delete carousel slide \"${title}\"?`)) {
-                return;
+                if (existingMedia && existingMedia.parentNode) {
+                    existingMedia.parentNode.replaceChild(nextElement, existingMedia);
+                } else {
+                    carouselDragCanvas.prepend(nextElement);
+                }
             }
 
-            fetch(`/admin/settings/carousel/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
+            if (carouselMediaInput) {
+                carouselMediaInput.addEventListener('change', function () {
+                    setPreviewMedia(this.files && this.files[0]);
+                });
+            }
+
+            if (carouselTextBox) {
+                let isDragging = false;
+                let dragOffsetX = 0;
+                let dragOffsetY = 0;
+
+                const moveTextBox = (event) => {
+                    if (!isDragging) {
+                        return;
+                    }
+
+                    const canvasRect = carouselDragCanvas.getBoundingClientRect();
+                    const left = ((event.clientX - canvasRect.left - dragOffsetX) / canvasRect.width) * 100;
+                    const top = ((event.clientY - canvasRect.top - dragOffsetY) / canvasRect.height) * 100;
+                    updateTextPosition(left, top);
+                };
+
+                carouselTextBox.addEventListener('pointerdown', (event) => {
+                    event.preventDefault();
+                    const canvasRect = carouselDragCanvas.getBoundingClientRect();
+                    const boxRect = carouselTextBox.getBoundingClientRect();
+                    isDragging = true;
+                    dragOffsetX = event.clientX - boxRect.left;
+                    dragOffsetY = event.clientY - boxRect.top;
+                    carouselTextBox.setPointerCapture(event.pointerId);
+                    document.addEventListener('pointermove', moveTextBox);
+                });
+
+                carouselTextBox.addEventListener('pointerup', (event) => {
+                    isDragging = false;
+                    try {
+                        carouselTextBox.releasePointerCapture(event.pointerId);
+                    } catch (error) {
+                        // ignore
+                    }
+                    document.removeEventListener('pointermove', moveTextBox);
+                });
+
+                carouselTextBox.addEventListener('pointercancel', () => {
+                    isDragging = false;
+                    document.removeEventListener('pointermove', moveTextBox);
+                });
+
+                carouselTextLeft.addEventListener('input', () => updateTextPosition(Number(carouselTextLeft.value), Number(carouselTextTop.value)));
+                carouselTextTop.addEventListener('input', () => updateTextPosition(Number(carouselTextLeft.value), Number(carouselTextTop.value)));
+
+                updateTextPosition(Number(carouselTextLeft.value || 50), Number(carouselTextTop.value || 50));
+            }
+
+            function deleteCarouselItem(id, title) {
+                if (!confirm(`Delete carousel slide \"${title}\"?`)) {
+                    return;
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/admin/settings/carousel';
-                } else {
-                    alert(data.message || 'Failed to delete carousel item');
-                }
-            })
-            .catch(error => {
-                console.error('Delete error:', error);
-                alert('Failed to delete carousel item');
-            });
-        }
-    </script>
+
+                fetch(`/admin/settings/carousel/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '/admin/settings/carousel';
+                        } else {
+                            alert(data.message || 'Failed to delete carousel item');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Delete error:', error);
+                        alert('Failed to delete carousel item');
+                    });
+            }
+        </script>
 </body>
+
 </html>

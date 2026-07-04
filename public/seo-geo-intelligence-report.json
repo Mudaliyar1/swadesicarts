@@ -1,13 +1,13 @@
 {
-  "lastUpdated": "2026-07-02T15:20:44.134Z",
+  "lastUpdated": "2026-07-04T10:58:29.906Z",
   "seoHealth": 100,
   "geoHealth": 100,
   "fileScore": 13,
-  "totalItems": 11,
+  "totalItems": 8,
   "missingSeoCount": 0,
   "missingGeoCount": 0,
   "missingAltCount": 0,
-  "sitemapDiscrepancyCount": 11,
+  "sitemapDiscrepancyCount": 8,
   "auditedFiles": [
     {
       "filename": "robots.txt",
@@ -69,7 +69,7 @@
   "diagnostics": [
     {
       "type": "CRITICAL",
-      "message": "11 items are missing from public/sitemap.xml.",
+      "message": "8 items are missing from public/sitemap.xml.",
       "impact": "Search crawlers might not discover these pages during structural audits."
     },
     {
@@ -181,33 +181,6 @@
     }
   },
   "items": [
-    {
-      "id": "6a12e5720eebac1c49eb5701",
-      "title": "GIR A2 COW GHEE",
-      "type": "organic",
-      "slug": "gir-a2-cow-ghee",
-      "isMissingSeo": false,
-      "isMissingGeo": false,
-      "inSitemap": false
-    },
-    {
-      "id": "6a3c043befb5fcadca78b12c",
-      "title": "testing product",
-      "type": "seasonal",
-      "slug": "testing-product",
-      "isMissingSeo": false,
-      "isMissingGeo": false,
-      "inSitemap": false
-    },
-    {
-      "id": "6a2e4244faf7f92fab14d260",
-      "title": "Basic Static Business Website Package",
-      "type": "tech",
-      "slug": "basic-static-business-website-package",
-      "isMissingSeo": false,
-      "isMissingGeo": false,
-      "inSitemap": false
-    },
     {
       "id": "6a4169dc54c58ff1c5b3843d",
       "title": "Privacy Policy",
