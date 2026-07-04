@@ -20,15 +20,88 @@ const uploadToCloudinary = (buffer, folder) => {
 // List all products
 exports.list = async (req, res) => {
   try {
-    const products = await SeasonalProduct.find().sort({ order: 1, createdAt: -1 });
-    
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const { search, category, status, sortBy, sortOrder } = req.query;
+
+    const filter = {};
+
+    // Search query (matches title or category case-insensitively)
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { title: searchRegex },
+        { category: searchRegex }
+      ];
+    }
+
+    // Category filter
+    if (category && category.trim() && category !== 'all') {
+      filter.category = category.trim();
+    }
+
+    // Status filter
+    if (status) {
+      if (status === 'visible') filter.isVisible = true;
+      if (status === 'hidden') filter.isVisible = false;
+      if (status === 'inStock') filter.inStock = true;
+      if (status === 'outOfStock') filter.inStock = false;
+    }
+
+    // Sorting
+    let sort = { order: 1, createdAt: -1 }; // default sorting
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? -1 : 1;
+      if (sortBy === 'price') {
+        sort = { price: direction, createdAt: -1 };
+      } else if (sortBy === 'title') {
+        sort = { title: direction, createdAt: -1 };
+      } else if (sortBy === 'order') {
+        sort = { order: direction, createdAt: -1 };
+      } else if (sortBy === 'date') {
+        sort = { createdAt: direction };
+      } else {
+        sort = { [sortBy]: direction };
+      }
+    }
+
+    const totalProducts = await SeasonalProduct.countDocuments(filter);
+    const products = await SeasonalProduct.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
+    // Get unique categories for the filter dropdown
+    const categories = await SeasonalProduct.distinct('category');
+
     res.render('admin/seasonal/list', {
       title: 'Seasonal Products',
       products,
+      categories,
       adminName: req.session.adminName,
       currentPage: 'seasonal',
       success: req.flash('success'),
-      error: req.flash('error')
+      error: req.flash('error'),
+      query: {
+        page,
+        limit,
+        search: search || '',
+        category: category || 'all',
+        status: status || '',
+        sortBy: sortBy || 'order',
+        sortOrder: sortOrder || 'asc'
+      },
+      pagination: {
+        totalProducts,
+        totalPages: Math.ceil(totalProducts / limit),
+        currentPage: page,
+        hasNextPage: page * limit < totalProducts,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1
+      }
     });
   } catch (error) {
     console.error('List error:', error);
@@ -109,7 +182,11 @@ exports.create = async (req, res) => {
     res.redirect('/admin/seasonal-products');
   } catch (error) {
     console.error('Create error:', error);
-    req.flash('error', 'An error occurred while creating the product');
+    if (error.code === 11000) {
+      req.flash('error', 'A product with this URL slug already exists. Please choose a different title or slug.');
+    } else {
+      req.flash('error', 'An error occurred while creating the product');
+    }
     res.redirect('/admin/seasonal-products/create');
   }
 };
@@ -210,7 +287,11 @@ exports.update = async (req, res) => {
     res.redirect('/admin/seasonal-products');
   } catch (error) {
     console.error('Update error:', error);
-    req.flash('error', 'An error occurred while updating the product');
+    if (error.code === 11000) {
+      req.flash('error', 'A product with this URL slug already exists. Please choose a different title or slug.');
+    } else {
+      req.flash('error', 'An error occurred while updating the product');
+    }
     res.redirect(`/admin/seasonal-products/edit/${req.params.id}`);
   }
 };
@@ -224,33 +305,36 @@ exports.delete = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // Delete featured image from Cloudinary
-    if (product.featuredImage && product.featuredImage.publicId) {
-      try {
-        const resourceType = product.featuredImage.type === 'video' ? 'video' : 'image';
-        await cloudinary.uploader.destroy(product.featuredImage.publicId, { resource_type: resourceType });
-      } catch (err) {
-        console.error('Error deleting featured image from Cloudinary:', err);
-      }
-    }
+    // Delete from DB first for instant user response
+    await SeasonalProduct.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Product deleted successfully' });
 
-    // Delete gallery images from Cloudinary
-    if (product.gallery && product.gallery.length > 0) {
-      for (const media of product.gallery) {
-        if (media.publicId) {
-          try {
-            const resourceType = media.type === 'video' ? 'video' : 'image';
-            await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
-          } catch (err) {
-            console.error('Error deleting gallery item from Cloudinary:', err);
+    // Clean up images in background
+    setImmediate(async () => {
+      // Delete featured image from Cloudinary
+      if (product.featuredImage && product.featuredImage.publicId) {
+        try {
+          const resourceType = product.featuredImage.type === 'video' ? 'video' : 'image';
+          await cloudinary.uploader.destroy(product.featuredImage.publicId, { resource_type: resourceType });
+        } catch (err) {
+          console.error('Error deleting featured image from Cloudinary:', err);
+        }
+      }
+
+      // Delete gallery images from Cloudinary
+      if (product.gallery && product.gallery.length > 0) {
+        for (const media of product.gallery) {
+          if (media.publicId) {
+            try {
+              const resourceType = media.type === 'video' ? 'video' : 'image';
+              await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+            } catch (err) {
+              console.error('Error deleting gallery item from Cloudinary:', err);
+            }
           }
         }
       }
-    }
-
-    await SeasonalProduct.findByIdAndDelete(req.params.id);
-
-    res.json({ success: true, message: 'Product deleted successfully' });
+    });
   } catch (error) {
     console.error('Delete error:', error);
     res.status(500).json({ success: false, message: 'An error occurred while deleting the product' });
@@ -291,5 +375,53 @@ exports.deleteGalleryItem = async (req, res) => {
   } catch (error) {
     console.error('Delete gallery item error:', error);
     res.status(500).json({ success: false, message: 'An error occurred' });
+  }
+};
+
+// Bulk delete products
+exports.bulkDelete = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'No product IDs provided' });
+    }
+
+    const products = await SeasonalProduct.find({ _id: { $in: ids } });
+
+    // Delete from DB first for instant user response
+    await SeasonalProduct.deleteMany({ _id: { $in: ids } });
+    res.json({ success: true, message: `${products.length} products deleted successfully` });
+
+    // Clean up images in background
+    setImmediate(async () => {
+      for (const product of products) {
+        // Delete featured image
+        if (product.featuredImage && product.featuredImage.publicId) {
+          try {
+            const resourceType = product.featuredImage.type === 'video' ? 'video' : 'image';
+            await cloudinary.uploader.destroy(product.featuredImage.publicId, { resource_type: resourceType });
+          } catch (err) {
+            console.error('Error deleting featured image from Cloudinary:', err);
+          }
+        }
+
+        // Delete gallery images
+        if (product.gallery && product.gallery.length > 0) {
+          for (const media of product.gallery) {
+            if (media.publicId) {
+              try {
+                const resourceType = media.type === 'video' ? 'video' : 'image';
+                await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+              } catch (err) {
+                console.error('Error deleting gallery item from Cloudinary:', err);
+              }
+            }
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Bulk delete error:', error);
+    res.status(500).json({ success: false, message: 'An error occurred during bulk deletion' });
   }
 };

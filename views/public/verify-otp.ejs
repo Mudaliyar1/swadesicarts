@@ -12,75 +12,425 @@
     <% if (typeof seo !== 'undefined') { %>
         <%- include('../partials/seo-meta') %>
     <% } %>
+    <style>
+        /* MATCHING LOGIN/REGISTER DESIGN SYSTEM (LIGHT LIQUID GLASS) */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #f8fafc !important;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #334155;
+        }
+
+        .mnc-viewport {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 4rem 1.5rem;
+        }
+
+        /* LIQUID GLASS CARD */
+        .mnc-card-wrapper {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.45) !important;
+            backdrop-filter: blur(25px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.04), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.6), 
+                inset 0 0 0 0.5px rgba(255, 255, 255, 0.2) !important;
+            padding: 3.5rem 3.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Override dynamic-styles inside form container to protect legibility */
+        .mnc-card-wrapper h2,
+        .mnc-card-wrapper p,
+        .mnc-card-wrapper label,
+        .mnc-card-wrapper span,
+        .mnc-card-wrapper div,
+        .mnc-card-wrapper input,
+        .mnc-card-wrapper a:not(.btn),
+        .mnc-card-wrapper h6 {
+            color: inherit;
+        }
+
+        .mnc-card-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mnc-card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 2.1rem;
+            letter-spacing: -0.5px;
+            color: #000000 !important;
+            margin-bottom: 0.35rem;
+        }
+
+        .mnc-card-header p {
+            color: #64748b !important;
+            font-size: 1.02rem;
+            font-weight: 500;
+        }
+
+        /* LIQUID GLASS INPUT */
+        .mnc-input {
+            width: 100%;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.55) !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-radius: 12px;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #0f172a !important;
+            letter-spacing: 0.5rem;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset;
+        }
+
+        .mnc-input::placeholder {
+            color: #cbd5e1;
+            letter-spacing: normal;
+            font-size: 1.25rem;
+        }
+
+        .mnc-input:focus {
+            background: rgba(255, 255, 255, 0.85) !important;
+            border-color: #000000 !important;
+            box-shadow: 
+                0 0 0 4px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            color: #000000 !important;
+        }
+
+        /* LIQUID GLASS SUBMIT */
+        .mnc-btn-submit {
+            width: 100%;
+            height: 56px;
+            background: rgba(255, 255, 255, 0.4) !important;
+            backdrop-filter: blur(10px);
+            border: 2px solid #000000 !important;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.12rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+            color: #000000 !important;
+        }
+
+        .mnc-btn-submit span,
+        .mnc-btn-submit i {
+            color: #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) {
+            background: #000000 !important;
+        }
+
+        .mnc-btn-submit:hover:not(:disabled) span,
+        .mnc-btn-submit:hover:not(:disabled) i {
+            color: #ffffff !important;
+        }
+
+        .mnc-btn-submit:disabled {
+            background: rgba(241, 245, 249, 0.6) !important;
+            border: 1.5px solid #cbd5e1 !important;
+            cursor: not-allowed;
+        }
+
+        .mnc-btn-submit:disabled span {
+            color: #94a3b8 !important;
+        }
+
+        /* Premium Stripe/Vercel-Style Onboarding welcome page */
+        .onboarding-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: #0f172a; /* Sleek dark slate canvas */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .onboarding-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .onboarding-content {
+            width: 100%;
+            max-width: 440px;
+            padding: 2.5rem;
+            background: #1e293b; /* Dark slate card */
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transform: scale(0.96);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .onboarding-overlay.show .onboarding-content {
+            transform: scale(1);
+        }
+        .onboarding-spinner {
+            width: 28px;
+            height: 28px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .onboarding-main-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #ffffff !important;
+            margin-bottom: 2rem;
+            letter-spacing: -0.2px;
+        }
+        .onboarding-step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+        .onboarding-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.95rem;
+            color: #64748b !important;
+            transition: color 0.3s ease;
+        }
+        .onboarding-step.active {
+            color: #e2e8f0 !important;
+        }
+        .onboarding-step.completed {
+            color: #38bdf8 !important; /* sky-400 check */
+        }
+        .onboarding-step .step-bullet {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            font-size: 0.95rem;
+            color: inherit;
+        }
+        .onboarding-step.completed .step-bullet {
+            animation: bounceBullet 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceBullet {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+        .onboarding-step .step-text {
+            font-weight: 500;
+        }
+        .onboarding-progress-bar-wrapper {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .onboarding-progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: #38bdf8;
+            transition: width 0.3s ease-out;
+        }
+
+        /* ── RESPONSIVE ─────────────────────────────────────────── */
+
+        /* Tablet (≤ 768px) */
+        @media (max-width: 768px) {
+            .mnc-viewport {
+                padding: 2rem 1rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2.5rem 2rem;
+                border-radius: 20px;
+                margin-top: 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.75rem;
+            }
+
+            .mnc-card-header p {
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Mobile (≤ 576px) */
+        @media (max-width: 576px) {
+            .mnc-viewport {
+                padding: 1rem 0.75rem;
+                align-items: flex-start;
+            }
+
+            .mnc-card-wrapper {
+                padding: 2rem 1.25rem;
+                border-radius: 16px;
+                margin-top: 0.5rem;
+                border-left: none;
+                border-right: none;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.55rem;
+            }
+
+            .mnc-label {
+                font-size: 0.92rem;
+            }
+
+            .mnc-input {
+                height: 54px;
+                font-size: 1.3rem;
+                letter-spacing: 0.35rem;
+            }
+
+            .mnc-btn-submit {
+                height: 50px;
+                font-size: 1rem;
+                margin-top: 1.25rem;
+            }
+            
+            .onboarding-content {
+                padding: 2rem 1.25rem;
+                max-width: 90%;
+            }
+            .welcome-title { font-size: 1.75rem; }
+            .welcome-subtitle { font-size: 1rem; }
+        }
+
+        /* Very small (≤ 375px) */
+        @media (max-width: 375px) {
+            .mnc-card-wrapper {
+                padding: 1.75rem 1rem;
+            }
+
+            .mnc-card-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .mnc-input {
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Onboarding Welcome Overlay -->
+    <div id="onboardingOverlay" class="onboarding-overlay">
+        <div class="onboarding-content">
+            <div class="onboarding-spinner"></div>
+            <h3 class="onboarding-main-title">Setting up your account...</h3>
+            
+            <div class="onboarding-step-list">
+                <div class="onboarding-step" id="step1">
+                    <span class="step-bullet"><i class="bi bi-circle"></i></span>
+                    <span class="step-text">Verifying credentials</span>
+                </div>
+                <div class="onboarding-step" id="step2">
+                    <span class="step-bullet"><i class="bi bi-circle"></i></span>
+                    <span class="step-text">Securing session token</span>
+                </div>
+                <div class="onboarding-step" id="step3">
+                    <span class="step-bullet"><i class="bi bi-circle"></i></span>
+                    <span class="step-text">Configuring Swadesi dashboard</span>
+                </div>
+                <div class="onboarding-step" id="step4">
+                    <span class="step-bullet"><i class="bi bi-circle"></i></span>
+                    <span class="step-text">Redirecting to home page</span>
+                </div>
+            </div>
+
+            <div class="onboarding-progress-bar-wrapper">
+                <div class="onboarding-progress-bar-fill"></div>
+            </div>
+        </div>
+    </div>
+
     <%- include('../partials/navbar-new') %>
     
-    <!-- PAGE HEADER -->
-    <section class="page-header text-center">
-        <div class="container">
-            <h1>Verify Email</h1>
-            <p>Enter the 6-digit code</p>
+    <div class="mnc-viewport">
+        <div class="mnc-card-wrapper">
+            <div class="mnc-card-header">
+                <div class="logo-box mb-3">
+                    <i class="bi bi-envelope-check" style="font-size: 3.25rem; color: #000000;"></i>
+                </div>
+                <h2>Verify Email</h2>
+                <p>We've sent a 6-digit code to:<br><strong class="text-dark"><%= email %></strong></p>
+            </div>
+
+            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+                <div class="alert border-0 mb-4" role="alert" style="border-radius: 12px; font-size: 0.9rem; background-color: #fef2f2; color: #b91c1c;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> <%= error %>
+                </div>
+            <% } %>
+
+            <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+                <div class="alert border-0 mb-4" role="alert" style="border-radius: 12px; font-size: 0.9rem; background-color: #f0fdf4; color: #15803d;">
+                    <i class="bi bi-check-circle-fill me-2"></i> <%= success %>
+                </div>
+            <% } %>
+
+            <form action="/verify-otp" method="POST" id="verifyForm">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="email" value="<%= email %>">
+                
+                <!-- Hidden metadata dataset elements for safe decoupling of variables -->
+                <div id="otpMeta" data-email="<%= email %>" data-error="<%= (typeof error !== 'undefined' && error) ? error : '' %>" style="display: none;"></div>
+
+                <div class="mb-4">
+                    <input type="text" class="mnc-input" id="otpInput" name="otp" pattern="[0-9]{6}" title="Please enter 6 digit OTP" placeholder="000000" maxlength="6" required autofocus autocomplete="one-time-code">
+                    <div id="otpAlert" class="text-danger mt-2 small fw-semibold text-center" style="display: none; font-size: 0.85rem;">
+                        <i class="bi bi-exclamation-circle"></i> Only numeric digits are allowed. Emojis and letters are blocked.
+                    </div>
+                </div>
+
+                <button type="submit" class="mnc-btn-submit" id="submitBtn">
+                    <span>Verify &amp; Login</span> <i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <div id="resendContainer" class="small text-muted-custom">
+                    Didn't receive the code? <button type="button" id="resendBtn" class="btn btn-link p-0 fw-bold text-decoration-none" style="color: #0f172a; vertical-align: baseline;" disabled>Resend OTP (30s)</button>
+                </div>
+                <div id="resendAlert" class="mt-2 alert alert-info py-2 px-3 small rounded-3" style="display: none;"></div>
+            </div>
         </div>
-    </section>
-
-    <!-- VERIFY SECTION -->
-    <section class="py-5 bg-light-custom">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6 col-xl-5">
-                    <div class="card border-0 shadow-sm" style="border-radius: 24px;">
-                        <div class="card-body p-5">
-                            <div class="text-center mb-4">
-                                <i class="bi bi-envelope-check mb-3" style="font-size: 3rem; color: var(--accent);"></i>
-                                <p class="text-muted-custom mb-0">We've sent a 6-digit verification code to<br><strong class="text-dark"><%= email %></strong></p>
-                            </div>
-
-                            <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
-                                <div class="alert alert-danger alert-dismissible fade show rounded-3" role="alert">
-                                    <i class="bi bi-exclamation-circle me-2"></i><%= error %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            <% } %>
-                            
-                            <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
-                                <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
-                                    <i class="bi bi-check-circle me-2"></i><%= success %>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                </div>
-                            <% } %>
-
-                              <form action="/verify-otp" method="POST" id="verifyForm">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                 <input type="hidden" name="email" value="<%= email %>">
-                                 
-                                 <!-- Hidden metadata dataset elements for safe decoupling of variables -->
-                                 <div id="otpMeta" data-email="<%= email %>" data-error="<%= (typeof error !== 'undefined' && error) ? error : '' %>" style="display: none;"></div>
-
-                                 <div class="mb-4">
-                                      <input type="text" class="form-control form-control-lg text-center" id="otpInput" name="otp" pattern="[0-9]{6}" title="Please enter 6 digit OTP" placeholder="000000" maxlength="6" required autofocus autocomplete="one-time-code" style="border-radius: 12px; font-size: 1.5rem; letter-spacing: 0.5rem; padding: 1rem;">
-                                      <div id="otpAlert" class="text-danger mt-2 small fw-semibold text-center" style="display: none; font-size: 0.85rem;">
-                                          <i class="bi bi-exclamation-circle"></i> Only numeric digits are allowed. Emojis and letters are blocked.
-                                      </div>
-                                  </div>
-                                 
-                                 <button type="submit" class="btn btn-accent btn-lg w-100 mb-4" id="submitBtn" style="border-radius: 12px; font-weight: 600;">
-                                     Verify & Login
-                                 </button>
-                              </form>
-                              
-                              <div class="text-center">
-                                  <div id="resendContainer" class="small text-muted-custom">
-                                      Didn't receive the code? <button type="button" id="resendBtn" class="btn btn-link p-0 fw-bold text-decoration-none" style="color: var(--primary); vertical-align: baseline;" disabled>Resend OTP (30s)</button>
-                                  </div>
-                                  <div id="resendAlert" class="mt-2 alert alert-info py-2 px-3 small rounded-3" style="display: none;"></div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </section>
+    </div>
   
       <%- include('../partials/footer-new') %>
       
@@ -146,7 +496,45 @@
                   const res = await response.json();
 
                   if (res.success) {
-                      window.location.href = res.redirect || '/';
+                      const overlay = document.getElementById('onboardingOverlay');
+                      overlay.style.display = 'flex';
+                      overlay.offsetHeight; // reflow
+                      overlay.classList.add('show');
+
+                      const progressBarFill = document.querySelector('.onboarding-progress-bar-fill');
+                      
+                      const steps = [
+                          { id: 'step1', start: 100, delay: 800, progress: 25 },
+                          { id: 'step2', start: 800, delay: 1700, progress: 50 },
+                          { id: 'step3', start: 1700, delay: 2700, progress: 75 },
+                          { id: 'step4', start: 2700, delay: 3500, progress: 100 }
+                      ];
+
+                      steps.forEach((step) => {
+                          // Set step active
+                          setTimeout(() => {
+                              const el = document.getElementById(step.id);
+                              if (el) el.classList.add('active');
+                          }, step.start);
+
+                          // Set step completed
+                          setTimeout(() => {
+                              const el = document.getElementById(step.id);
+                              if (el) {
+                                  el.classList.remove('active');
+                                  el.classList.add('completed');
+                                  const bullet = el.querySelector('.step-bullet');
+                                  if (bullet) {
+                                      bullet.innerHTML = '<i class="bi bi-check-circle-fill" style="color: #38bdf8 !important;"></i>';
+                                  }
+                              }
+                              progressBarFill.style.width = `${step.progress}%`;
+                          }, step.delay);
+                      });
+
+                      setTimeout(() => {
+                          window.location.href = res.redirect || '/';
+                      }, 4000);
                   } else {
                       // Show inline error red highlight and message
                       otpAlert.innerHTML = `<i class="bi bi-exclamation-circle"></i> ${res.message}`;
@@ -233,7 +621,46 @@
                   resendBtn.innerText = 'Resend OTP';
                   resendBtn.disabled = false;
               }
-          });
-      </script>
+            // Check for preview parameter in URL to test animation
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('preview') === 'true') {
+                setTimeout(() => {
+                    const overlay = document.getElementById('onboardingOverlay');
+                    overlay.style.display = 'flex';
+                    overlay.offsetHeight; // reflow
+                    overlay.classList.add('show');
+
+                    const progressBarFill = document.querySelector('.onboarding-progress-bar-fill');
+                    
+                    const steps = [
+                        { id: 'step1', start: 100, delay: 800, progress: 25 },
+                        { id: 'step2', start: 800, delay: 1700, progress: 50 },
+                        { id: 'step3', start: 1700, delay: 2700, progress: 75 },
+                        { id: 'step4', start: 2700, delay: 3500, progress: 100 }
+                    ];
+
+                    steps.forEach((step) => {
+                        setTimeout(() => {
+                            const el = document.getElementById(step.id);
+                            if (el) el.classList.add('active');
+                        }, step.start);
+
+                        setTimeout(() => {
+                            const el = document.getElementById(step.id);
+                            if (el) {
+                                el.classList.remove('active');
+                                el.classList.add('completed');
+                                const bullet = el.querySelector('.step-bullet');
+                                if (bullet) {
+                                    bullet.innerHTML = '<i class="bi bi-check-circle-fill" style="color: #38bdf8 !important;"></i>';
+                                }
+                            }
+                            progressBarFill.style.width = `${step.progress}%`;
+                        }, step.delay);
+                    });
+                }, 400);
+            }
+        });
+    </script>
 </body>
 </html>

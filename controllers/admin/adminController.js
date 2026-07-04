@@ -406,7 +406,26 @@ exports.resolveCriticalAlert = async (req, res) => {
     const userAuthController = require('../userAuthController');
     userAuthController.clearIpAttempts(alert.ipAddress);
 
-    req.flash('success', 'Critical Alert resolved and user time limits removed successfully.');
+    // Clear express-rate-limit cache for this IP
+    try {
+      const rateLimiters = require('../../middleware/rateLimiters');
+      if (rateLimiters.authLimiter && typeof rateLimiters.authLimiter.resetKey === 'function') {
+        rateLimiters.authLimiter.resetKey(alert.ipAddress);
+      }
+      if (rateLimiters.loginLimiter && typeof rateLimiters.loginLimiter.resetKey === 'function') {
+        rateLimiters.loginLimiter.resetKey(alert.ipAddress);
+      }
+      if (rateLimiters.globalLimiter && typeof rateLimiters.globalLimiter.resetKey === 'function') {
+        rateLimiters.globalLimiter.resetKey(alert.ipAddress);
+      }
+      if (rateLimiters.spamLimiter && typeof rateLimiters.spamLimiter.resetKey === 'function') {
+        rateLimiters.spamLimiter.resetKey(alert.ipAddress);
+      }
+    } catch (limiterError) {
+      console.error('Error clearing express rate limiters:', limiterError);
+    }
+
+    req.flash('success', 'Critical Alert resolved and user/IP time limits removed successfully.');
     res.redirect('/admin/critical-alerts');
   } catch (error) {
     console.error('Resolve critical alert error:', error);

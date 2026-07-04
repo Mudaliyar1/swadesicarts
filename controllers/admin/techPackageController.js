@@ -18,15 +18,88 @@ const uploadToCloudinary = (buffer, folder) => {
 
 exports.list = async (req, res) => {
   try {
-    const products = await TechPackage.find().sort({ order: 1, createdAt: -1 });
-    
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const { search, category, status, sortBy, sortOrder } = req.query;
+
+    const filter = {};
+
+    // Search query (matches title or category case-insensitively)
+    if (search && search.trim()) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      filter.$or = [
+        { title: searchRegex },
+        { category: searchRegex }
+      ];
+    }
+
+    // Category filter
+    if (category && category.trim() && category !== 'all') {
+      filter.category = category.trim();
+    }
+
+    // Status filter
+    if (status) {
+      if (status === 'visible') filter.isVisible = true;
+      if (status === 'hidden') filter.isVisible = false;
+      if (status === 'available') filter.isAvailable = true;
+      if (status === 'unavailable') filter.isAvailable = false;
+    }
+
+    // Sorting
+    let sort = { order: 1, createdAt: -1 }; // default sorting
+    if (sortBy) {
+      const direction = sortOrder === 'desc' ? -1 : 1;
+      if (sortBy === 'price') {
+        sort = { 'price.amount': direction, createdAt: -1 };
+      } else if (sortBy === 'title') {
+        sort = { title: direction, createdAt: -1 };
+      } else if (sortBy === 'order') {
+        sort = { order: direction, createdAt: -1 };
+      } else if (sortBy === 'date') {
+        sort = { createdAt: direction };
+      } else {
+        sort = { [sortBy]: direction };
+      }
+    }
+
+    const totalProducts = await TechPackage.countDocuments(filter);
+    const products = await TechPackage.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+
+    // Get unique categories for the filter dropdown
+    const categories = await TechPackage.distinct('category');
+
     res.render('admin/tech/list', {
       title: 'Tech Packages',
       products,
+      categories,
       adminName: req.session.adminName,
       currentPage: 'tech',
       success: req.flash('success'),
-      error: req.flash('error')
+      error: req.flash('error'),
+      query: {
+        page,
+        limit,
+        search: search || '',
+        category: category || 'all',
+        status: status || '',
+        sortBy: sortBy || 'order',
+        sortOrder: sortOrder || 'asc'
+      },
+      pagination: {
+        totalProducts,
+        totalPages: Math.ceil(totalProducts / limit),
+        currentPage: page,
+        hasNextPage: page * limit < totalProducts,
+        hasPrevPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1
+      }
     });
   } catch (error) {
     console.error('List error:', error);
@@ -103,7 +176,11 @@ exports.create = async (req, res) => {
     res.redirect('/admin/tech-packages');
   } catch (error) {
     console.error('Create error:', error);
-    req.flash('error', 'An error occurred while creating the package');
+    if (error.code === 11000) {
+      req.flash('error', 'A package with this URL slug already exists. Please choose a different title or slug.');
+    } else {
+      req.flash('error', 'An error occurred while creating the package');
+    }
     res.redirect('/admin/tech-packages/create');
   }
 };
@@ -201,7 +278,11 @@ exports.update = async (req, res) => {
     res.redirect('/admin/tech-packages');
   } catch (error) {
     console.error('Update error:', error);
-    req.flash('error', 'An error occurred while updating the package');
+    if (error.code === 11000) {
+      req.flash('error', 'A package with this URL slug already exists. Please choose a different title or slug.');
+    } else {
+      req.flash('error', 'An error occurred while updating the package');
+    }
     res.redirect(`/admin/tech-packages/edit/${req.params.id}`);
   }
 };
@@ -214,31 +295,36 @@ exports.delete = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Package not found' });
     }
 
-    if (pkg.featuredImage && pkg.featuredImage.publicId) {
-      try {
-        const resourceType = pkg.featuredImage.type === 'video' ? 'video' : 'image';
-        await cloudinary.uploader.destroy(pkg.featuredImage.publicId, { resource_type: resourceType });
-      } catch (err) {
-        console.error('Error deleting featured image from Cloudinary:', err);
-      }
-    }
+    // Delete from DB first for instant user response
+    await TechPackage.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'Package deleted successfully' });
 
-    if (pkg.gallery && pkg.gallery.length > 0) {
-      for (const media of pkg.gallery) {
-        if (media.publicId) {
-          try {
-            const resourceType = media.type === 'video' ? 'video' : 'image';
-            await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
-          } catch (err) {
-            console.error('Error deleting gallery item from Cloudinary:', err);
+    // Clean up images in background
+    setImmediate(async () => {
+      // Delete featured image from Cloudinary
+      if (pkg.featuredImage && pkg.featuredImage.publicId) {
+        try {
+          const resourceType = pkg.featuredImage.type === 'video' ? 'video' : 'image';
+          await cloudinary.uploader.destroy(pkg.featuredImage.publicId, { resource_type: resourceType });
+        } catch (err) {
+          console.error('Error deleting featured image from Cloudinary:', err);
+        }
+      }
+
+      // Delete gallery images from Cloudinary
+      if (pkg.gallery && pkg.gallery.length > 0) {
+        for (const media of pkg.gallery) {
+          if (media.publicId) {
+            try {
+              const resourceType = media.type === 'video' ? 'video' : 'image';
+              await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+            } catch (err) {
+              console.error('Error deleting gallery item from Cloudinary:', err);
+            }
           }
         }
       }
-    }
-
-    await TechPackage.findByIdAndDelete(req.params.id);
-
-    res.json({ success: true, message: 'Package deleted successfully' });
+    });
   } catch (error) {
     console.error('Delete error:', error);
     res.status(500).json({ success: false, message: 'An error occurred while deleting the package' });
@@ -277,5 +363,53 @@ exports.deleteGalleryItem = async (req, res) => {
   } catch (error) {
     console.error('Delete gallery item error:', error);
     res.status(500).json({ success: false, message: 'An error occurred' });
+  }
+};
+
+// Bulk delete packages
+exports.bulkDelete = async (req, res) => {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ success: false, message: 'No package IDs provided' });
+    }
+
+    const packages = await TechPackage.find({ _id: { $in: ids } });
+
+    // Delete from DB first for instant user response
+    await TechPackage.deleteMany({ _id: { $in: ids } });
+    res.json({ success: true, message: `${packages.length} packages deleted successfully` });
+
+    // Clean up images in background
+    setImmediate(async () => {
+      for (const pkg of packages) {
+        // Delete featured image
+        if (pkg.featuredImage && pkg.featuredImage.publicId) {
+          try {
+            const resourceType = pkg.featuredImage.type === 'video' ? 'video' : 'image';
+            await cloudinary.uploader.destroy(pkg.featuredImage.publicId, { resource_type: resourceType });
+          } catch (err) {
+            console.error('Error deleting featured image from Cloudinary:', err);
+          }
+        }
+
+        // Delete gallery images
+        if (pkg.gallery && pkg.gallery.length > 0) {
+          for (const media of pkg.gallery) {
+            if (media.publicId) {
+              try {
+                const resourceType = media.type === 'video' ? 'video' : 'image';
+                await cloudinary.uploader.destroy(media.publicId, { resource_type: resourceType });
+              } catch (err) {
+                console.error('Error deleting gallery item from Cloudinary:', err);
+              }
+            }
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Bulk delete error:', error);
+    res.status(500).json({ success: false, message: 'An error occurred during bulk deletion' });
   }
 };

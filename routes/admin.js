@@ -18,6 +18,7 @@ const { isAuthenticated, isGuest } = require('../middleware/auth');
 const { loginLimiter } = require('../middleware/rateLimiters');
 const upload = require('../config/multer');
 const { ticketAttachmentUpload, validateAttachmentMagicNumbers } = require('../middleware/ticketAttachmentUpload');
+const { doubleCsrfProtection } = require('../middleware/csrfProtection');
 
 // Auth routes
 router.get('/login', isGuest, authController.showLogin);
@@ -33,13 +34,14 @@ router.get('/seasonal-products/create', isAuthenticated, seasonalProductControll
 router.post('/seasonal-products/create', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), seasonalProductController.create);
+]), doubleCsrfProtection, seasonalProductController.create);
 router.get('/seasonal-products/edit/:id', isAuthenticated, seasonalProductController.showEdit);
 router.post('/seasonal-products/edit/:id', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), seasonalProductController.update);
+]), doubleCsrfProtection, seasonalProductController.update);
 router.delete('/seasonal-products/:id', isAuthenticated, seasonalProductController.delete);
+router.post('/seasonal-products/bulk-delete', isAuthenticated, doubleCsrfProtection, seasonalProductController.bulkDelete);
 router.delete('/seasonal-products/:productId/gallery/:itemId', isAuthenticated, seasonalProductController.deleteGalleryItem);
 
 // Tech Packages routes
@@ -48,13 +50,14 @@ router.get('/tech-packages/create', isAuthenticated, techPackageController.showC
 router.post('/tech-packages/create', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), techPackageController.create);
+]), doubleCsrfProtection, techPackageController.create);
 router.get('/tech-packages/edit/:id', isAuthenticated, techPackageController.showEdit);
 router.post('/tech-packages/edit/:id', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), techPackageController.update);
+]), doubleCsrfProtection, techPackageController.update);
 router.delete('/tech-packages/:id', isAuthenticated, techPackageController.delete);
+router.post('/tech-packages/bulk-delete', isAuthenticated, doubleCsrfProtection, techPackageController.bulkDelete);
 router.delete('/tech-packages/:productId/gallery/:itemId', isAuthenticated, techPackageController.deleteGalleryItem);
 
 // Organic Products routes
@@ -63,13 +66,14 @@ router.get('/organic-products/create', isAuthenticated, organicProductController
 router.post('/organic-products/create', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), organicProductController.create);
+]), doubleCsrfProtection, organicProductController.create);
 router.get('/organic-products/edit/:id', isAuthenticated, organicProductController.showEdit);
 router.post('/organic-products/edit/:id', isAuthenticated, upload.fields([
   { name: 'featuredImage', maxCount: 1 },
   { name: 'gallery', maxCount: 10 }
-]), organicProductController.update);
+]), doubleCsrfProtection, organicProductController.update);
 router.delete('/organic-products/:id', isAuthenticated, organicProductController.delete);
+router.post('/organic-products/bulk-delete', isAuthenticated, doubleCsrfProtection, organicProductController.bulkDelete);
 router.delete('/organic-products/:productId/gallery/:itemId', isAuthenticated, organicProductController.deleteGalleryItem);
 
 // Inquiries routes (Old)
@@ -84,6 +88,7 @@ router.post(
   isAuthenticated,
   ticketAttachmentUpload.array('attachments', 5),
   validateAttachmentMagicNumbers,
+  doubleCsrfProtection,
   ticketController.replyTicketAdmin
 );
 router.delete('/inquiries/:id', isAuthenticated, inquiryController.delete);
@@ -119,11 +124,11 @@ router.get('/stories', isAuthenticated, storyController.list);
 router.get('/stories/create', isAuthenticated, storyController.showCreate);
 router.post('/stories/create', isAuthenticated, upload.fields([
   { name: 'media', maxCount: 10 }
-]), storyController.create);
+]), doubleCsrfProtection, storyController.create);
 router.get('/stories/edit/:id', isAuthenticated, storyController.showEdit);
 router.post('/stories/edit/:id', isAuthenticated, upload.fields([
   { name: 'media', maxCount: 10 }
-]), storyController.update);
+]), doubleCsrfProtection, storyController.update);
 router.delete('/stories/delete/:id', isAuthenticated, storyController.delete);
 router.post('/stories/:id/toggle', isAuthenticated, storyController.toggleActive);
 
@@ -145,7 +150,7 @@ router.get('/settings', isAuthenticated, websiteSettingController.getSettings);
 router.post('/settings', isAuthenticated, upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'aboutImage', maxCount: 1 }
-]), websiteSettingController.updateSettings);
+]), doubleCsrfProtection, websiteSettingController.updateSettings);
 router.delete('/settings/logo', isAuthenticated, websiteSettingController.deleteLogo);
 router.delete('/settings/about-image', isAuthenticated, websiteSettingController.deleteAboutImage);
 
@@ -156,20 +161,20 @@ router.post('/reset-site-editor', isAuthenticated, websiteSettingController.rese
 router.get('/settings/carousel', isAuthenticated, websiteSettingController.getCarousel);
 router.post('/settings/carousel', isAuthenticated, upload.fields([
   { name: 'media', maxCount: 1 }
-]), websiteSettingController.addCarouselItem);
+]), doubleCsrfProtection, websiteSettingController.addCarouselItem);
 router.post('/settings/carousel/:id', isAuthenticated, upload.fields([
   { name: 'media', maxCount: 1 }
-]), websiteSettingController.updateCarouselItem);
+]), doubleCsrfProtection, websiteSettingController.updateCarouselItem);
 router.delete('/settings/carousel/:id', isAuthenticated, websiteSettingController.deleteCarouselItem);
 
 // Team Members routes
 router.get('/settings/team', isAuthenticated, websiteSettingController.getTeamMembers);
 router.post('/settings/team', isAuthenticated, upload.fields([
   { name: 'image', maxCount: 1 }
-]), websiteSettingController.addTeamMember);
+]), doubleCsrfProtection, websiteSettingController.addTeamMember);
 router.post('/settings/team/:id', isAuthenticated, upload.fields([
   { name: 'image', maxCount: 1 }
-]), websiteSettingController.updateTeamMember);
+]), doubleCsrfProtection, websiteSettingController.updateTeamMember);
 router.delete('/settings/team/:id', isAuthenticated, websiteSettingController.deleteTeamMember);
 
 module.exports = router;

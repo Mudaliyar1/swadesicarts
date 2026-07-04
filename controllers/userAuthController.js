@@ -291,7 +291,7 @@ exports.verifyOTP = async (req, res) => {
         if (err) console.error('Session save error:', err);
         const isAjax = req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1);
         if (isAjax) {
-          return res.json({ success: true, redirect: '/' });
+          return res.json({ success: true, redirect: '/', name: user.name });
         } else {
           req.flash('success', 'Account verified successfully. Welcome!');
           return res.redirect('/');

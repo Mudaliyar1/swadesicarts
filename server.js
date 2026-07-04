@@ -46,11 +46,13 @@ app.use(helmet({
     directives: {
       "default-src": ["'self'"],
       "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://cdn.jsdelivr.net", "https://code.jquery.com"],
+      "script-src-attr": ["'unsafe-inline'"],
       "style-src": ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://fonts.googleapis.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "https://cdn.jsdelivr.net"],
       "img-src": ["'self'", "data:", "blob:", "https://res.cloudinary.com", "https://flagcdn.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
       "media-src": ["'self'", "blob:", "https://res.cloudinary.com"],
-      "connect-src": ["'self'", "https://d1zv2aa70wpiur.cloudfront.net", "https://s3.amazonaws.com", "https://storage.googleapis.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "blob:", "data:"]
+      "connect-src": ["'self'", "https://d1zv2aa70wpiur.cloudfront.net", "https://s3.amazonaws.com", "https://storage.googleapis.com", "https://unpkg.com", "https://cdn.jsdelivr.net", "blob:", "data:"],
+      "upgrade-insecure-requests": null
     },
   },
   crossOriginEmbedderPolicy: false // Prevent breaking external cloudinary/flagcdn images
@@ -224,5 +226,37 @@ io.on('connection', (socket) => {
 server.timeout = 600000;
 server.keepAliveTimeout = 610000;
 server.headersTimeout = 615000;
+
+// Graceful shutdown handler to release port 3000 immediately on nodemon restart
+const gracefulShutdown = (signal) => {
+  console.log(`\n🌿 Received ${signal}. Shutting down gracefully...`);
+  
+  // Close the server immediately (stops accepting new connections)
+  server.close(() => {
+    console.log('🌐 HTTP server closed.');
+    
+    // Close MongoDB connection
+    mongoose.connection.close().then(() => {
+      console.log('💾 MongoDB connection closed.');
+      process.exit(0);
+    }).catch((err) => {
+      console.error('Error closing MongoDB:', err);
+      process.exit(1);
+    });
+  });
+  
+  // Force exit after 1.5 seconds to prevent hanging
+  setTimeout(() => {
+    console.warn('⚠️ Shutdown timed out, forcing exit.');
+    process.exit(1);
+  }, 1500);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.once('SIGUSR2', () => {
+  // nodemon uses SIGUSR2 to restart
+  gracefulShutdown('SIGUSR2');
+});
 
 module.exports = app;

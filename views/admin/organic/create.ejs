@@ -315,6 +315,16 @@
             
             xhr.addEventListener('load', function() {
                 isUploading = false;
+                
+                // If final URL points to /create, it means validation failed and redirected back
+                if (xhr.responseURL && xhr.responseURL.includes('/create')) {
+                    progressOverlay.style.display = 'none';
+                    submitBtn.disabled = false;
+                    alert('Failed to create product. Please check the fields and try again.');
+                    window.location.reload();
+                    return;
+                }
+
                 if (xhr.status === 200 || xhr.status === 302) {
                     progressBar.style.width = '100%';
                     progressBar.textContent = '100%';
