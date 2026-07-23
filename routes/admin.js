@@ -108,6 +108,12 @@ router.delete('/admins/delete/:id', isAuthenticated, adminController.delete);
 router.get('/users', isAuthenticated, adminUserController.list);
 router.get('/users/:id', isAuthenticated, adminUserController.view);
 router.post('/users/:id/toggle-status', isAuthenticated, adminUserController.toggleStatus);
+
+// Customer Reviews routes
+router.get('/reviews', isAuthenticated, adminController.listReviews);
+router.post('/reviews/bulk-action', isAuthenticated, doubleCsrfProtection, adminController.bulkActionReviews);
+router.post('/reviews/:id/toggle-hide', isAuthenticated, doubleCsrfProtection, adminController.toggleHideReview);
+router.delete('/reviews/:id', isAuthenticated, adminController.deleteReview);
 router.delete('/users/delete/:id', isAuthenticated, adminUserController.delete);
 
 // GEO / SEO / Generative AI Discoverability routes

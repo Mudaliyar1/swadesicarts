@@ -83,16 +83,16 @@
 
                                 <style>
                                     :root {
-                                        --ent-bg: #f8f9fa;
-                                        --ent-card-bg: #ffffff;
-                                        --ent-border: rgba(0,0,0,0.1);
-                                        --ent-text-main: #000000;
-                                        --ent-text-muted: #334155;
+                                        --ent-bg: #f6f5f0; /* Soft warm cream/off-white background */
+                                        --ent-card-bg: #ffffff; /* Pure white card background */
+                                        --ent-border: rgba(0, 0, 0, 0.08);
+                                        --ent-text-main: #1c1917; /* Crisp warm black text */
+                                        --ent-text-muted: #6b6661; /* Muted warm stone grey text */
                                         --ent-input-bg: #ffffff;
-                                        --ent-input-border: rgba(0,0,0,0.15);
-                                        --ent-hover: rgba(0,0,0,0.03);
-                                        --accent-color: <%=(typeof siteSettings !=='undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent: '#0070f3' %>;
-                                        --btn-text-color: <%=btnTextColor %>;
+                                        --ent-input-border: rgba(0, 0, 0, 0.15);
+                                        --ent-hover: rgba(0, 0, 0, 0.03);
+                                        --accent-color: <%=(typeof siteSettings !=='undefined' && siteSettings.colors && siteSettings.colors.accent) ? siteSettings.colors.accent: '#ffd400' %>;
+                                        --btn-text-color: #ffffff;
                                     }
 
                                     body {
@@ -114,7 +114,7 @@
                                     .ent-page-title,
                                     .ent-card-title,
                                     .ent-label-title {
-                                        color: #000000 !important;
+                                        color: var(--ent-text-main) !important;
                                     }
                                     
                                     .text-muted-custom,
@@ -122,7 +122,7 @@
                                     .ent-card-desc,
                                     .ent-nav-link,
                                     .ent-sidebar-heading {
-                                        color: #334155 !important;
+                                        color: var(--ent-text-muted) !important;
                                     }
 
                                     .text-muted-custom {
@@ -131,7 +131,7 @@
 
                                     /* Desktop Glassmorphism Page Wrapper */
                                     .glass-page-bg {
-                                        background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+                                        background: linear-gradient(135deg, #f6f5f0 0%, #ebeae4 100%);
                                         min-height: calc(100vh - var(--navbar-offset, 0px));
                                         padding: 60px 24px;
                                     }
@@ -139,22 +139,22 @@
                                         max-width: 1600px;
                                         width: 95%;
                                         margin: 0 auto;
-                                        background: rgba(255, 255, 255, 0.4);
+                                        background: rgba(255, 255, 255, 0.45);
                                         backdrop-filter: blur(20px);
                                         -webkit-backdrop-filter: blur(20px);
-                                        border: 1px solid rgba(255, 255, 255, 0.7);
+                                        border: 1px solid rgba(0, 0, 0, 0.05);
                                         border-radius: 24px;
                                         padding: 16px;
-                                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+                                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
                                     }
 
                                     /* Enterprise Layout */
                                     .ent-layout {
                                         display: flex;
-                                        background: rgba(255, 255, 255, 0.95);
+                                        background: var(--ent-card-bg);
                                         border-radius: 16px;
                                         min-height: 700px;
-                                        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 1);
+                                        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
                                         overflow: hidden;
                                         margin: 0;
                                         padding: 0;
@@ -167,9 +167,9 @@
                                         flex-shrink: 0;
                                         position: sticky;
                                         top: 100px;
-                                        background: #f8fafc;
+                                        background: #faf9f6;
                                         padding: 32px 24px;
-                                        border-right: 1px solid rgba(0, 0, 0, 0.03);
+                                        border-right: 1px solid var(--ent-border);
                                     }
 
                                     .ent-nav-link {
@@ -180,7 +180,7 @@
                                         border-radius: 12px;
                                         font-size: 1.05rem;
                                         font-weight: 500;
-                                        color: #64748b !important;
+                                        color: var(--ent-text-muted) !important;
                                         text-decoration: none;
                                         transition: all 0.3s ease;
                                     }
@@ -191,19 +191,17 @@
                                     }
 
                                     .ent-nav-link:hover {
-                                        background: #ffffff;
-                                        color: #3b82f6 !important;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                                        background: var(--ent-hover);
+                                        color: var(--accent-color) !important;
                                     }
 
                                     .ent-nav-link.active {
-                                        background: #ffffff;
-                                        color: #3b82f6 !important;
-                                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+                                        background: rgba(0, 0, 0, 0.03);
+                                        color: var(--accent-color) !important;
                                         font-weight: 600;
                                     }
                                     .ent-nav-link.active i {
-                                        color: #3b82f6 !important;
+                                        color: var(--accent-color) !important;
                                     }
 
                                     /* Main Content */
@@ -211,6 +209,7 @@
                                         flex: 1;
                                         max-width: 100%;
                                         padding: 40px;
+                                        background: var(--ent-bg);
                                     }
                                     
                                     .ent-page-header {
@@ -230,15 +229,15 @@
                                     .ent-card {
                                         border: none;
                                         border-radius: 16px;
-                                        background: #ffffff;
+                                        background: var(--ent-card-bg);
                                         overflow: hidden;
                                         margin-bottom: 32px;
-                                        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+                                        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
                                     }
 
                                     .ent-card-header {
                                         padding: 24px;
-                                        border-bottom: 1px solid rgba(0,0,0,0.03);
+                                        border-bottom: 1px solid var(--ent-border);
                                     }
 
                                     .ent-card-title {
@@ -259,8 +258,8 @@
                                     
                                     .ent-card-footer {
                                         padding: 16px 24px;
-                                        background: #f8fafc;
-                                        border-top: 1px solid rgba(0,0,0,0.03);
+                                        background: #faf9f6;
+                                        border-top: 1px solid var(--ent-border);
                                         display: flex;
                                         justify-content: flex-end;
                                         align-items: center;
@@ -383,7 +382,7 @@
 
                                     @media (max-width: 768px) {
                                         /* Mobile Reset for Glassmorphism */
-                                        .glass-page-bg { background: #fff; padding: 0; min-height: auto; }
+                                        .glass-page-bg { background: var(--ent-bg); padding: 0; min-height: auto; }
                                         .glass-container { background: none; backdrop-filter: none; border: none; box-shadow: none; padding: 0; border-radius: 0; }
                                         
                                         .ent-layout {
@@ -394,7 +393,7 @@
                                             border-radius: 0;
                                             min-height: auto;
                                             box-shadow: none;
-                                            background: #fff;
+                                            background: var(--ent-bg);
                                         }
                                         /* Mobile Settings Menu Logic */
                                         .ent-layout.mobile-menu-active .ent-sidebar { display: block; }
@@ -404,20 +403,20 @@
                                         
                                         .ent-sidebar {
                                             width: 100%;
-                                            background: #fff;
+                                            background: var(--ent-bg);
                                             min-height: calc(100vh - 60px);
                                         }
                                         .ent-nav-link {
                                             padding: 18px 24px;
-                                            border-bottom: 1px solid #f0f0f0;
+                                            border-bottom: 1px solid var(--ent-border);
                                             border-radius: 0;
                                             font-size: 1.05rem;
-                                            color: #262626 !important;
-                                            background: #fff;
+                                            color: var(--ent-text-main) !important;
+                                            background: var(--ent-bg);
                                         }
                                         .ent-nav-link:hover, .ent-nav-link.active {
-                                            background: #fafafa;
-                                            color: #262626 !important;
+                                            background: var(--ent-hover);
+                                            color: var(--accent-color) !important;
                                             font-weight: 500;
                                         }
                                         .ent-nav-link::after {

@@ -480,6 +480,26 @@
 
 <div class="container">
 
+    <!-- Flash Messages (Alerts) -->
+    <% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mt-3" role="alert" style="border-radius: 12px; background-color: #d1e7dd; color: #0f5132; font-family: 'Inter', sans-serif;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div style="font-weight: 500;"><%= success %></div>
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mt-3" role="alert" style="border-radius: 12px; background-color: #f8d7da; color: #842029; font-family: 'Inter', sans-serif;">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div style="font-weight: 500;"><%= error %></div>
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    <% } %>
+
     <!-- ═══ MOBILE HEADER (phones only) ═══ -->
     <div class="sc-mob-header">
         <div class="sc-tag"><i class="bi bi-tag-fill"></i>&nbsp;<%= product.category %></div>
@@ -667,6 +687,114 @@
                 </div>
             </div>
 
+            <!-- ─── Product Reviews ─── -->
+            <div class="sc-panel">
+                <div class="sc-panel-head d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="sc-panel-head-icon"><i class="bi bi-star-fill" style="color: #ffc107 !important;"></i></div>
+                        <span class="sc-panel-title">Customer Reviews</span>
+                    </div>
+                    <% if (typeof reviews !== 'undefined' && reviews && reviews.length > 0) { 
+                        const avg = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+                    %>
+                        <span class="badge bg-dark text-white rounded-pill px-2.5 py-1" style="font-size: 0.8rem; background-color: #111111 !important; color: #ffffff !important;">
+                            <i class="bi bi-star-fill me-1" style="color: #ffc107 !important;"></i><%= avg.toFixed(1) %> / 5.0
+                        </span>
+                    <% } %>
+                </div>
+                <div class="sc-panel-body">
+                    <!-- Reviews list -->
+                    <div class="sc-reviews-list mb-4">
+                        <% if (typeof reviews !== 'undefined' && reviews && reviews.length > 0) { %>
+                            <% const displayedReviews = reviews.slice(0, 3); %>
+                            <% displayedReviews.forEach(r => { %>
+                                <div class="pb-3 mb-3 border-bottom" style="border-color: rgba(0, 0, 0, 0.05) !important;">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <div class="fw-bold" style="font-size: 0.9rem; color: #111111 !important;"><%= r.userName %></div>
+                                        <div style="font-size: 0.8rem; color: #ffc107 !important;">
+                                            <% for(let i = 1; i <= 5; i++) { %>
+                                                <i class="bi bi-star<%= i <= r.rating ? '-fill' : '' %>"></i>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <p class="mb-1" style="font-size: 0.85rem; line-height: 1.4; color: #444444 !important; word-wrap: break-word !important; word-break: break-word !important; white-space: pre-wrap !important;"><%= r.comment %></p>
+                                    <small style="font-size: 0.75rem; color: #777777 !important;"><%= r.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
+                                    <% if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn && typeof userId !== 'undefined' && String(r.userId) === String(userId)) { %>
+                                        <button type="button" class="btn btn-link text-primary p-0 border-0 fw-bold ms-3 edit-review-btn" 
+                                                data-review-id="<%= r._id %>" 
+                                                data-comment="<%= r.comment %>" 
+                                                data-rating="<%= r.rating %>"
+                                                style="font-size: 0.75rem; text-decoration: none; vertical-align: baseline;">
+                                            Edit
+                                        </button>
+                                        <form action="/reviews/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your review?');">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <input type="hidden" name="reviewId" value="<%= r._id %>">
+                                            <input type="hidden" name="productId" value="<%= product._id %>">
+                                            <input type="hidden" name="productType" value="<%= type %>">
+                                            <button type="submit" class="btn btn-link text-danger p-0 border-0 fw-bold ms-2" style="font-size: 0.75rem; text-decoration: none; vertical-align: baseline;">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+
+                            <% if (reviews.length > 3) { %>
+                                <button type="button" class="btn btn-link p-0 text-decoration-none fw-bold text-dark w-100 text-center py-2" data-bs-toggle="modal" data-bs-target="#allReviewsModal" style="font-size: 0.88rem; color: #111111 !important;">
+                                    See More Reviews (<%= reviews.length - 3 %> more) <i class="bi bi-chevron-down ms-1"></i>
+                                </button>
+                            <% } %>
+                        <% } else { %>
+                            <div class="text-center py-4" style="font-size: 0.9rem; color: #777777 !important;">
+                                <i class="bi bi-chat-right-text fs-2 mb-2 d-block" style="color: #999999 !important;"></i>
+                                No reviews yet. Be the first to review this product!
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <!-- Review Form / Login prompt -->
+                    <div class="p-3 rounded-3 border" style="border-color: rgba(0,0,0,0.06) !important; background-color: #fcfcfc !important;">
+                        <% if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) { %>
+                            <h6 class="fw-bold mb-3" style="font-family: 'Poppins', sans-serif; font-size: 0.95rem; color: #111111 !important;">Write a Review</h6>
+                            <form action="/reviews" method="POST" novalidate>
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                <input type="hidden" name="productType" value="<%= type %>">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold" style="font-size: 0.8rem; color: #444444 !important;">Rating *</label>
+                                    <div class="d-flex gap-2 fs-5" id="starRatingSelector" style="cursor: pointer; color: #ffc107 !important;">
+                                        <i class="bi bi-star rating-star" data-value="1"></i>
+                                        <i class="bi bi-star rating-star" data-value="2"></i>
+                                        <i class="bi bi-star rating-star" data-value="3"></i>
+                                        <i class="bi bi-star rating-star" data-value="4"></i>
+                                        <i class="bi bi-star rating-star" data-value="5"></i>
+                                    </div>
+                                    <input type="hidden" name="rating" id="ratingInput" value="" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="reviewComment" class="form-label fw-semibold" style="font-size: 0.8rem; color: #444444 !important;">Comment *</label>
+                                    <textarea class="form-control form-control-sm text-dark bg-white border" id="reviewComment" name="comment" rows="3" placeholder="Tell us about your experience with this product (maximum 1000 characters)..." style="font-size: 0.85rem; color: #111111 !important;" maxlength="1000" required></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-dark btn-sm fw-bold px-3 py-2 w-100 rounded-3" style="background-color: #111111 !important; color: #ffffff !important; border: none !important;">
+                                    Submit Review
+                                </button>
+                            </form>
+                        <% } else { %>
+                            <div class="text-center py-2">
+                                <p class="mb-3" style="font-size: 0.82rem; line-height: 1.4; color: #444444 !important;">You must be logged in to rate and comment on this product.</p>
+                                <a href="/login?redirect=<%= encodeURIComponent(pageUrl) %>" class="btn btn-outline-dark btn-sm fw-bold px-4 py-2 rounded-3" style="border-color: #111111 !important; color: #111111 !important;">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i> Log In to Review
+                                </a>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
             <!-- ─── Share ─── -->
             <div class="sc-share">
                 <span class="sc-share-label">Share</span>
@@ -681,7 +809,493 @@
 </div><!-- /container -->
 </div><!-- /sc-pd -->
 
+<!-- Inquiry Authentication Decision Modal -->
+<div class="modal fade" id="inquiryAuthModal" tabindex="-1" aria-labelledby="inquiryAuthModalLabel" aria-hidden="true" data-is-logged-in="<%= (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn) ? 'true' : 'false' %>">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff !important; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <!-- Top visual accent line -->
+            <div style="height: 6px; background: #000000;"></div>
+            
+            <div class="modal-header border-0 pt-4 px-4 pb-0 d-flex align-items-start justify-content-between">
+                <div>
+                    <h5 class="modal-title fw-bold inq-modal-title d-flex align-items-center gap-2" id="inquiryAuthModalLabel" style="font-family: 'Poppins', sans-serif; font-size: 1.35rem; letter-spacing: -0.3px;">
+                        <i class="bi bi-shield-lock-fill" style="color: #000000;"></i>
+                        Inquiry Options
+                    </h5>
+                    <p class="inq-modal-subtitle mb-0 mt-1" style="font-size: 0.82rem; line-height: 1.4;">Please select how you would like to proceed with your inquiry.</p>
+                </div>
+                <button type="button" class="btn-close shadow-none border-0" data-bs-dismiss="modal" aria-label="Close" style="font-size: 0.85rem; filter: grayscale(1) invert(0);"></button>
+            </div>
+
+            <div class="modal-body px-4 py-4">
+                <div class="d-flex flex-column gap-3">
+                    
+                    <!-- Option 1: Login & Inquire (Recommended) -->
+                    <div class="p-3 border rounded-3 position-relative" style="transition: all 0.22s ease; cursor: pointer;" id="optLoginFirst" data-redirect-url="/login?redirect=<%= encodeURIComponent(inquiryPath + '?productId=' + product._id) %>">
+                        <!-- Recommended Badge (Black) -->
+                        <span class="position-absolute top-0 end-0 translate-middle-y badge px-2.5 py-1 text-white fw-bold rounded-pill shadow-sm" style="font-size: 0.65rem; background-color: #000000 !important; text-transform: uppercase; letter-spacing: 0.6px; margin-right: 15px;">
+                            <i class="bi bi-star-fill text-white"></i> Recommended
+                        </span>
+                        
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 44px; height: 44px; border: 1.5px solid rgba(0, 0, 0, 0.12);">
+                                <i class="bi bi-person-badge-fill fs-5" style="color: #000000;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1 inq-modal-text" style="font-family: 'Poppins', sans-serif; font-size: 0.95rem;">Login / Register First</h6>
+                                <p class="inq-modal-desc mb-3" style="font-size: 0.78rem; line-height: 1.45;">
+                                    This automatically creates a support ticket in your account dashboard. You can track all responses, reply back, and view history directly inside Swadesi Carts.
+                                </p>
+                                <div class="btn btn-sm inq-btn-login px-3 py-2 w-100 rounded-3 d-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-box-arrow-in-right text-white"></i> Login &amp; Inquire
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Option 2: Direct Inquiry (Without Account) -->
+                    <div class="p-3 border rounded-3" style="transition: all 0.22s ease; cursor: pointer;" id="optDirectInquiry" data-redirect-url="<%= inquiryPath %>?productId=<%= product._id %>">
+                        <div class="d-flex gap-3">
+                            <div class="flex-shrink-0 d-flex align-items-center justify-content-center bg-white rounded-circle shadow-sm" style="width: 44px; height: 44px; border: 1.5px solid rgba(0, 0, 0, 0.08);">
+                                <i class="bi bi-envelope-open-fill fs-5 text-secondary"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="fw-bold mb-1 inq-modal-text" style="font-family: 'Poppins', sans-serif; font-size: 0.95rem;">Direct Inquiry (Without Login)</h6>
+                                <p class="inq-modal-desc mb-3" style="font-size: 0.78rem; line-height: 1.45;">
+                                    Submit your inquiry directly. <strong class="inq-modal-danger">A support ticket will NOT be created</strong> in your dashboard. You will receive all replies and follow-ups only via email.
+                                </p>
+                                <div class="btn btn-sm inq-btn-guest px-3 py-2 w-100 rounded-3 d-flex align-items-center justify-content-center gap-1">
+                                    <i class="bi bi-arrow-right-short"></i> Proceed as Guest (Email Only)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 bg-light py-2.5 px-4 d-flex justify-content-between align-items-center">
+                <span class="inq-modal-footer-text" style="font-size: 0.7rem;"><i class="bi bi-info-circle"></i> Highly recommended to log in for easy tracking.</span>
+                <button type="button" class="btn btn-link text-decoration-none inq-modal-cancel fw-bold p-0" data-bs-dismiss="modal" style="font-size: 0.8rem; font-family: 'Poppins', sans-serif;">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Notification Modal -->
+<% if (typeof success !== 'undefined' && success && success.length > 0) { %>
+<div class="modal fade" id="successNotificationModal" tabindex="-1" aria-labelledby="successNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff !important; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <!-- Top visual accent line in green -->
+            <div style="height: 6px; background: #22c55e;"></div>
+            
+            <div class="modal-body px-4 py-4 text-center">
+                <!-- Large green success checkmark icon -->
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 72px; height: 72px; background-color: #f0fdf4 !important; border: 2px solid #bbf7d0;">
+                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                </div>
+                
+                <h4 class="fw-bold text-dark mb-2" id="successNotificationModalLabel" style="font-family: 'Poppins', sans-serif; letter-spacing: -0.3px;">
+                    Success!
+                </h4>
+                
+                <p class="mb-4 inq-modal-desc" style="font-size: 0.88rem; line-height: 1.5; color: #444444 !important;">
+                    <%= success %>
+                </p>
+                
+                <button type="button" class="btn w-100 py-2.5 fw-bold rounded-3 text-white" data-bs-dismiss="modal" style="background-color: #22c55e; border: none; font-size: 0.9rem; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#15803d'" onmouseout="this.style.backgroundColor='#22c55e'">
+                    Got it, thanks!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Error Notification Modal -->
+<% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+<div class="modal fade" id="errorNotificationModal" tabindex="-1" aria-labelledby="errorNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 450px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff !important; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <!-- Top visual accent line in red -->
+            <div style="height: 6px; background: #dc3545;"></div>
+            
+            <div class="modal-body px-4 py-4 text-center">
+                <!-- Large red error icon -->
+                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 72px; height: 72px; background-color: #fdf2f2 !important; border: 2px solid #fde8e8;">
+                    <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                </div>
+                
+                <h4 class="fw-bold text-dark mb-2" id="errorNotificationModalLabel" style="font-family: 'Poppins', sans-serif; letter-spacing: -0.3px;">
+                    Error
+                </h4>
+                
+                <p class="mb-4 inq-modal-desc" style="font-size: 0.88rem; line-height: 1.5; color: #444444 !important;">
+                    <%= error %>
+                </p>
+                
+                <button type="button" class="btn w-100 py-2.5 fw-bold rounded-3 text-white" data-bs-dismiss="modal" style="background-color: #dc3545; border: none; font-size: 0.9rem; transition: background-color 0.2s ease;" onmouseover="this.style.backgroundColor='#bd2130'" onmouseout="this.style.backgroundColor='#dc3545'">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+<% } %>
+
+<!-- View All Reviews Modal -->
+<% if (typeof reviews !== 'undefined' && reviews && reviews.length > 0) { %>
+<div class="modal fade" id="allReviewsModal" tabindex="-1" aria-labelledby="allReviewsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 600px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff !important; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <div class="modal-header border-bottom px-4 py-3" style="border-color: rgba(0, 0, 0, 0.08) !important; background-color: #fafafa !important;">
+                <h5 class="modal-title fw-bold" id="allReviewsModalLabel" style="font-family: 'Poppins', sans-serif; letter-spacing: -0.3px; color: #111111 !important; font-size: 1.1rem;">
+                    All Customer Reviews (<%= reviews.length %>)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-4 py-3" style="max-height: 450px;">
+                <% reviews.forEach(r => { %>
+                    <div class="pb-3 mb-3 border-bottom" style="border-color: rgba(0, 0, 0, 0.05) !important;">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                            <div class="fw-bold" style="font-size: 0.9rem; color: #111111 !important;"><%= r.userName %></div>
+                            <div style="font-size: 0.8rem; color: #ffc107 !important;">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <i class="bi bi-star<%= i <= r.rating ? '-fill' : '' %>"></i>
+                                <% } %>
+                            </div>
+                        </div>
+                        <p class="mb-1" style="font-size: 0.85rem; line-height: 1.4; color: #444444 !important; word-wrap: break-word !important; word-break: break-word !important; white-space: pre-wrap !important;"><%= r.comment %></p>
+                        <small style="font-size: 0.75rem; color: #777777 !important;"><%= r.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></small>
+                        <% if (typeof isUserLoggedIn !== 'undefined' && isUserLoggedIn && typeof userId !== 'undefined' && String(r.userId) === String(userId)) { %>
+                            <button type="button" class="btn btn-link text-primary p-0 border-0 fw-bold ms-3 edit-review-btn" 
+                                    data-review-id="<%= r._id %>" 
+                                    data-comment="<%= r.comment %>" 
+                                    data-rating="<%= r.rating %>"
+                                    style="font-size: 0.75rem; text-decoration: none; vertical-align: baseline;">
+                                Edit
+                            </button>
+                            <form action="/reviews/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete your review?');">
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <input type="hidden" name="reviewId" value="<%= r._id %>">
+                                <input type="hidden" name="productId" value="<%= product._id %>">
+                                <input type="hidden" name="productType" value="<%= type %>">
+                                <button type="submit" class="btn btn-link text-danger p-0 border-0 fw-bold ms-2" style="font-size: 0.75rem; text-decoration: none; vertical-align: baseline;">
+                                    Delete
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }); %>
+            </div>
+            <div class="modal-footer border-top px-4 py-3" style="border-color: rgba(0, 0, 0, 0.08) !important; background-color: #fafafa !important;">
+                <button type="button" class="btn btn-dark btn-sm fw-bold px-4 py-2 rounded-3" data-bs-dismiss="modal" style="background-color: #111111 !important; color: #ffffff !important; border: none !important;">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<% } %>
+
+<!-- Edit Review Modal -->
+<div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 500px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; background: #ffffff !important; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <div class="modal-header border-bottom px-4 py-3" style="border-color: rgba(0, 0, 0, 0.08) !important; background-color: #fafafa !important;">
+                <h5 class="modal-title fw-bold" id="editReviewModalLabel" style="font-family: 'Poppins', sans-serif; letter-spacing: -0.3px; color: #111111 !important; font-size: 1.1rem;">
+                    Edit Your Review
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/reviews/edit" method="POST" novalidate>
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <input type="hidden" name="productId" value="<%= product._id %>">
+                <input type="hidden" name="productType" value="<%= type %>">
+                <input type="hidden" name="reviewId" id="editReviewId">
+                
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 0.8rem; color: #444444 !important;">Rating *</label>
+                        <div class="d-flex gap-2 fs-5" id="editStarRatingSelector" style="cursor: pointer; color: #ffc107 !important;">
+                            <i class="bi bi-star edit-rating-star" data-value="1"></i>
+                            <i class="bi bi-star edit-rating-star" data-value="2"></i>
+                            <i class="bi bi-star edit-rating-star" data-value="3"></i>
+                            <i class="bi bi-star edit-rating-star" data-value="4"></i>
+                            <i class="bi bi-star edit-rating-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="editRatingInput" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editReviewComment" class="form-label fw-semibold" style="font-size: 0.8rem; color: #444444 !important;">Comment *</label>
+                        <textarea class="form-control text-dark bg-white border" id="editReviewComment" name="comment" rows="4" placeholder="Tell us about your experience..." style="font-size: 0.85rem; color: #111111 !important;" maxlength="1000" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3" style="border-color: rgba(0, 0, 0, 0.08) !important; background-color: #fafafa !important;">
+                    <button type="button" class="btn btn-outline-dark btn-sm fw-bold px-3 py-2 rounded-3" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-dark btn-sm fw-bold px-4 py-2 rounded-3" style="background-color: #111111 !important; color: #ffffff !important; border: none !important;">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Scoped classes to override global EJS yellow styles and make the modal look premium */
+    .inq-modal-title {
+        color: #000000 !important;
+    }
+    .inq-modal-subtitle {
+        color: #555555 !important;
+    }
+    .inq-modal-text {
+        color: #111111 !important;
+    }
+    .inq-modal-desc {
+        color: #444444 !important;
+    }
+    .inq-modal-danger {
+        color: #d93838 !important;
+    }
+    .inq-modal-footer-text {
+        color: #777777 !important;
+    }
+    .inq-modal-cancel {
+        color: #666666 !important;
+    }
+    .inq-modal-cancel:hover {
+        color: #000000 !important;
+    }
+
+    #optLoginFirst {
+        border-color: rgba(0, 0, 0, 0.12) !important;
+        background-color: rgba(0, 0, 0, 0.02) !important;
+    }
+    #optLoginFirst:hover {
+        border-color: #000000 !important;
+        background-color: rgba(0, 0, 0, 0.05) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    #optDirectInquiry {
+        border-color: rgba(0, 0, 0, 0.08) !important;
+        background-color: #fafafa !important;
+    }
+    #optDirectInquiry:hover {
+        border-color: #000000 !important;
+        background-color: #f5f5f5 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Buttons explicit style */
+    .inq-btn-login {
+        background-color: #000000 !important;
+        border: 1.5px solid #000000 !important;
+        color: #ffffff !important;
+        font-size: 0.8rem;
+        font-weight: 700 !important;
+        transition: all 0.2s ease;
+    }
+    .inq-btn-login:hover {
+        background-color: #222222 !important;
+        border-color: #222222 !important;
+        color: #ffffff !important;
+    }
+
+    .inq-btn-guest {
+        background-color: transparent !important;
+        border: 1.5px solid #000000 !important;
+        color: #000000 !important;
+        font-size: 0.8rem;
+        font-weight: 700 !important;
+        transition: all 0.2s ease;
+    }
+    .inq-btn-guest:hover {
+        background-color: #000000 !important;
+        border-color: #000000 !important;
+        color: #ffffff !important;
+    }
+
+    /* Smaller devices responsive overrides */
+    @media (max-width: 576px) {
+        .modal-dialog {
+            margin: 1rem !important;
+        }
+        .modal-content {
+            border-radius: 20px !important;
+        }
+        .modal-body {
+            padding: 1.25rem 1.25rem !important;
+        }
+        .inq-modal-title {
+            font-size: 1.15rem !important;
+        }
+        .inq-modal-subtitle {
+            font-size: 0.75rem !important;
+        }
+        .inq-modal-text {
+            font-size: 0.88rem !important;
+        }
+        .inq-modal-desc {
+            font-size: 0.74rem !important;
+            line-height: 1.4 !important;
+            margin-bottom: 0.75rem !important;
+        }
+        .inq-modal-footer-text {
+            font-size: 0.65rem !important;
+        }
+        .p-3 {
+            padding: 0.85rem !important;
+        }
+        .d-flex.gap-3 {
+            gap: 0.65rem !important;
+        }
+    }
+</style>
+
 <%- include('../partials/footer-new') %>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalEl = document.getElementById('inquiryAuthModal');
+        if (!modalEl) return;
+        
+        const isUserLoggedIn = modalEl.dataset.isLoggedIn === 'true';
+        const inquireBtn = document.querySelector('.sc-btn-inquire');
+        
+        if (inquireBtn && !isUserLoggedIn) {
+            inquireBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const authModal = new bootstrap.Modal(modalEl);
+                authModal.show();
+            });
+        }
+
+        const optLoginFirst = document.getElementById('optLoginFirst');
+        if (optLoginFirst) {
+            optLoginFirst.addEventListener('click', function() {
+                const targetUrl = optLoginFirst.getAttribute('data-redirect-url');
+                if (targetUrl) window.location.href = targetUrl;
+            });
+        }
+
+        const optDirectInquiry = document.getElementById('optDirectInquiry');
+        if (optDirectInquiry) {
+            optDirectInquiry.addEventListener('click', function() {
+                const targetUrl = optDirectInquiry.getAttribute('data-redirect-url');
+                if (targetUrl) window.location.href = targetUrl;
+            });
+        }
+
+        // Auto-trigger Success or Error modals if they exist in the DOM
+        const successModalEl = document.getElementById('successNotificationModal');
+        if (successModalEl) {
+            const successModal = new bootstrap.Modal(successModalEl);
+            successModal.show();
+        }
+
+        const errorModalEl = document.getElementById('errorNotificationModal');
+        if (errorModalEl) {
+            const errorModal = new bootstrap.Modal(errorModalEl);
+            errorModal.show();
+        }
+
+        // Interactive Star Rating Selector
+        const stars = document.querySelectorAll('.rating-star');
+        const ratingInput = document.getElementById('ratingInput');
+        if (stars.length > 0 && ratingInput) {
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(star.getAttribute('data-value'));
+                    ratingInput.value = value;
+                    stars.forEach((s, idx) => {
+                        if (idx < value) {
+                            s.classList.remove('bi-star');
+                            s.classList.add('bi-star-fill');
+                        } else {
+                            s.classList.remove('bi-star-fill');
+                            s.classList.add('bi-star');
+                        }
+                    });
+                });
+            });
+        }
+
+        // Form Submit Validation for Star Rating
+        const reviewForm = document.querySelector('form[action="/reviews"]');
+        if (reviewForm && ratingInput) {
+            reviewForm.addEventListener('submit', function(e) {
+                if (!ratingInput.value) {
+                    e.preventDefault();
+                    alert('Please select a star rating before submitting your review!');
+                }
+            });
+        }
+
+        // Edit Review Modal Populate & Interaction Logic
+        const editReviewBtns = document.querySelectorAll('.edit-review-btn');
+        const editReviewModalEl = document.getElementById('editReviewModal');
+        if (editReviewBtns.length > 0 && editReviewModalEl) {
+            const editReviewModal = new bootstrap.Modal(editReviewModalEl);
+            const editReviewIdInput = document.getElementById('editReviewId');
+            const editReviewCommentInput = document.getElementById('editReviewComment');
+            const editRatingInput = document.getElementById('editRatingInput');
+            const editStars = document.querySelectorAll('.edit-rating-star');
+            
+            editReviewBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const reviewId = btn.getAttribute('data-review-id');
+                    const comment = btn.getAttribute('data-comment');
+                    const rating = parseInt(btn.getAttribute('data-rating')) || 5;
+                    
+                    editReviewIdInput.value = reviewId;
+                    editReviewCommentInput.value = comment;
+                    editRatingInput.value = rating;
+                    
+                    // Highlight stars inside the edit modal
+                    editStars.forEach((s, idx) => {
+                        if (idx < rating) {
+                            s.classList.remove('bi-star');
+                            s.classList.add('bi-star-fill');
+                        } else {
+                            s.classList.remove('bi-star-fill');
+                            s.classList.add('bi-star');
+                        }
+                    });
+                    
+                    // If open from inside another modal (like allReviewsModal), hide it first
+                    const allReviewsModalEl = document.getElementById('allReviewsModal');
+                    if (allReviewsModalEl) {
+                        const allReviewsModal = bootstrap.Modal.getInstance(allReviewsModalEl);
+                        if (allReviewsModal) allReviewsModal.hide();
+                    }
+                    
+                    editReviewModal.show();
+                });
+            });
+
+            // Interactive Star Selector for Edit Modal
+            editStars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(star.getAttribute('data-value'));
+                    editRatingInput.value = value;
+                    editStars.forEach((s, idx) => {
+                        if (idx < value) {
+                            s.classList.remove('bi-star');
+                            s.classList.add('bi-star-fill');
+                        } else {
+                            s.classList.remove('bi-star-fill');
+                            s.classList.add('bi-star');
+                        }
+                    });
+                });
+            });
+        }
+    });
+</script>
 </body>
 </html>

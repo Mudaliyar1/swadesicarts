@@ -134,6 +134,8 @@ app.use((req, res, next) => {
   res.locals.adminName = req.session ? req.session.adminName : '';
   res.locals.isUserLoggedIn = req.session && req.session.userId ? true : false;
   res.locals.userName = req.session ? req.session.userName : '';
+  res.locals.userEmail = req.session ? req.session.userEmail : '';
+  res.locals.userId = req.session ? req.session.userId : '';
   next();
 });
 

@@ -932,3 +932,101 @@ exports.postApplyIntelligence = async (req, res) => {
   }
 };
 
+// Reviews Management Section
+const Review = require('../../models/Review');
+
+exports.listReviews = async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    
+    res.render('admin/reviews/list', {
+      title: 'Customer Reviews Management',
+      reviews,
+      adminName: req.session.adminName,
+      currentPage: 'reviews',
+      success: req.flash('success'),
+      error: req.flash('error')
+    });
+  } catch (error) {
+    console.error('List reviews error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
+exports.toggleHideReview = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      req.flash('error', 'Review not found');
+      return res.redirect('/admin/reviews');
+    }
+
+    review.isHidden = !review.isHidden;
+    await review.save();
+
+    req.flash('success', `Review successfully ${review.isHidden ? 'hidden' : 'shown'}.`);
+    res.redirect('/admin/reviews');
+  } catch (error) {
+    console.error('Toggle hide review error:', error);
+    req.flash('error', 'Server error');
+    res.redirect('/admin/reviews');
+  }
+};
+
+exports.deleteReview = async (req, res) => {
+  try {
+    const review = await Review.findByIdAndDelete(req.params.id);
+    if (!review) {
+      req.flash('error', 'Review not found');
+      return res.redirect('/admin/reviews');
+    }
+
+    req.flash('success', 'Review deleted successfully.');
+    res.redirect('/admin/reviews');
+  } catch (error) {
+    console.error('Delete review error:', error);
+    req.flash('error', 'Server error');
+    res.redirect('/admin/reviews');
+  }
+};
+
+exports.bulkActionReviews = async (req, res) => {
+  try {
+    const { action } = req.body;
+    let reviewIds = req.body.reviewIds || req.body['reviewIds[]'];
+    
+    if (!reviewIds) {
+      req.flash('error', 'No reviews selected.');
+      return res.redirect('/admin/reviews');
+    }
+
+    if (!Array.isArray(reviewIds)) {
+      reviewIds = [reviewIds];
+    }
+
+    if (reviewIds.length === 0) {
+      req.flash('error', 'No reviews selected.');
+      return res.redirect('/admin/reviews');
+    }
+
+    if (action === 'delete') {
+      await Review.deleteMany({ _id: { $in: reviewIds } });
+      req.flash('success', `Successfully deleted ${reviewIds.length} reviews.`);
+    } else if (action === 'hide') {
+      await Review.updateMany({ _id: { $in: reviewIds } }, { isHidden: true });
+      req.flash('success', `Successfully hid ${reviewIds.length} reviews.`);
+    } else if (action === 'show') {
+      await Review.updateMany({ _id: { $in: reviewIds } }, { isHidden: false });
+      req.flash('success', `Successfully showed ${reviewIds.length} reviews.`);
+    } else {
+      req.flash('error', 'Invalid action selected.');
+    }
+
+    res.redirect('/admin/reviews');
+  } catch (error) {
+    console.error('Bulk action reviews error:', error);
+    req.flash('error', 'Server error performing bulk action.');
+    res.redirect('/admin/reviews');
+  }
+};
+

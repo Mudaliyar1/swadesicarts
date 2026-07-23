@@ -10,6 +10,30 @@
     <link rel="stylesheet" href="/css/style-new.css">
     <%- include('../partials/dynamic-styles') %>
     <%- include('../partials/seo-meta') %>
+    <style>
+        /* Scoped overrides to make form labels and text black instead of yellow */
+        .card.shadow-lg,
+        .card.shadow-lg label,
+        .card.shadow-lg div,
+        .card.shadow-lg p,
+        .card.shadow-lg span,
+        .card.shadow-lg .form-text,
+        .card.shadow-lg .form-label {
+            color: #212529 !important;
+        }
+        .card.shadow-lg input,
+        .card.shadow-lg select,
+        .card.shadow-lg textarea {
+            color: #212529 !important;
+            border-color: #ced4da !important;
+        }
+        .card.shadow-lg input:focus,
+        .card.shadow-lg select:focus,
+        .card.shadow-lg textarea:focus {
+            border-color: #000000 !important;
+            box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1) !important;
+        }
+    </style>
 </head>
 <body>
     <%- include('../partials/navbar-new') %>
@@ -63,7 +87,21 @@
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label">Email *</label>
-                                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+                                        <div class="input-group">
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" autocomplete="email" required
+                                                <% if (isUserLoggedIn && userEmail) { %>
+                                                    value="<%= userEmail %>" readonly
+                                                <% } %>
+                                            >
+                                            <% if (isUserLoggedIn && userEmail) { %>
+                                                <button class="btn btn-outline-dark" type="button" id="editEmailBtn">
+                                                    <i class="bi bi-pencil-square"></i> Edit
+                                                </button>
+                                            <% } %>
+                                        </div>
+                                        <% if (isUserLoggedIn && userEmail) { %>
+                                            <div class="form-text text-muted" style="font-size: 0.75rem;">Your registered email is auto-filled. Click Edit to change the communication email for this inquiry.</div>
+                                        <% } %>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="mobile" class="form-label">Mobile Number *</label>
@@ -112,10 +150,36 @@
 
         <%- include('../partials/footer-new') %>
 
+        <div id="inquiry-prefill-data" data-prefill="<%= JSON.stringify(inquiryPrefill || {}) %>" style="display: none;"></div>
         <script>
-            window.__INQUIRY_PREFILL__ = <%- JSON.stringify(inquiryPrefill || {}) %>;
+            const prefillEl = document.getElementById('inquiry-prefill-data');
+            window.__INQUIRY_PREFILL__ = prefillEl ? JSON.parse(prefillEl.dataset.prefill) : {};
         </script>
         <script src="/js/inquiry-autofill.js"></script>
+        <% if (isUserLoggedIn && userEmail) { %>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const editEmailBtn = document.getElementById('editEmailBtn');
+                const emailInput = document.getElementById('email');
+                if (editEmailBtn && emailInput) {
+                    editEmailBtn.addEventListener('click', function() {
+                        if (emailInput.hasAttribute('readonly')) {
+                            emailInput.removeAttribute('readonly');
+                            emailInput.focus();
+                            editEmailBtn.innerHTML = '<i class="bi bi-check-lg"></i> Lock';
+                            editEmailBtn.classList.remove('btn-outline-dark');
+                            editEmailBtn.classList.add('btn-dark');
+                        } else {
+                            emailInput.setAttribute('readonly', 'readonly');
+                            editEmailBtn.innerHTML = '<i class="bi bi-pencil-square"></i> Edit';
+                            editEmailBtn.classList.remove('btn-dark');
+                            editEmailBtn.classList.add('btn-outline-dark');
+                        }
+                    });
+                }
+            });
+        </script>
+        <% } %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

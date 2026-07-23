@@ -294,6 +294,11 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
             </a>
         </li>
         <li>
+            <a href="/admin/reviews" class="<%= current === 'reviews' ? 'active' : '' %>" title="Customer Reviews">
+                <i class="bi bi-star-fill"></i> <span class="sidebar-text">Customer Reviews</span>
+            </a>
+        </li>
+        <li>
             <a href="/admin/critical-alerts" class="<%= current === 'critical-alerts' ? 'active' : '' %>" title="Critical Alerts">
                 <i class="bi bi-exclamation-octagon-fill text-warning"></i> <span class="sidebar-text">Critical Alerts</span>
             </a>
@@ -366,6 +371,7 @@ var current = typeof currentPage !== 'undefined' ? currentPage : '';
             
             <li><a href="/admin/admins" class="<%= current === 'admins' ? 'active' : '' %>"><i class="bi bi-shield-check"></i> Admin Users</a></li>
             <li><a href="/admin/users" class="<%= current === 'users' ? 'active' : '' %>"><i class="bi bi-people-fill"></i> Registered Users</a></li>
+            <li><a href="/admin/reviews" class="<%= current === 'reviews' ? 'active' : '' %>"><i class="bi bi-star-fill"></i> Customer Reviews</a></li>
             <li><a href="/admin/critical-alerts" class="<%= current === 'critical-alerts' ? 'active' : '' %>"><i class="bi bi-exclamation-octagon-fill text-warning"></i> Critical Alerts</a></li>
             <li><a href="/admin/settings" class="<%= current === 'settings' ? 'active' : '' %>"><i class="bi bi-gear-fill"></i> Website Settings</a></li>
             

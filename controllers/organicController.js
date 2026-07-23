@@ -84,6 +84,14 @@ exports.getProductDetail = async (req, res) => {
       }
     ];
 
+    // Fetch reviews for this product
+    const Review = require('../models/Review');
+    const reviews = await Review.find({
+      productId: product._id,
+      productType: 'organic',
+      isHidden: { $ne: true }
+    }).sort({ createdAt: -1 });
+
     res.render('public/product-detail-template', {
       title: `${product.title} - Swadesi Carts`,
       product,
@@ -122,8 +130,9 @@ exports.getProductDetail = async (req, res) => {
         ])),
         toJsonLd(faqSchema(faqQuestions))
       ],
-      success: req.flash('success'),
-      error: req.flash('error')
+      reviews,
+      success: res.locals.success,
+      error: res.locals.error
     });
   } catch (error) {
     console.error('Product detail error:', error);

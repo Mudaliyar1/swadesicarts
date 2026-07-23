@@ -14,4 +14,10 @@ router.post('/profile/email/request-otp', isUserAuthenticated, userController.re
 router.post('/profile/email/verify-otp', isUserAuthenticated, userController.verifyEmailChangeOtp);
 router.post('/profile/email/update', isUserAuthenticated, userController.updateEmail);
 
+// Product Review Routes
+const reviewController = require('../controllers/reviewController');
+router.post('/reviews', isUserAuthenticated, reviewController.submitReview);
+router.post('/reviews/edit', isUserAuthenticated, reviewController.editReview);
+router.post('/reviews/delete', isUserAuthenticated, reviewController.deleteReview);
+
 module.exports = router;

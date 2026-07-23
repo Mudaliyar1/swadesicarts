@@ -305,6 +305,9 @@ exports.verifyOTP = async (req, res) => {
 
 // Show Login page
 exports.showLogin = (req, res) => {
+  if (req.query.redirect && req.query.redirect.startsWith('/') && !req.query.redirect.startsWith('//')) {
+    req.session.redirectTo = req.query.redirect;
+  }
   res.render('public/login', {
     title: 'Login | Swadesi Carts',
     error: req.flash('error'),
@@ -365,6 +368,9 @@ exports.login = async (req, res) => {
     // Check for linked Admin account and sync session
     const linkedAdmin = await Admin.findOne({ email: user.email, isActive: true });
     
+    // Save redirectTo before session regeneration since regenerate deletes old session data
+    const redirectTo = req.session.redirectTo;
+
     // Rotate session ID to prevent Session Fixation
     req.session.regenerate(async (err) => {
       if (err) {
@@ -384,10 +390,17 @@ exports.login = async (req, res) => {
         req.session.adminEmail = linkedAdmin.email;
       }
 
+      // Restore redirectTo after session regeneration
+      if (redirectTo) {
+        req.session.redirectTo = redirectTo;
+      }
+
       req.session.save((saveErr) => {
           if (saveErr) console.error('Session save error:', saveErr);
           req.flash('success', 'Login successful');
-          res.redirect('/');
+          const targetUrl = req.session.redirectTo || '/';
+          delete req.session.redirectTo;
+          res.redirect(targetUrl);
       });
     });
   } catch (error) {
